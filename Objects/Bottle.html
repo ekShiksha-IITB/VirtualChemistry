@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Example 01.04 - Materials, light and animation</title>
+    <script type="text/javascript" src="../libs/three.js"></script>
+
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <script type="text/javascript" src="../libs/spin.js"></script>
+    <script type="text/javascript" src="../libs/ThreeBSP.js"></script>
+    <script src="../libs/OrbitControls.js"></script>  
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+    function Bottle(h,fp){
+        this.height=h;
+        this.radius=h/2;
+        this.fillp=fp;
+        var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.5});
+        var c1=new THREE.CylinderGeometry(this.radius,this.radius,this.height,32,1);
+        c1=new THREE.Mesh(c1,m);
+        var c2=new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height*0.95,32,1);
+        c2=new THREE.Mesh(c2,m);
+        var c3= new THREE.CylinderGeometry(this.radius*0.3,this.radius,this.height*0.2,32,1);
+        c3=new THREE.Mesh(c3,m);
+        c3.position.set(0,this.height*0.6,0);
+        var c4= new THREE.CylinderGeometry(this.radius*0.2,this.radius*0.9,this.height*0.2,32,1);
+        c4=new THREE.Mesh(c4,m);
+        c4.position.set(0,this.height*0.6,0);
+        var c5= new THREE.CylinderGeometry(this.radius*0.3,this.radius*0.3,this.height*0.3,32,1);
+        c5=new THREE.Mesh(c5,m);
+        c5.position.set(0,this.height*0.7,0);
+        var c6= new THREE.CylinderGeometry(this.radius*0.25,this.radius*0.25,this.height*0.5,32,1);
+        c6=new THREE.Mesh(c6,m);
+        c6.position.set(0,this.height*0.7,0);
+        var t=new THREE.TorusGeometry(this.radius,this.radius*0.05,16,32);
+        t=new THREE.Mesh(t,m);
+        t.rotation.x+=Math.PI/2;
+        t.position.set(0,this.height/2,0);
+        c2.position.set(0,this.height*0.049,0);
+        c1.position.set(0,0,0);
+        var b1=new ThreeBSP(c1);
+        var b2=new ThreeBSP(c2);
+        var b3=new ThreeBSP(t);
+        var b4=new ThreeBSP(c3);
+        var b5=new ThreeBSP(c4);
+        var b6=new ThreeBSP(c5);
+        var b7=new ThreeBSP(c6);
+        var r=b1.union(b4);
+        r=r.subtract(b2);
+        r=r.subtract(b5);
+        r=r.union(b6);
+        r=r.subtract(b7);
+        //r=r.union(b4);
+        r=r.toGeometry();
+        r=new THREE.Mesh(r,m);
+        var temp = new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height*0.9*1,64,1);
+        this.fl=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: "blue"}));
+        this.fl.position.set(0,this.height*0.9*fp*0.5-this.height*0.45,0);
+        this.fl.scale.y=fp;
+        this.Mesh=r;
+        this.Fill=Fill;
+    }
+    function flask(h,fp){
+        this.Fill=Fill;
+    }
+    function Fill(fp){
+        this.fillp=fp;
+        this.fl.scale.y=fp;
+        this.fl.position.set(this.Mesh.position.x,this.Mesh.position.y+this.height*0.9*fp*0.5-this.height*0.45,this.Mesh.position.z);
+    }
+    // once everything is loaded, we run our Three.js stuff.
+    function init() {
+        var stats = initStats();
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+        renderer.setClearColor(new THREE.Color(0x436521, 1));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+        camera.position.x = -30;
+        camera.position.y = 40;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+        // add subtle ambient lighting
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+        scene.add(ambientLight);
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(-40, 60, -10);
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+        // add the output of the renderer to the html element
+        document.getElementById("WebGL-output").appendChild(renderer.domElement);
+        // call the render function
+        
+        r=new Bottle(20,1);
+        //r.Mesh.geometry.mergeVertices();
+        //r.Mesh.geometry.computeVertexNormals();
+        scene.add(r.Mesh);
+        scene.add(r.fl);
+        var controls = new THREE.OrbitControls( camera, renderer.domElement );
+        renderScene();
+        var x=1;
+        function renderScene() {
+            stats.update();
+            controls.update(); 
+            if(x>0)
+                x-=0.001;
+            r.Fill(x);
+            requestAnimationFrame(renderScene);
+            renderer.render(scene, camera);
+        }
+        function initStats() {
+
+            var stats = new Stats();
+            stats.setMode(0); // 0: fps, 1: ms
+            // Align top-left
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            document.getElementById("Stats-output").appendChild(stats.domElement);
+
+            return stats;
+        }
+    }
+    window.onload = init;
+</script>
+</body>
+</html>

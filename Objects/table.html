@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Example 01.04 - Materials, light and animation</title>
+    <script type="text/javascript" src="../libs/three.js"></script>
+
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <script type="text/javascript" src="../libs/spin.js"></script>
+    <script type="text/javascript" src="../libs/ThreeBSP.js"></script>
+    <script src="../libs/OrbitControls.js"></script>  
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+    function Bottle(h){
+        this.height=h;
+        this.wood=h/10;
+        var m=new THREE.MeshStandardMaterial({color: 0x663300});
+        var r=new THREE.BoxGeometry(h*2,this.wood,h*6/5);
+        r=new THREE.Mesh(r,m);
+        var p1=new THREE.BoxGeometry(this.wood,h*0.9,this.wood);
+        p1=new THREE.Mesh(p1,m);
+        p1.position.set(-h*0.9,-h*0.9/2,h*3*0.85/5);
+        var p2=new THREE.BoxGeometry(this.wood,h*0.9,this.wood);
+        p2=new THREE.Mesh(p2,m);
+        p2.position.set(h*0.9,-h*0.9/2,h*3*0.85/5);
+        var p3=new THREE.BoxGeometry(this.wood,h*0.9,this.wood);
+        p3=new THREE.Mesh(p3,m);
+        p3.position.set(-h*0.9,-h*0.9/2,-h*3*0.85/5);
+        var p4=new THREE.BoxGeometry(this.wood,h*0.9,this.wood);
+        p4=new THREE.Mesh(p4,m);
+        p4.position.set(h*0.9,-h*0.9/2,-h*3*0.85/5);
+        r.add(p1);
+        r.add(p2);
+        r.add(p3);
+        r.add(p4);
+        this.Mesh=r;
+    }
+    //function 
+    // once everything is loaded, we run our Three.js stuff.
+    function init() {
+        var stats = initStats();
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+        renderer.setClearColor(new THREE.Color(0x436521, 1));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+        camera.position.x = 0;
+        camera.position.y = 0;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+        // add subtle ambient lighting
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+        scene.add(ambientLight);
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(-40, 60, -10);
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+        // add the output of the renderer to the html element
+        document.getElementById("WebGL-output").appendChild(renderer.domElement);
+        // call the render function
+        
+        r=new Bottle(20,1);
+        //r.Mesh.geometry.mergeVertices();
+        //r.Mesh.geometry.computeVertexNormals();
+        scene.add(r.Mesh);
+        var controls = new THREE.OrbitControls( camera, renderer.domElement );
+        renderScene();
+        var x=1;
+        function renderScene() {
+            stats.update();
+            controls.update(); 
+            requestAnimationFrame(renderScene);
+            renderer.render(scene, camera);
+        }
+        function initStats() {
+
+            var stats = new Stats();
+            stats.setMode(0); // 0: fps, 1: ms
+            // Align top-left
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            document.getElementById("Stats-output").appendChild(stats.domElement);
+
+            return stats;
+        }
+    }
+    window.onload = init;
+</script>
+</body>
+</html>

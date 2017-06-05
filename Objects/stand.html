@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+    <title>Example 01.04 - Materials, light and animation</title>
+    <script type="text/javascript" src="../libs/three.js"></script>
+
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <script type="text/javascript" src="../libs/spin.js"></script>
+    <script type="text/javascript" src="../libs/ThreeBSP.js"></script>
+    <script src="../libs/OrbitControls.js"></script>  
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+    function testtube(h,fp){
+        this.height=h;
+        this.radius=h/50;
+        this.fillp=fp;
+        var m=new THREE.MeshStandardMaterial({color: 0x121212});
+        var c1=new THREE.CylinderGeometry(this.radius,this.radius,this.height,32,1);
+        c1=new THREE.Mesh(c1,m);
+        var c2=new THREE.BoxGeometry(this.height/2,this.radius*3,this.height/3);
+        c2=new THREE.Mesh(c2,m);
+        c2.position.set((this.radius*4-this.height/2)/2,-this.height/2,0);
+        var c3=new THREE.CylinderGeometry(this.radius/2,this.radius/2,this.height/6,32,1);
+        c3=new THREE.Mesh(c3,m);
+        c3.rotation.z+=Math.PI/2;
+        c3.position.set(-this.height/12,this.height/8,0);
+        var t1=new THREE.TorusGeometry(this.radius*2,this.radius/2,16,32);
+        t1=new THREE.Mesh(t1,m);
+        t1.rotation.x+=Math.PI/2;
+        t1.position.set(-this.height/6-this.radius*2,this.height/8,0);
+        var r=c1;
+        r.add(c2);
+        r.add(c3);
+        r.add(t1);
+        this.Mesh=r;
+    }
+    //function 
+    // once everything is loaded, we run our Three.js stuff.
+    function init() {
+        var stats = initStats();
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+        renderer.setClearColor(new THREE.Color(0x436521, 1));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+        camera.position.x = -30;
+        camera.position.y = 40;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+        // add subtle ambient lighting
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+        scene.add(ambientLight);
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(-40, 60, -10);
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+        // add the output of the renderer to the html element
+        document.getElementById("WebGL-output").appendChild(renderer.domElement);
+        // call the render function
+        
+        r=new testtube(20,1);
+        //r.Mesh.geometry.mergeVertices();
+        //r.Mesh.geometry.computeVertexNormals();
+        scene.add(r.Mesh);
+        var controls = new THREE.OrbitControls( camera, renderer.domElement );
+        renderScene();
+        var x=1;
+        function renderScene() {
+            stats.update();
+            controls.update(); 
+            requestAnimationFrame(renderScene);
+            renderer.render(scene, camera);
+        }
+        function initStats() {
+
+            var stats = new Stats();
+            stats.setMode(0); // 0: fps, 1: ms
+            // Align top-left
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            document.getElementById("Stats-output").appendChild(stats.domElement);
+
+            return stats;
+        }
+    }
+    window.onload = init;
+</script>
+</body>
+</html>
