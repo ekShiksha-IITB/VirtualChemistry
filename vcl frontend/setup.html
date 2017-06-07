@@ -242,46 +242,111 @@ $("#selectbox2").change(function () {
 
 <div id="WebGL-output">
 <script type="text/javascript">
-    function testtube(h,fp){
+        var cur=0;
+    function shelf(h,fp){
         this.height=h;
         this.wood=h/10;
-        this.fillp=fp;
-        this.radius=h/8;
         var m=new THREE.MeshStandardMaterial({color: 0x663300});
-        var r=new THREE.BoxGeometry(h,h/2,h/3);
-        var s=new THREE.BoxGeometry(h/1.1,h/2.2,h/3);
-        var c1= new THREE.CylinderGeometry(this.radius,this.radius,h/4,32,1);
-        c1=new THREE.Mesh(c1,m);
-        var c2= new THREE.CylinderGeometry(this.radius,this.radius,h/4,32,1);
-        c2=new THREE.Mesh(c2,m);
-        var c3= new THREE.CylinderGeometry(this.radius,this.radius,h/4,32,1);
-        c3=new THREE.Mesh(c3,m);
-        c1.position.set(-h/3,h/4,0);
-        c2.position.set(h/3,h/4,0);
-        c3.position.set(0,h/4,0);
-        r=new THREE.Mesh(r,m);
-        s=new THREE.Mesh(s,m);
+        var r=new THREE.BoxGeometry(h,h,h/3);
+        var s1=new THREE.BoxGeometry(h/1.1,h/3.5,h/3);
+        var s2=new THREE.BoxGeometry(h/1.1,h/3.5,h/3);
+        var s3=new THREE.BoxGeometry(h/1.1,h/3.5,h/3);
+        s2.translate(0,h/3.15,0);
+        s3.translate(0,-h/3.15,0);
         var b1=new ThreeBSP(r);
-        var b2=new ThreeBSP(s);
-        var b3=new ThreeBSP(c1);
-        var b4=new ThreeBSP(c2);
-        var b5=new ThreeBSP(c3);
+        var b2=new ThreeBSP(s1);
+        var b3=new ThreeBSP(s2);
+        var b4=new ThreeBSP(s3);
         var x=b1.subtract(b2);
         x=x.subtract(b3);
         x=x.subtract(b4);
-        x=x.subtract(b5);
         x=x.toGeometry();
         x=new THREE.Mesh(x,m);
         this.Mesh=x;
     }
+    function Bottle(h,fp){
+        this.x=0;
+        this.y=0;
+        this.z=0;
+        this.height=h/1.5;
+        this.radius=h/3;
+        this.fillp=fp;
+        var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.5});
+        var c1=new THREE.CylinderGeometry(this.radius,this.radius,this.height,32,1);
+        c1=new THREE.Mesh(c1,m);
+        var c2=new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height*0.95,32,1);
+        c2=new THREE.Mesh(c2,m);
+        var c3= new THREE.CylinderGeometry(this.radius*0.3,this.radius,this.height*0.2,32,1);
+        c3=new THREE.Mesh(c3,m);
+        c3.position.set(0,this.height*0.6,0);
+        var c4= new THREE.CylinderGeometry(this.radius*0.2,this.radius*0.9,this.height*0.2,32,1);
+        c4=new THREE.Mesh(c4,m);
+        c4.position.set(0,this.height*0.6,0);
+        var c5= new THREE.CylinderGeometry(this.radius*0.3,this.radius*0.3,this.height*0.3,32,1);
+        c5=new THREE.Mesh(c5,m);
+        c5.position.set(0,this.height*0.7,0);
+        var c6= new THREE.CylinderGeometry(this.radius*0.25,this.radius*0.25,this.height*0.5,32,1);
+        c6=new THREE.Mesh(c6,m);
+        c6.position.set(0,this.height*0.7,0);
+        var t=new THREE.TorusGeometry(this.radius,this.radius*0.05,16,32);
+        t=new THREE.Mesh(t,m);
+        t.rotation.x+=Math.PI/2;
+        t.position.set(0,this.height/2,0);
+        c2.position.set(0,this.height*0.049,0);
+        c1.position.set(0,0,0);
+        var b1=new ThreeBSP(c1);
+        var b2=new ThreeBSP(c2);
+        var b4=new ThreeBSP(c3);
+        var b5=new ThreeBSP(c4);
+        var b6=new ThreeBSP(c5);
+        var b7=new ThreeBSP(c6);
+        var r=b1.union(b4);
+        r=r.subtract(b2);
+        r=r.subtract(b5);
+        r=r.union(b6);
+        r=r.subtract(b7);
+        r=r.toGeometry();
+        r=new THREE.Mesh(r,m);
+        r.position.set(0,this.height/2,0);
+        var temp = new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height*0.9*1,64,1);
+        this.fl=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: "blue"}));
+        this.fl.position.set(0,this.height*0.9*fp*0.5-this.height*0.45,0);
+        this.fl.scale.y=fp;
+        this.fl.translateY(this.height/2);
+        this.Mesh=r;
+        this.Fill=Fill;
+        this.move=move;
+    }
+    function move(x,y,z){
+      this.Mesh.translateX(x-this.x);
+      this.Mesh.translateY(y-this.y);
+      this.Mesh.translateZ(z-this.z);
+      this.fl.translateX(x-this.x);
+      this.fl.translateY(y-this.y);
+      this.fl.translateZ(z-this.z);
+    }
+    function Fill(fp){
+        this.fillp=fp;
+        this.fl.scale.y=fp;
+        this.fl.position.set(this.Mesh.position.x,this.Mesh.position.y+this.height*0.9*fp*0.5-this.height*0.45,this.Mesh.position.z);
+    }
     //function 
     // once everything is loaded, we run our Three.js stuff.
     function init() {
+        document.getElementById("add").addEventListener("click", function(){
+            if(cur<9){
+              var n=new Bottle(5,0.5);
+              n.move(-6+6*(cur%3),(20/3.15)-(20/7)-Math.floor(cur/3)*(20/3.15),0);
+              scene.add(n.Mesh);
+              scene.add(n.fl);
+              cur++;
+            }
+        });
         //var stats = initStats();
         // create a scene, that will hold all our elements such as objects, cameras and lights.
         var scene = new THREE.Scene();
         // create a camera, which defines where we're looking at.
-        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var camera = new THREE.PerspectiveCamera(45, 700/720, 0.1, 1000);
         // create a render and set the size
         var renderer = new THREE.WebGLRenderer();
 
@@ -304,7 +369,7 @@ $("#selectbox2").change(function () {
         document.getElementById("WebGL-output").appendChild(renderer.domElement);
         // call the render function
         
-        r=new testtube(20,1);
+        r=new shelf(20);
         //r.Mesh.geometry.mergeVertices();
         //r.Mesh.geometry.computeVertexNormals();
         scene.add(r.Mesh);
