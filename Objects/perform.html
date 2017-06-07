@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ekshikhsha</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <script type="text/javascript" src="../libs/three.js"></script>
+
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <script type="text/javascript" src="../libs/spin.js"></script>
+    <script type="text/javascript" src="../libs/ThreeBSP.js"></script>
+    <script src="../libs/OrbitControls.js"></script>  
+    <script src="../libs/DragControls.js"></script>
+    <script src="../libs/TrackballControls.js"></script>  
+  <style>
+    /* Remove the navbar's default margin-bottom and rounded borders */ 
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
+    
+    /* Add a gray background color and some padding to the footer */
+    footer {
+      background-color: #f2f2f2;
+      padding: 25px;
+    }
+	
+	.jumbotron{
+	background-image:url("chem.jpg");
+	}
+	.largebox{
+	  width:1300px;
+	  height:900px;
+	  top:-20px;
+	  margin-left:-80px;
+	   position:relative;
+	    border:1px solid black;
+		border-radius:3px;
+		margin-top:50px;
+		background-color:#343436;
+		 box-shadow: 2px 2px 4px black;
+
+		}
+	  .largebox2{
+	  width:400px;
+	  height:300px;
+	  border:1px solid black;
+	  border-radius:3px;
+	  margin-left:75px;
+	  margin-top:80px;
+	  background-color:white;
+	  box-shadow: 2px 2px 4px black;
+	
+	  }
+	  #canvas1{
+	  border:1px solid black;
+	  margin-left:75px;
+	  margin-top:20px;
+	  border-radius:3px;
+	  background-color:white;
+	   box-shadow: 2px 2px 4px black;
+
+	  }
+	  #selectbox{
+	  width:200px;
+	  height:30px;
+	  margin-left:100px;
+	  margin-top:10px;
+	  }
+	  #canvas2{
+	  border:1px solid black;
+	  border-radius:3px;
+	  position:relative;
+	  top:-728px;
+	  margin-left:520px;
+	  background-color:white;
+	   box-shadow: 2px 2px 4px black;
+
+	  }
+	  
+	   #selectbox2{
+	  width:200px;
+	  height:30px;
+	  margin-left:100px;
+	  margin-top:10px;
+	  }
+	  #add{
+	  margin-left:348px;
+	  margin-bottom:-104px;
+	 
+	  }
+	#WebGL-output{
+		border:1px solid black;
+		width:1400px; 
+		height:700px;
+		position:relative;
+		top:10px;
+		margin-left:70px;
+		background-color:white;
+	}
+	
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">ekshiksha</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active" ><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Join us</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div id="WebGL-output"></div>
+<script type="text/javascript">
+    var scene,camera,renderer,raycaster;
+    var objects=[];
+    var selection;
+    var plane;
+    function shelf(h){
+        this.height=h;
+        this.wood=h/10;
+        var m=new THREE.MeshStandardMaterial({color: 0x663300});
+        var r=new THREE.BoxGeometry(h,h,h/3);
+        var s1=new THREE.BoxGeometry(h/1.1,h/3.5,h/3);
+        var s2=new THREE.BoxGeometry(h/1.1,h/3.5,h/3);
+        var s3=new THREE.BoxGeometry(h/1.1,h/3.5,h/3);
+        s2.translate(0,h/3.15,0);
+        s3.translate(0,-h/3.15,0);
+        var b1=new ThreeBSP(r);
+        var b2=new ThreeBSP(s1);
+        var b3=new ThreeBSP(s2);
+        var b4=new ThreeBSP(s3);
+        var x=b1.subtract(b2);
+        x=x.subtract(b3);
+        x=x.subtract(b4);
+        x=x.toGeometry();
+        x=new THREE.Mesh(x,m);
+        this.Mesh=x;
+    }
+    function Beaker(h,fp){
+        this.height=h/1.5;
+        this.radius=h/3;
+        this.fillp=fp;
+        var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.5});
+        var c1=new THREE.CylinderGeometry(this.radius,this.radius,this.height,32,1);
+        c1=new THREE.Mesh(c1,m);
+        var c2=new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height*0.95,32,1);
+        c2=new THREE.Mesh(c2,m);
+        var c3= new THREE.CylinderGeometry(this.radius*0.3,this.radius,this.height*0.2,32,1);
+        c3=new THREE.Mesh(c3,m);
+        c3.position.set(0,this.height*0.6,0);
+        var c4= new THREE.CylinderGeometry(this.radius*0.2,this.radius*0.9,this.height*0.2,32,1);
+        c4=new THREE.Mesh(c4,m);
+        c4.position.set(0,this.height*0.6,0);
+        var c5= new THREE.CylinderGeometry(this.radius*0.3,this.radius*0.3,this.height*0.3,32,1);
+        c5=new THREE.Mesh(c5,m);
+        c5.position.set(0,this.height*0.7,0);
+        var c6= new THREE.CylinderGeometry(this.radius*0.25,this.radius*0.25,this.height*0.5,32,1);
+        c6=new THREE.Mesh(c6,m);
+        c6.position.set(0,this.height*0.7,0);
+        var t=new THREE.TorusGeometry(this.radius,this.radius*0.05,16,32);
+        t=new THREE.Mesh(t,m);
+        t.rotation.x+=Math.PI/2;
+        t.position.set(0,this.height/2,0);
+        c2.position.set(0,this.height*0.049,0);
+        c1.position.set(0,0,0);
+        var b1=new ThreeBSP(c1);
+        var b2=new ThreeBSP(c2);
+        var b3=new ThreeBSP(t);
+        var b4=new ThreeBSP(c3);
+        var b5=new ThreeBSP(c4);
+        var b6=new ThreeBSP(c5);
+        var b7=new ThreeBSP(c6);
+        var r=b1.union(b4);
+        r=r.subtract(b2);
+        r=r.subtract(b5);
+        r=r.union(b6);
+        r=r.subtract(b7);
+        //r=r.union(b4);
+        r=r.toGeometry();
+        r=new THREE.Mesh(r,m);
+        this.Mesh=r;
+    }
+    function Table(h){
+        this.height=h;
+        this.wood=h/10;
+        var m=new THREE.MeshStandardMaterial({color: 0x663300});
+        var r=new THREE.BoxGeometry(h*2,this.wood,h*6/5);
+        r=new THREE.Mesh(r,m);
+        var p1=new THREE.BoxGeometry(this.wood,h*0.9,this.wood);
+        p1=new THREE.Mesh(p1,m);
+        p1.position.set(-h*0.9,-h*0.9/2,h*3*0.85/5);
+        var p2=new THREE.BoxGeometry(this.wood,h*0.9,this.wood);
+        p2=new THREE.Mesh(p2,m);
+        p2.position.set(h*0.9,-h*0.9/2,h*3*0.85/5);
+        var p3=new THREE.BoxGeometry(this.wood,h*0.9,this.wood);
+        p3=new THREE.Mesh(p3,m);
+        p3.position.set(-h*0.9,-h*0.9/2,-h*3*0.85/5);
+        var p4=new THREE.BoxGeometry(this.wood,h*0.9,this.wood);
+        p4=new THREE.Mesh(p4,m);
+        p4.position.set(h*0.9,-h*0.9/2,-h*3*0.85/5);
+        r.add(p1);
+        r.add(p2);
+        r.add(p3);
+        r.add(p4);
+        this.Mesh=r;
+    }
+    //function 
+    // once everything is loaded, we run our Three.js stuff.
+    function init() {
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        scene = new THREE.Scene();
+        // create a camera, which defines where we're looking at.
+       	camera = new THREE.PerspectiveCamera(45, 1400 / 700, 0.1, 1000);
+        // create a render and set the size
+        renderer = new THREE.WebGLRenderer();
+
+        renderer.setClearColor(new THREE.Color(0x436521, 1));
+        renderer.setSize(1398,698);
+        renderer.shadowMapEnabled = true;
+        camera.position.x = 0;
+        camera.position.y = 10;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+        // add subtle ambient lighting
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+        scene.add(ambientLight);
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(-40, 60, -10);
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+        // add the output of the renderer to the html element
+        document.getElementById("WebGL-output").appendChild(renderer.domElement);
+        // call the render function
+        var r3=new shelf(10);
+        r3.Mesh.position.set(-10,5.5,-3.7);
+        var r4=new shelf(10);
+        r4.Mesh.position.set(10,5.5,-3.7);
+        scene.add(r4.Mesh);
+        r=new Table(10,1);
+        r.Mesh.position.set(-10,0,0);
+        var r1=new Beaker(4,0.5);
+        var r2=new Table(10,1);
+        scene.add(r1.Mesh);
+        scene.add(r3.Mesh);
+        r1.Mesh.position.set(-5,1.5,0);
+        r2.Mesh.position.set(10+0.05,0,0);
+        //r.Mesh.geometry.mergeVertices();
+        //r.Mesh.geometry.computeVertexNormals();
+        scene.add(r.Mesh);
+        scene.add(r2.Mesh);
+        var controls = new THREE.OrbitControls( camera, renderer.domElement );
+        //objects.push(Cylinder);
+        objects.push(r1.Mesh);
+        renderScene();
+        var dragControls =new THREE.DragControls(objects,camera,renderer.domElement);
+        dragControls.addEventListener('dragstart',function (event){
+
+        	controls.enabled=false;
+        });
+        dragControls.addEventListener('dragend',function (event){controls.enabled=true;});
+        var x=1;
+        function renderScene() {
+            if(r1.Mesh.position.z!=0){
+        		r1.Mesh.position.z=0;
+        	}
+        	if(r1.Mesh.position.y<1.7){
+        		r1.Mesh.position.y=1.7;
+        	}
+        	if(r1.Mesh.position.x<-20){
+        		r1.Mesh.position.x=-20;
+        	}
+        	if(r1.Mesh.position.x>=20){
+        		r1.Mesh.position.x=20;
+        	}
+            controls.update(); 
+            requestAnimationFrame(renderScene);
+            renderer.render(scene, camera);
+        }
+    }
+    window.onload = init;
+</script>
+</body>
+</html>
