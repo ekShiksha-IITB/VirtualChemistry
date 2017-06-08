@@ -29,13 +29,23 @@ function Burette(h,fp){
     r=r.toGeometry();
     r=new THREE.Mesh(r,m);
 }
-function Bottle(h,fp){
-    this.height=h;
-    this.radius=h/2;
-    this.fillp=fp;
+function Bottle(v,vf,col){
+    var h= Math.pow(v/(Math.PI*0.25),1/3);
+    this.volume=v;
+    this.height=h/1.5;
+    this.radius=this.height/2;
+    this.volumef=vf;
     this.xoff=0;
-    this.yoff=h/2;
+    this.yoff=this.height/2;
     this.zoff=0;
+    this.setPosition=setPosition;
+    this.x=_x;
+    this.y=_y;
+    this.z=_z;
+    this.sety=sety;
+    this.setz=setz;
+    this.setx=setx;
+    this.restrict=restrict;
     var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.5});
     var c1=new THREE.CylinderGeometry(this.radius,this.radius,this.height,32,1);
     c1=new THREE.Mesh(c1,m);
@@ -75,21 +85,18 @@ function Bottle(h,fp){
     r=new THREE.Mesh(r,m);
     r.position.set(0,this.height/2,0);
     var temp = new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height*0.9*1,64,1);
-    this.fl=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: "blue"}));
-    this.fl.position.set(0,this.height*0.9*fp*0.5-this.height*0.45,0);
-    this.fl.scale.y=fp;
+    this.fl=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: col}));
+    this.fl.position.set(0,this.height*0.9*this.volumef*0.5/this.volume-this.height*0.45,0);
+    this.fl.scale.y=v=this.volumef/this.volume;
     r.add(this.fl);
     this.Mesh=r;
     this.Fill=Fillb;
-    this.setPosition=setPosition;
-    this.x=_x;
-    this.y=_y;
-    this.z=_z;
+    this.height*=1.5;
 }
-function Fillb(fp){
-    this.fillp=fp;
-    this.fl.scale.y=fp;
-    this.fl.position.set(0,this.height*0.9*fp*0.5-this.height*0.45,0);
+function Fillb(volumef){
+    this.volumef=volumef;
+    this.fl.scale.y=this.volumef/this.volume;
+    this.fl.position.set(0,this.height*0.9*this.volumef*0.5/this.volume-this.height*0.45,0);
 }
 function Petridish(h,fp){
     this.height=h;
@@ -231,13 +238,23 @@ function testTubeStand(h,fp){
 function shelf(h){
     this.height=h;
     this.wood=h/10;
+    this.xoff=0;
+    this.yoff=h/2;
+    this.zoff=0;
+    this.setPosition=setPosition;
+    this.x=_x;
+    this.y=_y;
+    this.z=_z;
+    this.sety=sety;
+    this.setz=setz;
+    this.setx=setx;
     var m=new THREE.MeshStandardMaterial({color: 0x663300});
     var r=new THREE.BoxGeometry(h,h,h/3);
-    var s1=new THREE.BoxGeometry(h/1.1,h/3.5,h/3);
-    var s2=new THREE.BoxGeometry(h/1.1,h/3.5,h/3);
-    var s3=new THREE.BoxGeometry(h/1.1,h/3.5,h/3);
-    s2.translate(0,h/3.15,0);
-    s3.translate(0,-h/3.15,0);
+    var s1=new THREE.BoxGeometry(h*0.9,h*0.8/3,h/3);
+    var s2=new THREE.BoxGeometry(h*0.9,h*0.8/3,h/3);
+    var s3=new THREE.BoxGeometry(h*0.9,h*0.8/3,h/3);
+    s2.translate(0,h*0.05+h*0.8/3,0);
+    s3.translate(0,-h*0.05-h*0.8/3,0);
     var b1=new ThreeBSP(r);
     var b2=new ThreeBSP(s1);
     var b3=new ThreeBSP(s2);
@@ -248,6 +265,7 @@ function shelf(h){
     x=x.toGeometry();
     x=new THREE.Mesh(x,m);
     this.Mesh=x;
+    this.slot=slot;
 }
 function _x(){
     return this.Mesh.position.x-this.xoff;
@@ -258,9 +276,41 @@ function _y(){
 function _z(){
     return this.Mesh.position.z-this.zoff;
 }
+function setx(x){
+	this.Mesh.position.x=x+this.xoff;
+}
+function sety(y){
+	this.Mesh.position.y=y+this.yoff;
+}
+function setz(z){
+	this.Mesh.position.z=z+this.zoff;
+}
 function setPosition(x,y,z){
     this.Mesh.position.set(x+this.xoff,y+this.yoff,z+this.zoff);
 }
-function tellpi(){
-    return Math.PI;
+function restrict(x1,x2,y1,y2,z1,z2){
+	if(this.x()<x1)
+		this.setx(x1);
+	if(this.x()>x2)
+		this.setx(x2);
+	if(this.y()<y1)
+		this.sety(y1);
+	if(this.y()>y2)
+		this.sety(y2);
+	if(this.z()<z1)
+		this.setz(z1);
+	if(this.z()>z2)
+		this.setz(z2);
+}
+function checkVis(){
+
+}
+function slot(n){
+	var x0,y0;
+	var xd,yd;
+	x0=this.x()-this.height*0.9/4;
+	y0=this.y()+this.height*0.15+2*this.height*0.8/3;
+	xd=this.height*0.9/4;;
+	yd=-this.height*0.05-this.height*0.8/3;
+	return new THREE.Vector3(x0+(n%3)*xd,y0+Math.floor(n/3)*yd,this.z());
 }
