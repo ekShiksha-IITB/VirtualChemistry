@@ -3,7 +3,7 @@
  * @author mrdoob / http://mrdoob.com
  * Running this will allow you to drag three.js objects around the screen.
  */
-
+var _selected=null;
 THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 	if ( _objects instanceof THREE.Camera ) {
@@ -20,7 +20,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	var _offset = new THREE.Vector3();
 	var _intersection = new THREE.Vector3();
 
-	var _selected = null, _hovered = null;
+	var  _hovered = null;
 
 	//
 
