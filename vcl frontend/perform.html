@@ -133,15 +133,19 @@
 <script type="text/javascript">
     var scene,camera,renderer,raycaster;
     var objects=[];
+    var objectsM=[];
+    var objectsC=[];
     var selection;
     var plane;
+    var cur=-1;
+    var curm=-1;
     //function 
     // once everything is loaded, we run our Three.js stuff.
     function init() {
         // create a scene, that will hold all our elements such as objects, cameras and lights.
         scene = new THREE.Scene();
         // create a camera, which defines where we're looking at.
-       	camera = new THREE.PerspectiveCamera(45, 1400 / 700, 0.1, 1000);
+       	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         // create a render and set the size
         renderer = new THREE.WebGLRenderer();
 
@@ -160,68 +164,120 @@
         spotLight.position.set(-40, 60, -10);
         spotLight.castShadow = true;
         scene.add(spotLight);
-        // add the output of the renderer to the html element
         document.body.appendChild(renderer.domElement);
-        // call the render function
-        var s1=new shelf(10);
-        s1.Mesh.position.set(-10,5.5,-3.7);
-        var s2=new shelf(10);
-        s2.Mesh.position.set(10,5.5,-3.7);
+        var s1=new shelf(25);
+        var s2=new shelf(25);
         scene.add(s2.Mesh);
-        t2=new Table(10,1);
-        t2.setPosition(-10,-10,0);
-        var b1=new Bottle(4/1.5,0.5);
-        var b2=new Bottle(4/1.5,0.5);
-        var t1=new Table(10,1);
+        t2=new Table(25,1);
+        var b1=new Bottle(200,150,"blue");
+        var b2=new Bottle(100,30,"blue");
+        var b3=new Bottle(200,75,"blue");
+        var b4=new Bottle(200,200,"blue");
+        var b5=new Bottle(200,100,"blue");
+        var b6=new Bottle(100,100,"blue");
+        var b7=new Bottle(200,60,"blue");
+        var t1=new Table(25,1);
+        b1.setPosition(-10,0,0);
+        //eval("b1.setPosition(-15,0,0)");
+        b2.setPosition(25,0,0);
+        t1.setPosition(25,-25,0);
+        t2.setPosition(-25,-25,0);
+        s1.setPosition(-25,0,-10);
+        s2.setPosition(25,0,-10);
+        b3.setPosition(s1.slot(0).x,s1.slot(0).y,s1.slot(0).z);
+        b4.setPosition(s1.slot(1).x,s1.slot(1).y,s1.slot(1).z);
+        b5.setPosition(s1.slot(2).x,s1.slot(2).y,s1.slot(2).z);
+        b6.setPosition(s1.slot(3).x,s1.slot(3).y,s1.slot(3).z);
+        b7.setPosition(s1.slot(4).x,s1.slot(4).y,s1.slot(4).z);
         scene.add(b1.Mesh);
         scene.add(s1.Mesh);
-        b2.Mesh.position.set(5,1.5,0);
-        b1.Mesh.position.set(-5,1.5,0);
-        t1.setPosition(10,-10,0);
         scene.add(b2.Mesh);
         scene.add(t2.Mesh);
         scene.add(t1.Mesh);
+        scene.add(b3.Mesh);
+        scene.add(b4.Mesh);
+        scene.add(b5.Mesh);
+        scene.add(b6.Mesh);
+        scene.add(b7.Mesh);
         var controls = new THREE.OrbitControls( camera, renderer.domElement );
-        objects.push(b1.Mesh);
-        objects.push(b2.Mesh);
+        objects.push(b1);
+        objects.push(b2);
+        objects.push(b3);
+        objects.push(b4);
+        objects.push(b5);
+        objects.push(b6);
+        objects.push(b7);
+        for(var i=0;i<objects.length;i++){
+            objectsC.push(new THREE.Vector3(objects[i].x(),objects[i].y(),objects[i].z()));
+        }
+        for(var i=0;i<objects.length;i++){
+            objectsM.push(objects[i].Mesh);
+        }
         renderScene();
-        var dragControls =new THREE.DragControls(objects,camera,renderer.domElement);
+        var dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
         dragControls.addEventListener('dragstart',function (event){
-
         	controls.enabled=false;
+            var temp=_selected;
+            for(var i=0;i<objects.length;i++){
+                if(temp.position.x==objectsM[i].position.x && temp.position.y==objectsM[i].position.y){
+                    curm=i;
+                }
+            }
         });
         dragControls.addEventListener('dragend',function (event){
         	controls.enabled=true;
-        	//if(b1.Mesh.postion.y>1.7){
-        //		b1.Mesh.position.y=1.7;
-        //	}
+            
+            for(var i=0;i<objects.length;i++){
+                if(objects[i].x()!=objectsC[i].x ||objects[i].y()!=objectsC[i].y ||objects[i].z()!=objectsC[i].z ){
+                    cur=i;
+                    break;
+                }
+            }
         });
+        objects[0].Fill(200);
         function renderScene() {
-            if(b1.Mesh.position.z!=0){
-        		b1.Mesh.position.z=0;
-        	}
-        	/*if(b1.y()<-5){
-        		b1.setPosition(b1.x(),0,b1.z());
-        	}*/
-        	if(b1.Mesh.position.x<-20){
-        		b1.Mesh.position.x=-20;
-        	}
-        	if(b1.Mesh.position.x>=20){
-        		b1.Mesh.position.x=20;
-        	}
-            if(b2.Mesh.position.z!=0){
-                b2.Mesh.position.z=0;
+            if(curm!=-1){
+                objects[curm].restrict(-50,50,0,50,0,0); 
             }
-            if(b2.Mesh.position.y<0){
-                b2.Mesh.position.y=0;
+            if(cur!=-1){
+                var f=-1;
+                for(var i=0;i<objects.length;i++){
+                    if(i!=cur &&(objects[i].y()==0)&& (Math.abs(objects[cur].x()-objects[i].x())<= objects[i].radius+objects[cur].radius)){
+                        f=i;
+                        break;
+                    }
+                }
+                if(f==-1){
+                    objects[cur].sety(0);
+                    objects[cur].setz(0);
+                    objectsC[cur]=new THREE.Vector3(objects[cur].x(),objects[cur].y(),objects[cur].z());
+                }
+                else{
+                    var x=prompt("Tell Volume to transfer ");
+                    if(x==null){
+
+                    }
+                    else{
+                        x=parseFloat(x);
+                         if(x>objects[cur].volumef){
+                            alert("Not enough fluid to transfer");
+                        }
+                        else if(x>(objects[f].volume-objects[f].volumef)){
+                            alert("Not enough capacity to transfer");
+                        }
+                        else{
+                            objects[cur].Fill(objects[cur].volumef-x);
+                            objects[f].Fill(objects[f].volumef+x);
+                        }
+                    }
+                    objects[cur].setx(objectsC[cur].x);
+                    objects[cur].sety(objectsC[cur].y);
+                    objects[cur].setz(objectsC[cur].z);
+                }
+                cur=-1;
+                curm=-1;
             }
-            if(b2.Mesh.position.x<-20){
-                b2.Mesh.position.x=-20;
-            }
-            if(b2.Mesh.position.x>=20){
-                b2.Mesh.position.x=20;
-            }
-            controls.update(); 
+            controls.update();
             requestAnimationFrame(renderScene);
             renderer.render(scene, camera);
         }
