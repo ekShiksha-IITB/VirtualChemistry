@@ -307,6 +307,88 @@ function Beaker(v,vf,col){
     this.Fill=Fillb;
     this.height*=1.5;
 }
+function Flask(h){
+    this.height=h;
+    this.radius=h/2;
+    this.x=0;
+    this.y=0;
+    this.z=0;
+    var h1,h2;
+    h1=h*0.8;
+    h2=h*0.2;
+    var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.3});
+    var c1= new THREE.CylinderGeometry(this.radius*0.3,this.radius,h1,32,1);
+    c1=new THREE.Mesh(c1,m);
+    c1.position.set(0,h1/2,0);
+    var c2= new THREE.CylinderGeometry(this.radius*0.25,this.radius*0.90,h1*0.95,32,1);
+    c2=new THREE.Mesh(c2,m);
+    c2.position.set(0,h1/2+h1/20,0);
+    var c3= new THREE.CylinderGeometry(this.radius*0.3,this.radius*0.3,h2,32,1);
+    var c4= new THREE.CylinderGeometry(this.radius*0.25,this.radius*0.25,h2,32,1);
+    c3=new THREE.Mesh(c3,m);
+    c4=new THREE.Mesh(c4,m);
+    c3.position.set(0,h1+h2/2,0);
+    c4.position.set(0,h1+h2/2,0);
+    var b1=new ThreeBSP(c1);
+    var b2=new ThreeBSP(c2);
+    var b3=new ThreeBSP(c3);
+    var b4=new ThreeBSP(c4);
+    var r=b1;
+    r=r.subtract(b2);
+    b3=b3.subtract(b4);
+    r=r.union(b3);
+    r=r.toGeometry();
+    r=new THREE.Mesh(r,m);
+    this.Mesh=r;
+}
+function BunsenBurner(){
+    var h=20;
+    this.height=h;
+    this.radius=h/15;
+    this.x=0;
+    this.y=0;
+    this.z=0;
+    var h1,h2,h3;
+    var r1,r2,r3;
+    h1=0.05*h;
+    h2=0.80*h;
+    h3=0.15*h;
+    r1=h/2.5;
+    r2=this.radius;
+    r3=this.radius*1.2;
+    var m1=new THREE.MeshStandardMaterial({color:"blue"});
+    var m2=new THREE.MeshStandardMaterial({color:"gray"});
+    var m3=new THREE.MeshStandardMaterial({color:"gold"});
+    var c1=new THREE.CylinderGeometry(r1,r1,h1,32,1);
+    var c2=new THREE.CylinderGeometry(r2,r2,h2,32,1);
+    var c3=new THREE.CylinderGeometry(r2*0.8,r2*0.8,h2,32,1);
+    var c4=new THREE.CylinderGeometry(r3,r3,h3,32,1);
+    var c5=new THREE.CylinderGeometry(r2*0.8,r2*0.8,h3,32,1);
+    c1=new THREE.Mesh(c1,m1);
+    c2=new THREE.Mesh(c2,m2);
+    c3=new THREE.Mesh(c3,m2);
+    c4=new THREE.Mesh(c4,m3);
+    c5=new THREE.Mesh(c5,m3);
+    c1.position.set(0,h1/2,0);
+    var b2=new ThreeBSP(c2);
+    var b3=new ThreeBSP(c3);
+    var b4=new ThreeBSP(c4);
+    var b5=new ThreeBSP(c5);
+    b2=b2.subtract(b3);
+    c2=b2.toGeometry();
+    c2=new THREE.Mesh(c2,m2);
+    c2.position.set(0,(h1+h2)/2,0);
+    b4=b4.subtract(b5);
+    c4=b4.toGeometry();
+    c4=new THREE.Mesh(c4,m3);
+    c4.position.set(0,h1/2+h2+(h3/2),0);
+    var r=c1;
+    r.add(c2);
+    r.add(c4);
+    this.Mesh=r;
+    this.translate=translate;
+    this.move=move;
+}
 function _x(){
     return this.Mesh.position.x-this.xoff;
 }
