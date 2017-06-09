@@ -267,6 +267,46 @@ function shelf(h){
     this.Mesh=x;
     this.slot=slot;
 }
+function Beaker(v,vf,col){
+    var h= Math.pow(v/(Math.PI*0.25),1/3);
+    this.volume=v;
+    this.height=h/1.5;
+    this.radius=this.height/2;
+    this.volumef=vf;
+    this.xoff=0;
+    this.yoff=this.height*1.1/2;
+    this.zoff=0;
+    this.setPosition=setPosition;
+    this.x=_x;
+    this.y=_y;
+    this.z=_z;
+    this.sety=sety;
+    this.setz=setz;
+    this.setx=setx;
+    this.restrict=restrict;
+    var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.5});
+    var c1=new THREE.CylinderGeometry(this.radius,this.radius,this.height*1.1,32,1);
+    c1=new THREE.Mesh(c1,m);
+    var c2=new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height*1.1*0.95,32,1);
+    c2=new THREE.Mesh(c2,m);
+    c2.position.set(0,this.height*0.049,0);
+    c1.position.set(0,0,0);
+    var b1=new ThreeBSP(c1);
+    var b2=new ThreeBSP(c2);
+    var r=b1;
+    r=r.subtract(b2);
+    r=r.toGeometry();
+    r=new THREE.Mesh(r,m);
+    r.position.set(0,this.height*1.1/2,0);
+    var temp = new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height*0.9,64,1);
+    this.fl=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: col}));
+    this.fl.position.set(0,this.height*0.9*this.volumef*0.5/this.volume-this.height*0.45*1.1,0);
+    this.fl.scale.y=v=this.volumef/this.volume;
+    r.add(this.fl);
+    this.Mesh=r;
+    this.Fill=Fillb;
+    this.height*=1.5;
+}
 function _x(){
     return this.Mesh.position.x-this.xoff;
 }
@@ -308,9 +348,9 @@ function checkVis(){
 function slot(n){
 	var x0,y0;
 	var xd,yd;
-	x0=this.x()-this.height*0.9/4;
+	x0=this.x()-this.height/4;
 	y0=this.y()+this.height*0.15+2*this.height*0.8/3;
-	xd=this.height*0.9/4;;
+	xd=this.height/4;;
 	yd=-this.height*0.05-this.height*0.8/3;
 	return new THREE.Vector3(x0+(n%3)*xd,y0+Math.floor(n/3)*yd,this.z());
 }
