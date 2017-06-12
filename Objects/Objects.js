@@ -235,7 +235,7 @@ function testTubeStand(h,fp){
     x=new THREE.Mesh(x,m);
     this.Mesh=x;
 }
-function shelf(h){
+function Shelf(h){
     this.height=h;
     this.wood=h/10;
     this.xoff=0;
@@ -305,7 +305,7 @@ function Beaker(v,vf,col){
     r.add(this.fl);
     this.Mesh=r;
     this.Fill=Fillb;
-    this.height*=1.5;
+    this.height*=1/0.9;
 }
 function _x(){
     return this.Mesh.position.x-this.xoff;
