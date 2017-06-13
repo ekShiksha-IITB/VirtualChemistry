@@ -9,7 +9,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <script type="text/javascript" src="../libs/three.js"></script>
-    <script type="text/javascript" src="../Objects/Objects.js"></script>  
+    <script type="text/javascript" src="../Objects/Objects.js"></script>
+    <script type="text/javascript" src="../Objects/Interactions.js"></script>    
     <script type="text/javascript" src="../libs/ThreeBSP.js"></script>
     <script src="../libs/OrbitControls.js"></script>  
     <script src="../libs/DragControls.js"></script>
@@ -91,16 +92,6 @@
       margin-bottom:-104px;
      
       }
-    /*#WebGL-output{
-        border:1px solid black;
-        width:1400px; 
-        height:700px;
-        position:relative;
-        top:10px;
-        margin-left:70px;
-        background-color:white;
-    }*/
-    
   </style>
 </head>
 <body>
@@ -113,7 +104,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-      <a class="navbar-brand" href="#" style="color:white">ekshiksha</a>
+      <a class="navbar-brand" href="#" style="color:white">Submit</a>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
@@ -128,13 +119,20 @@
   </div>
 </nav>
 <script type="text/javascript">
+    var prevcor;  
     var scene,camera,renderer;
+    var basin_width=30;
     var objects=[];
     var objectsM=[];
     var objectsC=[];
     var table_n;
+    var table_height=50;
+    var basin_height=50;
+    var shelf_height=table_height;
     var tables=[];
+    var basins=[];
     var shelves=[];
+    var spotLight=[];
     var dobject=-1;
     var pobject=-1;
     function init() {
@@ -151,23 +149,21 @@
         var ambientLight = new THREE.AmbientLight(0x0c0c0c);
         scene.add(ambientLight);
         // add spotlight for the shadows
-        var spotLight = new THREE.SpotLight(0xffffff);
-        spotLight.position.set(-40, 60, -10);
-        spotLight.castShadow = true;
-        scene.add(spotLight);
         document.body.appendChild(renderer.domElement);
         var controls = new THREE.OrbitControls( camera, renderer.domElement );
         //This data has to be taken from the database
-        shelves.push(new Shelf(25));
-        shelves[0].setPosition(0,0,-10);
-        table_n=3;
-        objects.push(new Bottle(250,150,"blue"));
-        objects.push(new Bottle(100,100,"blue"));
-        objects.push(new Bottle(250,75,"blue"));
+        shelves.push(new Shelf(shelf_height));
+        shelves[0].setPosition(0,0,-table_height*2/5);
+        table_n=5;
+        //objects.push(new Beaker(250,150,"blue"));
+        var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
+        objects.push(new Bottle(250,nmix));
+        objects.push(new Beaker(100,100,"blue"));
+        objects.push(new Beaker(250,75,"blue"));
         objects.push(new Beaker(250,250,"blue"));
-        objects.push(new Bottle(250,100,"blue"));
+        objects.push(new Beaker(250,100,"blue"));
         objects.push(new Beaker(100,20,"blue"));
-        objects.push(new Bottle(250,60,"blue"));
+        objects.push(new Beaker(250,60,"blue"));
         objects.push(new Beaker(250,100,"blue"));
         objectsC.push(new THREE.Vector3(-10,0,0));
         objectsC.push(new THREE.Vector3(25,0,0));
@@ -176,82 +172,118 @@
         objectsC.push(shelves[0].slot(2));
         objectsC.push(shelves[0].slot(3));
         objectsC.push(shelves[0].slot(4));
-        objectsC.push(new THREE.Vector3(0,0,0));;
+        objectsC.push(new THREE.Vector3(0,0,0));
+        var xflask=new Flask(250,200,"blue");
+        objectsC.push(new THREE.Vector3(15,0,0));
+        objects.push(xflask);
+        //scene.add(xflask.Mesh);
         shelves.pop();
+        // var xpet=new Petridish(3);
+        // scene.add(xpet.Mesh);
+        // xpet.setPosition(-20,0,0);
+        var xwatch=new WatchGlass(50,40,"blue");
+        //scene.add(xwatch.Mesh);
+        objects.push(xwatch);
+        objectsC.push(new THREE.Vector3(120,0,0));
+        xwatch.setPosition(120,0,0);
+        var xbstand=new Burette(50);
+        //scene.add(xbstand.Mesh);
+        objects.push(xbstand);
+        objectsC.push(new THREE.Vector3(170,0,0));
+        //xwatch.setPosition(120,0,0);
+        //xbstand.setPosition(170,0,0);
         //End
-        //camera.target.position.x=table_n*25;
-        camera.position.set(table_n*25,30,100);
         for(var i=0;i<table_n;i++){
-            tables.push(new Table(25));
-            tables[i].setPosition(i*50,-25,0);
+          spotLight.push(new THREE.PointLight(0xffffff,0.4));
+          spotLight[i].position.set(i*table_height*2+i*basin_width, 80, -60);
+          spotLight[i].castShadow = true;
+          scene.add(spotLight[i]);
+        }
+        camera.position.set(0,table_height,table_height*4);
+        for(var i=0;i<table_n;i++){
+            tables.push(new Table(table_height));
+            tables[i].setPosition(i*table_height*2+i*basin_width,-table_height,0);
             scene.add(tables[i].Mesh);
-            shelves.push(new Shelf(25));
-            shelves[i].setPosition(i*50,0,-10);
+            shelves.push(new Shelf(shelf_height));
+            shelves[i].setPosition(i*shelf_height*2+i*basin_width,0,-table_height*2/5);
             scene.add(shelves[i].Mesh);
+            basins.push(new Basin(basin_width));
+            basins[i].setPosition((2*i+1)*table_height+((1/2)+i)*basin_width,-basin_height,0);
+            scene.add(basins[i].Mesh);   
         }
         for(var i=0;i<objects.length;i++){
             scene.add(objects[i].Mesh);
             objectsM.push(objects[i].Mesh);
             objects[i].setPosition(objectsC[i].x,objectsC[i].y,objectsC[i].z);
         }
-        renderScene();
+        objectsM.pop();
         var dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
+        objectsM.push(objects[objects.length-1].Mesh);
         dragControls.addEventListener('dragstart',function (event){
             controls.enabled=false;
-            var temp=_selected;
             for(var i=0;i<objects.length;i++){
-                if(temp.position.x==objectsM[i].position.x && temp.position.y==objectsM[i].position.y){
+                if(_selected==objectsM[i]){
                     pobject=i;
+                    prevcor=new THREE.Vector3(objects[i].x(),objects[i].y(),objects[i].z());
+                    break;
                 }
             }
         });
         dragControls.addEventListener('dragend',function (event){
             controls.enabled=true;
-            for(var i=0;i<objects.length;i++){
-                if(objects[i].x()!=objectsC[i].x ||objects[i].y()!=objectsC[i].y ||objects[i].z()!=objectsC[i].z ){
-                    dobject=i;
-                    break;
-                }
-            }
+            dobject=pobject;
         });
+        renderScene();
         function renderScene() {
             if(pobject!=-1){
-                objects[pobject].restrict(-25,-25+50*table_n,0,50,0,0); 
+                objects[pobject].restrict(-table_height+objects[pobject].radius,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].radius,0,table_height*2,0,0);
             }
             if(dobject!=-1){
-                var f=-1;
-                for(var i=0;i<objects.length;i++){
-                    if(i!=dobject &&(objects[i].y()==0)&& (Math.abs(objects[dobject].x()-objects[i].x())<= objects[i].radius+objects[dobject].radius)){
-                        f=i;
-                        break;
+                var sobject=-1;
+                var flag=0;
+                if(issmall[objects[dobject].id] && objects[dobject].y()>=2*shelf_height/3){
+                  for(var i=0;i<table_n;i++){
+                    if(Math.abs(objects[dobject].x()-shelves[i].x())<shelves[i].radius){
+                      if(place(objects[dobject],shelves[i])){
+                        flag=1;
+                      }
+                      break;
                     }
+                  }
                 }
-                if(f==-1){
-                    objects[dobject].sety(0);
-                    objects[dobject].setz(0);
-                    objectsC[dobject]=new THREE.Vector3(objects[dobject].x(),objects[dobject].y(),objects[dobject].z());
+                if(!flag){
+                  for(var i=0;i<table_n;i++){
+                    if(Math.abs(objects[dobject].x()-basins[i].x())<basins[i].radius){
+                      wash(objects[dobject],basins[i]);
+                      flag=1;
+                      break;
+                    }
+                  }
                 }
-                else{
-                    var x=prompt("Tell Volume to transfer ");
-                    if(x==null){
-
-                    }
-                    else{
-                        x=parseFloat(x);
-                         if(x>objects[dobject].volumef){
-                            alert("Not enough fluid to transfer");
-                        }
-                        else if(x>(objects[f].volume-objects[f].volumef)){
-                            alert("Not enough capacity to transfer");
-                        }
-                        else{
-                            objects[dobject].Fill(objects[dobject].volumef-x);
-                            objects[f].Fill(objects[f].volumef+x);
-                        }
-                    }
-                    objects[dobject].setx(objectsC[dobject].x);
-                    objects[dobject].sety(objectsC[dobject].y);
-                    objects[dobject].setz(objectsC[dobject].z);
+                if(!flag){
+                  var lobject=-1;
+                  for(var i=0;i<objects.length;i++){
+                      if(i!=dobject &&(objects[i].y()==0)&& (Math.abs(objects[dobject].x()-objects[i].x())<= objects[i].radius+objects[dobject].radius)){
+                          if((map[objects[dobject].id][objects[i].id]!=0)){
+                            sobject=i;
+                            flag=1;
+                            break;
+                          }
+                          else{
+                            lobject=i;
+                          }
+                      }
+                  }
+                  if(sobject>=0){
+                    operate(objects[dobject],objects[sobject])
+                  }
+                  else if(lobject>=0){
+                    operate(objects[dobject],objects[lobject]);
+                  }
+                }
+                if(!flag){
+                  objects[dobject].sety(0);
+                  objects[dobject].setz(0);
                 }
                 dobject=-1;
                 pobject=-1;
