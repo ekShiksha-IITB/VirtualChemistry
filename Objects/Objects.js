@@ -52,7 +52,7 @@ function Mixture(sol="H2O",solcol="blue",vsol,narr,carr,colarr,natarr,nfarr){
     }
     this.toString=MixtoString;
 }
-function MixtoSting(){
+function MixtoString(){
     var s='';
     s+=this.Solvent;
     s+=',';
