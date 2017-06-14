@@ -140,7 +140,7 @@
     
 </select></li>
 <li><button class="btn btn-primary" id ="Save" style="margin-top:8px;margin-right:10px;margin-left:50px">Save</button></li>
-<li><button class="btn btn-primary" id = "Restore" style="margin-top:8px;margin-right:10px;margin-left:10px">Restore</button></li>
+<!--<li><button class="btn btn-primary" id = "Restore" style="margin-top:8px;margin-right:10px;margin-left:10px">Restore</button></li>-->
 <li><button class="btn btn-primary" id="NewTable" style="margin-top:8px;margin-right:10px;margin-left:10px">New table</button></li>
     
       </ul>
@@ -253,15 +253,44 @@ $("#selectbox2").change(function () {
         //This data has to be taken from the database
         shelves.push(new Shelf(shelf_height));
         shelves[0].setPosition(0,0,-table_height*2/5);
-        table_n=2;
+        //==========================================================
+        //NEW RETRIVE
+        var dataLoader = function() {
+                        console.log("Retriving");
+                            $.ajax({
+
+                                    method: "GET",
+                                    url: "RetriveObjects",
+                                    async: false,
+                                    success: function(response) {
+                                        console.log(response);
+                                        var data = response.split("#");
+                                        var n = data.length;
+                                        console.log(n);
+                                        for(var i = 0;i<n;i++){
+                                            console.log(data[i]);
+                                            eval(data[i]);
+                                        }
+                                    },
+                                    error : function(){
+                                              alert("Error Occured");
+                                    }
+                        });
+
+                /* response will be saved to data_obj*/
+                }();
+        //=========================================================
+        
+        
+//        table_n=2;
         //instantiate(new Beaker(250,150,"blue"));
-        var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
-        console.log(nmix.toString());
-        var wat=new Mixture(undefined,undefined,80,[],[],[],[],[])
-        instantiate(new Bottle(250,wat));
-        move(objects[0],-10,0,0);
-        instantiate(new Beaker(100,wat));
-        move(objects[objects.length-1],new THREE.Vector3(25,0,0));
+//        var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
+//        console.log(nmix.toString());
+//        var wat=new Mixture(undefined,undefined,80,[],[],[],[],[])
+//        instantiate(new Bottle(250,wat));
+//        move(objects[0],-10,0,0);
+//        instantiate(new Beaker(100,wat));
+//        move(objects[objects.length-1],new THREE.Vector3(25,0,0));
 //        instantiate(new Flask(250,75,"blue"));
 //        Place(objects[objects.length-1],shelves[0]);
 //        instantiate(new Flask(250,250,"blue"));
@@ -364,13 +393,10 @@ $("#selectbox2").change(function () {
                                   alert("Successfull Entry of data");
                               }
                 });
-            }();
+            };
             console.log(mystring);
 //            addFunc();
           
-        });
-        document.getElementById('Restore').addEventListener('click',function(){
-            window.open('perform2.html')
         });
         renderScene();
         function renderScene() {
