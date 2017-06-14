@@ -298,6 +298,37 @@ function Petridish(h){
     r=new THREE.Mesh(r,m);
     this.Mesh=r;       
 }
+function Pipette(v){
+    this.radius=Math.pow(3*v/(4*Math.PI),1/3)*2;
+    h=this.radius*60/8;
+    this.height=h;
+    this.sradius=this.radius/5;
+    //this.fillp=fp;
+    this.xoff=0;
+    this.zoff=0;
+    this.yoff=this.height/2;
+    this.x=_x;
+    this.y=_y;
+    this.z=_z;
+    this.setPosition=setPosition;
+    this.restrict=restrict;
+    var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.3});
+    var c1= new THREE.CylinderGeometry(this.sradius,this.sradius,this.height,32,32);
+    c1=new THREE.Mesh(c1,m);
+    var c2= new THREE.CylinderGeometry(this.sradius*0.9,this.sradius*0.9,this.height,32,32);
+    c2=new THREE.Mesh(c2,m);
+    var s1=new THREE.SphereGeometry(this.radius,32,32);
+    s1=new THREE.Mesh(s1,m);
+    s1.position.set(0,0,0);
+    var b1=new ThreeBSP(c1);
+    var b2=new ThreeBSP(c2);
+    var b3=new ThreeBSP(s1);
+    b1=b1.union(b3);
+    var r=b1.subtract(b2);
+    r=r.toGeometry();
+    r=new THREE.Mesh(r,m);
+    this.Mesh=r;
+}
 function Table(h){
     this.height=h;
     this.wood=h/10;
