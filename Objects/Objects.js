@@ -3,10 +3,15 @@ for(var i=0;i<17;i++){
     geoCache[i]=new Array(1000);
 }
 class Equipment{
-    constructor(xoff=0,yoff=0,zoff=0){
+    constructor(xoff=0,yoff=0,zoff=0,id=undefined){
+        this.height;
+        this.half_width;
         this.xoff=xoff;
         this.yoff=yoff;
         this.zoff=zoff;
+        this.Master=null;
+        this.Masterslot=null;
+        this.id=0;
         this.setPosition=setPosition;
         this.x=_x;
         this.y=_y;
@@ -15,9 +20,6 @@ class Equipment{
         this.setz=setz;
         this.setx=setx;
         this.restrict=restrict;
-        this.id=0;
-        this.Master=null;
-        this.Masterslot=null;
     }
 }
 function Mixture(sol="H2O",solcol="blue",vsol,narr,carr,colarr,natarr,nfarr){
@@ -179,9 +181,7 @@ class Bottle extends Equipment{
         this.height=h;
         this.radius=this.height/2;
         this.volumef=mixt.volume;
-        this.xoff=0;
         this.yoff=this.height/2;
-        this.zoff=0;
         this.id=0;
         this.Mixture=mixt;
         this.Color=this.Mixture.Color;
@@ -451,10 +451,9 @@ function testTubeStand(h){
     this.Mesh=x;
 }
 function Shelf(h){
-    this.flags=new Array(9);
-    for(var i=0;i<9;i++){
-        this.flags[i]=0;
-    }
+    this.id=13;
+    this.getPosition=getPosition;
+    this.Slots=new Array(9);
     this.radius=h/2;
     this.height=h;
     this.wood=h/10;
@@ -485,22 +484,36 @@ function Shelf(h){
     x=x.toGeometry();
     x=new THREE.Mesh(x,m);
     this.Mesh=x;
-    this.slotpos=slotpos;
+    var x0,y0;
+    var xd,yd;
+    x0=-this.height/4;
+    y0=this.height*0.15+2*this.height*0.8/3;
+    xd=this.height/4;;
+    yd=-this.height*0.05-this.height*0.8/3;
+    for(var n=0;n<9;n++){
+        this.Slots[n]=new Slot(null,new THREE.Vector3(x0+(n%3)*xd,y0+Math.floor(n/3)*yd,0));
+        console.log(this.z());
+    }
+    this.Slotpos=function(n){
+        return new THREE.Vector3(this.Slots[n].Position.x+this.x(),this.Slots[n].Position.y+this.y(),this.Slots[n].Position.z+this.z());
+    }
 }
-function Beaker(v,vf,col){
+function Beaker(v,mix){
     this.id=1;
+    this.Mixture=mix;
     var h= Math.pow(v/(Math.PI*0.25),1/3);
     this.volume=v;
     this.height=h;
     this.radius=this.height/2;
-    this.volumef=vf;
+    this.volumef=this.Mixture.volume;
+    console.log(this.volumef);
     this.xoff=0;
     this.yoff=this.height/(2*0.9);
     this.zoff=0;
     this.setPosition=setPosition;
     this.x=_x;
     this.y=_y;
-    this.color=col;
+    this.Color=this.Mixture.Color;
     this.z=_z;
     this.sety=sety;
     this.setz=setz;
@@ -528,7 +541,7 @@ function Beaker(v,vf,col){
     r=new THREE.Mesh(r,m);
     r.position.set(0,this.height*1.1/2,0);
     var temp = new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height*0.9,64,1);
-    this.fl=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: col}));
+    this.fl=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: this.Color}));
     this.fl.position.set(0,this.height*0.9*this.volumef*0.5/this.volume-this.height*0.45*1.1,0);
     this.fl.scale.y=v=this.volumef/this.volume;
     r.add(this.fl);
@@ -729,7 +742,12 @@ function setz(z){
 	this.Mesh.position.z=z+this.zoff;
 }
 function setPosition(x,y,z){
-    this.Mesh.position.set(x+this.xoff,y+this.yoff,z+this.zoff);
+    if(typeof x == typeof new THREE.Vector3()){
+        this.Mesh.position.set(x.x+this.xoff,x.y+this.yoff,x.z+this.zoff)
+    }
+    else{
+        this.Mesh.position.set(x+this.xoff,y+this.yoff,z+this.zoff);
+    }
 }
 function restrict(x1,x2,y1,y2,z1,z2){
 	if(this.x()<x1)
@@ -745,12 +763,12 @@ function restrict(x1,x2,y1,y2,z1,z2){
 	if(this.z()>z2)
 		this.setz(z2);
 }
-function slotpos(n){
-	var x0,y0;
-	var xd,yd;
-	x0=this.x()-this.height/4;
-	y0=this.y()+this.height*0.15+2*this.height*0.8/3;
-	xd=this.height/4;;
-	yd=-this.height*0.05-this.height*0.8/3;
-	return new THREE.Vector3(x0+(n%3)*xd,y0+Math.floor(n/3)*yd,this.z());
+function getPosition(){
+    return new THREE.Vector3(this.x()-this.xoff,this.y()-this.yoff,this.z()-this.zoff);
+}
+class Slot{
+    constructor(obj,pos){
+        this.Slave=obj;
+        this.Position=pos;
+    }
 }
