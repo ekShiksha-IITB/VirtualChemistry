@@ -59,36 +59,48 @@ function Mixture(sol="H2O",solcol="blue",vsol,narr,carr,colarr,natarr,nfarr){
     this.toString=MixtoString;
 }
 function MixtoString(){
-    var s='';
-    s+=this.Solvent;
+    new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1])
+    var s='new Mixture(';
+    s+= "\"" + this.Solvent + "\"";
     s+=',';
-    s+=this.SolventColor.toString();
+    s+= "\"" + this.SolventColor.toString() + "\"";
     s+=',';
     s+=this.volume.toString();
-    s+=',';
-    s+=this.Chemicals.length.toString();
-    s+=',';
+    s+=',[';
     for(var i=0;i<this.Chemicals.length;i++){
-        s+=this.Chemicals[i].Name.toString();
-        s+=',';
-    }
-    for(var i=0;i<this.Chemicals.length;i++){
-        s+=this.Chemicals[i].Concentration.toString();
-        s+=',';
-    }
-    for(var i=0;i<this.Chemicals.length;i++){
-        s+=this.Chemicals[i].Color.toString();
-        s+=',';
-    }
-    for(var i=0;i<this.Chemicals.length;i++){
-        s+=this.Chemicals[i].Nature.toString();
-        s+=',';
-    }
-    for(var i=0;i<this.Chemicals.length;i++){
-        s+=this.Chemicals[i].Nfac.toString();
+        s+= "\"" + this.Chemicals[i].Name.toString() + "\"" ;
         if(i!=(this.Chemicals.length-1))
             s+=',';
     }
+    s+= ']'
+    s+=',[';
+    for(var i=0;i<this.Chemicals.length;i++){
+        s+= "\"" + this.Chemicals[i].Concentration.toString() + "\"" ;
+        if(i!=(this.Chemicals.length-1))
+            s+=',';
+    }
+    s+= ']'
+    s+=',[';
+    for(var i=0;i<this.Chemicals.length;i++){
+        s+= "\"" + this.Chemicals[i].Color.toString() + "\"" ;
+        if(i!=(this.Chemicals.length-1))
+            s+=',';
+    }
+    s+= ']'
+    s+=',[';
+    for(var i=0;i<this.Chemicals.length;i++){
+        s+= "\"" + this.Chemicals[i].Nature.toString() + "\"" ;
+        if(i!=(this.Chemicals.length-1))
+            s+=',';
+    }
+    s+= ']'
+    s+=',[';
+    for(var i=0;i<this.Chemicals.length;i++){
+        s+= "\"" + this.Chemicals[i].Nfac.toString() + "\"" ;
+        if(i!=(this.Chemicals.length-1))
+            s+=',';
+    }
+    s+= '])'
     return s;
 }
 function Chemical(nc,cc,col,nat,nf){
@@ -733,13 +745,13 @@ function _z(){
     return this.Mesh.position.z-this.zoff;
 }
 function setx(x){
-	this.Mesh.position.x=x+this.xoff;
+    this.Mesh.position.x=x+this.xoff;
 }
 function sety(y){
-	this.Mesh.position.y=y+this.yoff;
+    this.Mesh.position.y=y+this.yoff;
 }
 function setz(z){
-	this.Mesh.position.z=z+this.zoff;
+    this.Mesh.position.z=z+this.zoff;
 }
 function setPosition(x,y,z){
     if(typeof x == typeof new THREE.Vector3()){
@@ -750,18 +762,18 @@ function setPosition(x,y,z){
     }
 }
 function restrict(x1,x2,y1,y2,z1,z2){
-	if(this.x()<x1)
-		this.setx(x1);
-	if(this.x()>x2)
-		this.setx(x2);
-	if(this.y()<y1)
-		this.sety(y1);
-	if(this.y()>y2)
-		this.sety(y2);
-	if(this.z()<z1)
-		this.setz(z1);
-	if(this.z()>z2)
-		this.setz(z2);
+    if(this.x()<x1)
+        this.setx(x1);
+    if(this.x()>x2)
+        this.setx(x2);
+    if(this.y()<y1)
+        this.sety(y1);
+    if(this.y()>y2)
+        this.sety(y2);
+    if(this.z()<z1)
+        this.setz(z1);
+    if(this.z()>z2)
+        this.setz(z2);
 }
 function getPosition(){
     return new THREE.Vector3(this.x()-this.xoff,this.y()-this.yoff,this.z()-this.zoff);
