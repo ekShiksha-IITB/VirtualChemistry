@@ -84,7 +84,7 @@
        #selectbox2{
       width:200px;
       height:30px;
-      margin-left:100px;
+      margin-left:10px;
       margin-top:10px;
       }
       #add{
@@ -104,20 +104,117 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-      <a class="navbar-brand" href="#" style="color:white">Submit</a>
+      <a class="navbar-brand" href="#" style="color:white">ekshikhsha</a>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         <li class="active" ><a href="#" style="color:white">Home</a></li>
         <li><a href="#" style="color:white">About</a></li>
         <li><a href="#" style="color:white">Join us</a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#" style="color:white"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+    <li> <select id="selectbox">
+   <option selected hidden>Choose equipments</option>
+  <option value="#consumergoods">Test tube</option>
+  <option value="#consumergoods2">Beaker</option>
+  <option value="#consumergoods2">Burner</option>
+  <option value="#consumergoods">Flask</option>
+  <option value="#consumergoods">Pipette</option>
+  <option value="#consumergoods2">Test Tube stand</option>
+  <option value="#consumergoods2">Bottles</option>
+  <option value="#consumergoods">Burette</option>
+  <option value="#consumergoods2">Wash Basin</option>
+</select></li>
+<li><select id="selectbox2">
+  <option selected hidden>Choose chemicals</option>
+  <optgroup label="Acids">
+  <option value="#consumer_goods">Hydrochloric acid</option>
+  <option value="#consumer_goods">Sulphuric acid</option>
+  <option value="#consumer_goods">Phosphoric acid</option>
+  <optgroup label="Bases">
+  <option value="#consumer_goods">Sodium Hydroxide</option>
+  <option value="#consumer_goods">Ammonium Hydroxide</option>
+  <optgroup label="Indicators">
+  <option>Methyl orange</option>
+  <option>Phenolphthalein</option>
+  <option>Red litmus</option>
+  <option>Blue litmus</option>
+    
+</select></li>
+<li><button class="btn btn-primary" style="margin-top:8px;margin-right:10px;margin-left:50px">Save</button></li>
+<li><button class="btn btn-primary" style="margin-top:8px;margin-right:10px;margin-left:10px">Restore</button></li>
+<li><button class="btn btn-primary" id="NewTable" style="margin-top:8px;margin-right:10px;margin-left:10px">New table</button></li>
+    
       </ul>
     </div>
   </div>
 </nav>
+<script>
+$("#selectbox").change(function () {
+    if ($(this).val() == "#consumergoods") {
+        $('#consumergoods').modal('show');
+      }
+    if ($(this).val() == "#consumergoods2") {
+        $('#consumergoods2').modal('show');
+      }
+    
+ });
+</script>
+<div class="modal fade" id="consumergoods" data-target="#consumergoods">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header orange">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+
+        </button>
+        <h4 class="modal-title">Provide details</h4>
+        <p><input type="text" class="form-control" id="text1" placeholder="Enter number">
+    <input type="text" class="form-control" id="text2" placeholder="Enter volume in mL" style="margin-top:20px">
+    </p>
+    <button type="button" class="btn btn-primary"  action="#">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="consumergoods2" data-target="#consumergoods2">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header orange">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+
+        </button>
+        <h4 class="modal-title">Provide details</h4>
+        <p><input type="text" class="form-control" id="text1" placeholder="Enter number">
+    </p>
+    <button type="button" class="btn btn-primary"  action="#">Submit</button>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+$("#selectbox2").change(function () {
+    if ($(this).val() == "#consumer_goods") {
+        $('#consumer_goods').modal('show');
+      }
+});
+</script>
+<div class="modal fade" id="consumer_goods" data-target="#consumer_goods">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header orange">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+
+        </button>
+        <p><h4 class="modal-title">Provide details</h4></p>
+        <form action="#" method="$POST">
+    <input type="text" class="form-control" id="text1" placeholder="Enter volume in mL">
+    <input type="text" class="form-control" id="text2" placeholder="Enter Normality" style="margin-top:20px"><br>
+    <button type="button" class="btn btn-primary"  action="#">Submit</button>
+    
+    </form>
+      </div>
+    </div>
+  </div>
+</div>
 <script type="text/javascript">
     var prevcor;  
     var scene,camera,renderer;
@@ -141,7 +238,6 @@
         camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         // create a render and set the size
         renderer = new THREE.WebGLRenderer();
-
         renderer.setClearColor(new THREE.Color(0x436521, 1));
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMapEnabled = true;
@@ -192,6 +288,9 @@
         objectsC.push(new THREE.Vector3(170,0,0));
         //xwatch.setPosition(120,0,0);
         //xbstand.setPosition(170,0,0);
+        var xpip=new Pipette(10);
+        scene.add(xpip.Mesh);
+        xpip.setPosition(40,0,0);
         //End
         for(var i=0;i<table_n;i++){
           spotLight.push(new THREE.PointLight(0xffffff,0.4));
@@ -232,6 +331,9 @@
         dragControls.addEventListener('dragend',function (event){
             controls.enabled=true;
             dobject=pobject;
+        });
+        document.getElementById('NewTable').addEventListener('click',function(){
+          alert("works");
         });
         renderScene();
         function renderScene() {
