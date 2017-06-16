@@ -251,48 +251,129 @@ $("#selectbox2").change(function () {
         //This data has to be taken from the database
         shelves.push(new Shelf(shelf_height));
         shelves[0].setPosition(0,0,-table_height*2/5);
-        table_n=2;
-        //instantiate(new Beaker(250,150,"blue"));
-        var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
-        var wat=new Mixture(undefined,undefined,80,[],[],[],[],[])
-        instantiate(new Flask(250,nmix));
-        move(objects[0],-10,0,0);
-        instantiate(new Beaker(100,wat));
-        move(objects[objects.length-1],new THREE.Vector3(25,0,0));
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat));
-        move(objects[objects.length-1],shelves[0].Slotpos(0));
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat));
-        move(objects[objects.length-1],shelves[0].Slotpos(1));
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat));
-        move(objects[objects.length-1],shelves[0].Slotpos(2));
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(100,wat));
-        move(objects[objects.length-1],shelves[0].Slotpos(3));
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat));
-        move(objects[objects.length-1],shelves[0].Slotpos(4));
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat));
-        move(objects[objects.length-1],new THREE.Vector3(0,0,0));
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        var xflask=new Bottle(250,wat);
-        instantiate(xflask);
-        move(objects[objects.length-1],new THREE.Vector3(15,0,0));
-        shelves.pop();
-        wat=new Mixture(undefined,undefined,20,[],[],[],[],[]);
-        var xwatch=new WatchGlass(50,wat);
-        instantiate(xwatch);
-        move(objects[objects.length-1],120,0,0);
-        wat=new Mixture(undefined,undefined,100,[],[],[],[],[]);
-        var xbstand=new Burette(100,wat);
-        instantiate(xbstand);
-        move(objects[objects.length-1],new THREE.Vector3(170,0,0));
-        var xpip=new Pipette(10);
-        instantiate(xpip);
-        move(objects[objects.length-1],new THREE.Vector3(40,0,0));
+        // User Functionality Added here=============================
+        var uid = prompt("User ID");
+        var way = prompt("setup/perform");
+        var eid = null;
+        eid = prompt("Experiment ID");
+//        if(way == 'perform'){
+//            eid = prompt("Experiment ID");
+//        }
+        if(way == 'setup'){
+            table_n=2;
+            //instantiate(new Beaker(250,150,"blue"));
+            var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
+            var wat=new Mixture(undefined,undefined,80,[],[],[],[],[])
+            instantiate(new Flask(250,nmix));
+            move(objects[0],-10,0,0);
+            instantiate(new Beaker(100,wat));
+            move(objects[objects.length-1],new THREE.Vector3(25,0,0));
+            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+            instantiate(new Bottle(250,wat));
+            move(objects[objects.length-1],shelves[0].Slotpos(0));
+            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+            instantiate(new Bottle(250,wat));
+            move(objects[objects.length-1],shelves[0].Slotpos(1));
+            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+            instantiate(new Bottle(250,wat));
+            move(objects[objects.length-1],shelves[0].Slotpos(2));
+            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+            instantiate(new Bottle(100,wat));
+            move(objects[objects.length-1],shelves[0].Slotpos(3));
+            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+            instantiate(new Bottle(250,wat));
+            move(objects[objects.length-1],shelves[0].Slotpos(4));
+            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+            instantiate(new Bottle(250,wat));
+            move(objects[objects.length-1],new THREE.Vector3(0,0,0));
+            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+            var xflask=new Bottle(250,wat);
+            instantiate(xflask);
+            move(objects[objects.length-1],new THREE.Vector3(15,0,0));
+            shelves.pop();
+            wat=new Mixture(undefined,undefined,20,[],[],[],[],[]);
+            var xwatch=new WatchGlass(50,wat);
+            instantiate(xwatch);
+            move(objects[objects.length-1],120,0,0);
+            wat=new Mixture(undefined,undefined,100,[],[],[],[],[]);
+            var xbstand=new Burette(100,wat);
+            instantiate(xbstand);
+            move(objects[objects.length-1],new THREE.Vector3(170,0,0));
+//            var xpip=new Pipette(10);
+//            instantiate(xpip);
+//            move(objects[objects.length-1],new THREE.Vector3(40,0,0));
+        }
+        else if(way == 'perform'){
+            var dataLoader = function() {
+                        console.log("Retriving");
+                            $.ajax({
+
+                                    method: "GET",
+                                    url: "RetriveObjects?uid=" + uid +"&&way=" + way +"&&eid=" + eid,
+                                    async: false,
+                                    success: function(response) {
+                                        console.log(response);
+                                        var data = response.split("#");
+                                        var n = data.length;
+                                        console.log(n);
+                                        for(var i = 0;i<n;i++){
+                                            console.log(data[i]);
+                                            eval(data[i]);
+                                        }
+                                    },
+                                    error : function(){
+                                              alert("Error Occured");
+                                    }
+                        });
+
+                /* response will be saved to data_obj*/
+                }();
+        }
+       //======================================================================
+//        table_n=2;
+//        //instantiate(new Beaker(250,150,"blue"));
+//        var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
+//        var wat=new Mixture(undefined,undefined,80,[],[],[],[],[])
+//        instantiate(new Flask(250,nmix));
+//        move(objects[0],-10,0,0);
+//        instantiate(new Beaker(100,wat));
+//        move(objects[objects.length-1],new THREE.Vector3(25,0,0));
+//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+//        instantiate(new Bottle(250,wat));
+//        move(objects[objects.length-1],shelves[0].Slotpos(0));
+//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+//        instantiate(new Bottle(250,wat));
+//        move(objects[objects.length-1],shelves[0].Slotpos(1));
+//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+//        instantiate(new Bottle(250,wat));
+//        move(objects[objects.length-1],shelves[0].Slotpos(2));
+//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+//        instantiate(new Bottle(100,wat));
+//        move(objects[objects.length-1],shelves[0].Slotpos(3));
+//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+//        instantiate(new Bottle(250,wat));
+//        move(objects[objects.length-1],shelves[0].Slotpos(4));
+//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+//        instantiate(new Bottle(250,wat));
+//        move(objects[objects.length-1],new THREE.Vector3(0,0,0));
+//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+//        var xflask=new Bottle(250,wat);
+//        instantiate(xflask);
+//        move(objects[objects.length-1],new THREE.Vector3(15,0,0));
+//        shelves.pop();
+//        wat=new Mixture(undefined,undefined,20,[],[],[],[],[]);
+//        var xwatch=new WatchGlass(50,wat);
+//        instantiate(xwatch);
+//        move(objects[objects.length-1],120,0,0);
+//        wat=new Mixture(undefined,undefined,100,[],[],[],[],[]);
+//        var xbstand=new Burette(100,wat);
+//        instantiate(xbstand);
+//        move(objects[objects.length-1],new THREE.Vector3(170,0,0));
+//        var xpip=new Pipette(10);
+//        instantiate(xpip);
+//        move(objects[objects.length-1],new THREE.Vector3(40,0,0));
+//        
+        //======================================================================
         var xtable=new Table(5);
         //End
         for(var i=0;i<table_n;i++){
@@ -363,11 +444,19 @@ $("#selectbox2").change(function () {
             mystring += "table_n=" + table_n.toString();
             var addFunc = function() {
             /* ajax request to add data into db */
+                  
+                  console.log(uid);
+                  console.log(way);
+                  console.log(eid);
+                  
                   $.ajax({
                       type: "POST",
                       url: "UploadSevlet",
                               data:{
-                                    'id':mystring
+                                    'uid':uid,
+                                    'data':mystring,
+                                    'way':way,
+                                    'eid':eid
                               },
                               error : function(){
                                   alert("Error Occured");
@@ -382,7 +471,31 @@ $("#selectbox2").change(function () {
           
         });
         document.getElementById('Restore').addEventListener('click',function(){
-            window.open('perform2.html')
+            //window.open('perform2.html')
+            var dataLoader = function() {
+                        console.log("Retriving");
+                            $.ajax({
+
+                                    method: "GET",
+                                    url: "RetriveObjects?uid=" + uid +"&&way=" + way +"&&eid=" + eid,
+                                    async: false,
+                                    success: function(response) {
+                                        console.log(response);
+                                        var data = response.split("#");
+                                        var n = data.length;
+                                        console.log(n);
+                                        for(var i = 0;i<n;i++){
+                                            console.log(data[i]);
+                                            eval(data[i]);
+                                        }
+                                    },
+                                    error : function(){
+                                              alert("Error Occured");
+                                    }
+                        });
+
+                /* response will be saved to data_obj*/
+                }();
         });
         renderScene();
         function renderScene() {
