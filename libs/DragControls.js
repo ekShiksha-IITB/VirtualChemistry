@@ -4,6 +4,7 @@
  * Running this will allow you to drag three.js objects around the screen.
  */
 var _selected=null;
+var _raycaster ;
 THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 	if ( _objects instanceof THREE.Camera ) {
@@ -14,7 +15,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	}
 
 	var _plane = new THREE.Plane();
-	var _raycaster = new THREE.Raycaster();
+	 _raycaster = new THREE.Raycaster();
 
 	var _mouse = new THREE.Vector2();
 	var _offset = new THREE.Vector3();
