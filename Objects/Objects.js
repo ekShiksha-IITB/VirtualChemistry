@@ -230,41 +230,43 @@ class Burette extends Equipment{
                 this.Mesh.add(this.stream);
             }
         }
-        this.onPressEnd=function(dt){
+        this.onPressEnd=function(fi){
             if(this.stream!=null){
                 this.stream.parent.remove(this.stream);
                 this.stream=null;
             }
         }
-        this.duringPress=function(dt){
+        this.duringPress=function(fi,dt){
             if(this.stream!=null){
-                var trans=Math.min(0.1,this.Mixture.volume);
-                if(this.Slots[1].Slave!=null){
-                    pourF(fi,this.Slots[1].Slave,trans);
-                }
-                else{
-                    this.Mixture.volume-=trans;
-                    this.Fill();
-                }
+	            var trans=Math.min(dt/100,this.Mixture.volume);
+	            var trans2=0;
+	            if(this.Slots[1].Slave!=null){
+	            	trans2=Math.min(trans,objects[this.Slots[1].Slave].volume-objects[this.Slots[1].Slave].Mixture.volume);
+	            }
+	            trans-=trans2;
+		        if(trans2!=0){
+		            pourF(fi,this.Slots[1].Slave,trans2);
+		        }
+		        this.Mixture.volume-=trans;
+		        this.Fill();
                 if(this.Mixture.volume==0){
                     this.stream.parent.remove(this.stream);
                     this.stream=null;
                 }
             }
         }
-        this.PressFor=function(dt){
-            var trans=Math.min(0.1,this.Mixture.volume);
+        this.PressFor=function(fi,dt){
+            var trans=Math.min(dt/100,this.Mixture.volume);
+            var trans2=0;
             if(this.Slots[1].Slave!=null){
-                pourF(fi,this.Slots[1].Slave,trans);
+            	trans2=Math.min(trans,this.Slots[1].Slave.volume-this.Slots[1].Slave.Mixture.volume);
             }
-            else{
-                this.Mixture.volume-=trans;
-                this.Fill();
-            }
-            if(this.Mixture.volume==0){
-                this.stream.parent.remove(this.stream);
-                this.stream=null;
-            }
+            trans-=trans2;
+	        if(trans2!=0){
+	            pourF(fi,this.Slots[1].Slave,trans);
+	        }
+	        this.Mixture.volume-=trans;
+	        this.Fill();
         }
     }
 }

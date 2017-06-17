@@ -38,6 +38,7 @@ CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 var omap=['Bottle','Beaker','Flask','TestTube','Burette','Pipette','Petridish','BunsenBurner','WeighingMachine','WatchGlass','TestTubeStand','Funnel','PhMeter','Shelf','Table','Basin'];
 var issmall=[1,1,1,1,0,0,1,0,0,1,1,1,0];
 var iscontainer=[1,1,1,1,1,1,1,0,0,1,0,0,0];
+var maxhw=[10,10,10,10,10,10,10];
 function operate(s,t){
     var c=map[objects[s].id][objects[t].id];
     if(c==0){
@@ -77,7 +78,14 @@ function pourF(fi,se,x){
 }
 function wash(fi,se){
     s=objects[fi];
-    t=objects[se];
+    if(s.Slots!=null){
+        for(var i=0;i<s.Slots.length;i++){
+            if(s.Slots[i].Slave!=null){
+                resetPosition(fi);
+                return;
+            }
+        }
+    }
     if(confirm('Are you sure you want to wash this equipment?')){
         if (typeof s.Fill == 'function') {
             s.Mixture=new Mixture(undefined,undefined,0,[],[],[],[],[]);
