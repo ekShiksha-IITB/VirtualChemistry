@@ -22,7 +22,7 @@
     }
     
     /* Add a gray background color and some padding to the footer */
-    footer {
+    .footer {
       background-color: #f2f2f2;
       padding: 25px;
     }
@@ -91,14 +91,28 @@
       margin-bottom:-104px;
      
       }
-      #buttons {
-        overflow: hidden;
-        background-color: #333;
-        position: fixed; 
-        top: 50px; 
-        width: 100%;
-        height : 5%;
-      }
+    .equip{
+    width:650px;
+    height:50px;
+    background-color:white;
+   text-align:center;
+   border-radius:4px;
+
+    float:right;
+    margin-left:40px;
+    }
+    .objects{
+      width:20px;
+      height:20px;
+border: 1px solid #ddd;
+    border-radius: 4px;
+
+    }
+    .active {
+  background-color: green !important;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+    
   </style>
 </head>
 <body>
@@ -115,7 +129,7 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active" ><a href="#" style="color:white">Home</a></li>
+        <li ><a href="#" style="color:white">Home</a></li>
         <li><a href="#" style="color:white">About</a></li>
         <li><a href="#" style="color:white">Join us</a></li>
     <li> <select id="selectbox">
@@ -146,31 +160,14 @@
   <option>Blue litmus</option>
     
 </select></li>
-<li><button class="btn btn-primary" id ="Save" style="margin-top:8px;margin-right:10px;margin-left:50px">Save</button></li>
-<li><button class="btn btn-primary" id = "Restore" style="margin-top:8px;margin-right:10px;margin-left:10px">Restore</button></li>
-<li><button class="btn btn-primary" id="NewTable" style="margin-top:8px;margin-right:10px;margin-left:10px">New table</button></li>   
+<li><button class="btn btn-primary" id='Save' style="margin-top:8px;margin-right:10px;margin-left:50px">Save</button></li>
+<li><button class="btn btn-primary" id='Restore' style="margin-top:8px;margin-right:10px;margin-left:10px">Restore</button></li>
+<li><button class="btn btn-primary" id='NewTable' style="margin-top:8px;margin-right:10px;margin-left:10px">New table</button></li>
+    
       </ul>
     </div>
   </div>
 </nav>
-<div id="buttons">
-  <button id='b0'>Normal</button>
-  <button id='b1'>Bottle</button>
-  <button id='b2'>Beaker</button>
-  <button id='b3'>Flask</button>
-  <button id='b4'>TestTube</button>
-  <button id='b5'>Burette</button>
-  <button id='b6'>Pipette</button>
-  <script type="text/javascript">
-  	document.getElementById('b0').addEventListener('click',function(){state=0;dragControls.activate();});
-  	document.getElementById('b1').addEventListener('click',function(){state=1;dragControls.deactivate();});
-  	document.getElementById('b2').addEventListener('click',function(){state=2});
-  	document.getElementById('b3').addEventListener('click',function(){state=3});
-  	document.getElementById('b4').addEventListener('click',function(){state=4});
-  	document.getElementById('b5').addEventListener('click',function(){state=5});
-  	document.getElementById('b6').addEventListener('click',function(){state=6});
-  </script>
-</div>
 <script>
 $("#selectbox").change(function () {
     if ($(this).val() == "#consumergoods") {
@@ -182,6 +179,50 @@ $("#selectbox").change(function () {
     
  });
 </script>
+<nav class="navbar navbar-fixed-top" style="background-color:#33B8FF;margin-top:50px;padding:10px 10px 10px 10px">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <button class="btn btn-default" style="margin-left:170px;margin-top:10px"><i class="glyphicon glyphicon-hand-up"></i></button>
+    <div class="equip">
+    <div class="btn btn-group">
+    <button class="btn btn-default" title="Bottle"><img class="objects" src="Photos/bottle.jpeg" ></button>
+    <button class="btn btn-default" title="Beaker"><img class="objects" src="Photos/beaker.jpg" ></button>
+    <button class="btn btn-default" title="Flask"><img class="objects" src="Photos/flask.jpg" ></button>
+    <button class="btn btn-default" title="Test tube"><img class="objects" src="Photos/testtube.jpg" ></button>
+    <button class="btn btn-default" title="Burette"><img class="objects" src="Photos/burette.jpeg" ></button>
+    <button class="btn btn-default" title="Pipette"><img class="objects" src="Photos/pipette.jpg" ></button>
+    <button class="btn btn-default" title="Petridish"><img class="objects" src="Photos/petridish.jpeg" ></button>
+    <button class="btn btn-default" title="BunsenBurner"><img class="objects" src="Photos/bunsenburner.jpeg" ></button>
+    <button class="btn btn-default" title="Weighing machine"><img class="objects" src="Photos/weighingmachine.jpeg" ></button>
+    <button class="btn btn-default" title="Watch glass"><img class="objects" src="Photos/watchglass.jpeg" ></button>
+    <button class="btn btn-default" title="Test tube stand"><img class="objects" src="Photos/testtubestand.jpeg" ></button>
+    <button class="btn btn-default" title="Funnel"><img class="objects" src="Photos/funnel.jpeg" ></button>
+    <button class="btn btn-default" title="Phmeter"><img class="objects" src="Photos/phmeter.jpeg" ></button>
+
+    </div>
+    </div>
+    <button class="btn btn-default" style="margin-top:10px"><i class="fa fa-undo"></i></button>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+<script>
+$("button").click(function(){
+  $("button").removeClass("active");
+  $(this).addClass("active");
+});
+
+</script>
+
 <div class="modal fade" id="consumergoods" data-target="#consumergoods">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -239,6 +280,7 @@ $("#selectbox2").change(function () {
     </div>
   </div>
 </div>
+
 <script type="text/javascript">
 	var state=0;
 	var drag=1;
@@ -504,6 +546,13 @@ $("#selectbox2").change(function () {
                   for(var i=0;i<objects.length;i++){
                       if(objects[i]!=objects[dobject] && !isSlave(i,dobject) &&(objects[i].z()==0)&& (Math.abs(objects[dobject].x()-objects[i].x())<= objects[i].half_width+objects[dobject].half_width)){
                           if((map[objects[dobject].id][objects[i].id]!=0)){
+                            if(objects[i].Master!=null){
+                              if(map[objects[dobject].id][objects[objects[i].Master].id]!=0){
+                                sobject=objects[i].Master;
+                                flag=1;
+                                break;
+                              }
+                            }
                             sobject=i;
                             flag=1;
                             break;
