@@ -91,6 +91,14 @@
       margin-bottom:-104px;
      
       }
+      #buttons {
+        overflow: hidden;
+        background-color: #333;
+        position: fixed; 
+        top: 50px; 
+        width: 100%;
+        height : 5%;
+      }
   </style>
 </head>
 <body>
@@ -145,6 +153,24 @@
     </div>
   </div>
 </nav>
+<div id="buttons">
+  <button id='b0'>Normal</button>
+  <button id='b1'>Bottle</button>
+  <button id='b2'>Beaker</button>
+  <button id='b3'>Flask</button>
+  <button id='b4'>TestTube</button>
+  <button id='b5'>Burette</button>
+  <button id='b6'>Pipette</button>
+  <script type="text/javascript">
+  	document.getElementById('b0').addEventListener('click',function(){state=0;dragControls.activate();});
+  	document.getElementById('b1').addEventListener('click',function(){state=1;dragControls.deactivate();});
+  	document.getElementById('b2').addEventListener('click',function(){state=2});
+  	document.getElementById('b3').addEventListener('click',function(){state=3});
+  	document.getElementById('b4').addEventListener('click',function(){state=4});
+  	document.getElementById('b5').addEventListener('click',function(){state=5});
+  	document.getElementById('b6').addEventListener('click',function(){state=6});
+  </script>
+</div>
 <script>
 $("#selectbox").change(function () {
     if ($(this).val() == "#consumergoods") {
@@ -214,7 +240,8 @@ $("#selectbox2").change(function () {
   </div>
 </div>
 <script type="text/javascript">
-  var drag=1;
+	var state=0;
+	var drag=1;
     var pressobjects=[];
     var pressmap=[];
     var prevcor;
@@ -238,6 +265,7 @@ $("#selectbox2").change(function () {
     var dirLight;
     var journal=[];
     var isclick=1;
+    var dragControls;
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2();
     function init() {
@@ -321,7 +349,7 @@ $("#selectbox2").change(function () {
             basins[i].setPosition((2*i+1)*table_height+((1/2)+i)*basin_width,-basin_height,0);
             scene.add(basins[i].Mesh);   
         }
-        var dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
+        dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
         dragControls.addEventListener('dragstart',function (event){
             isclick=1;
             drag=1;
@@ -424,7 +452,7 @@ $("#selectbox2").change(function () {
             ct=temp;
             if(pobject!=null){
                 if(drag){
-                  objects[pobject].restrict(-table_height+objects[pobject].radius,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].radius,0,table_height*2,0,0);
+               		objects[pobject].restrict(-table_height+objects[pobject].radius,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].radius,0,table_height*2,0,0);
                   updatePos(objects[pobject]);
                 }
                 else{
@@ -434,7 +462,7 @@ $("#selectbox2").change(function () {
                     objects[pobject].onPress(presstate);
                   }
                   presstate=pobject;
-                  objects[pobject].duringPress(presstate);
+                  objects[pobject].duringPress(presstate,dt);
                   objects[pobject].setPosition(prevcor);
                 }
             }
@@ -442,7 +470,8 @@ $("#selectbox2").change(function () {
               date=new Date();
               et=date.getTime();
               resetPosition(presstate);
-              console.log("objects["+presstate.toString()+'].PressFor('+(et-st).toString()+')')
+              //var str=("objects["+presstate.toString()+'].PressFor('+presstate.toString()+','+(et-st).toString()+')');
+              console.log("objects["+presstate.toString()+'].PressFor('+presstate.toString()+','+(et-st).toString()+')');
               objects[presstate].onPressEnd(presstate);
               presstate=null;
             }
