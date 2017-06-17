@@ -507,7 +507,7 @@ $("#selectbox2").change(function () {
                 var flag=0;
                 if(!flag){
                   for(var i=0;i<table_n;i++){
-                    if(dobject.id!=4 && Math.abs(objects[dobject].x()-basins[i].x())<basins[i].half_width){
+                    if(objects[dobject.id]!=4 && Math.abs(objects[dobject].x()-basins[i].x())<basins[i].half_width){
                       console.log("wash("+dobject.toString()+','+i.toString()+')');
                       wash(dobject,i);
                       flag=1;
