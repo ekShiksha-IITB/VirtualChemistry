@@ -14,6 +14,7 @@
     <script type="text/javascript" src="libs/ThreeBSP.js"></script>
     <script src="libs/OrbitControls.js"></script>  
     <script src="libs/DragControls.js"></script>
+    <script src="libs/TrackballControls.js"></script>  
   <style>
     /* Remove the navbar's default margin-bottom and rounded borders */ 
     .navbar {
@@ -125,25 +126,14 @@ border: 1px solid #ddd;
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-      <a class="navbar-brand" href="#" style="color:white">ekshikhsha</a>
+     <a href="#" class="navbar-brand" style="color:white">ekshiksha</a>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         <li ><a href="#" style="color:white">Home</a></li>
         <li><a href="#" style="color:white">About</a></li>
         <li><a href="#" style="color:white">Join us</a></li>
-    <li> <select id="selectbox">
-   <option selected hidden>Choose equipments</option>
-  <option value="#consumergoods">Test tube</option>
-  <option value="#consumergoods2">Beaker</option>
-  <option value="#consumergoods2">Burner</option>
-  <option value="#consumergoods">Flask</option>
-  <option value="#consumergoods">Pipette</option>
-  <option value="#consumergoods2">Test Tube stand</option>
-  <option value="#consumergoods2">Bottles</option>
-  <option value="#consumergoods">Burette</option>
-  <option value="#consumergoods2">Wash Basin</option>
-</select></li>
+
 <li><select id="selectbox2">
   <option selected hidden>Choose chemicals</option>
   <optgroup label="Acids">
@@ -160,38 +150,20 @@ border: 1px solid #ddd;
   <option>Blue litmus</option>
     
 </select></li>
-<li><button class="btn btn-primary" id='Save' style="margin-top:8px;margin-right:10px;margin-left:50px">Save</button></li>
-<li><button class="btn btn-primary" id='Restore' style="margin-top:8px;margin-right:10px;margin-left:10px">Restore</button></li>
-<li><button class="btn btn-primary" id='NewTable' style="margin-top:8px;margin-right:10px;margin-left:10px">New table</button></li>
+<li>
+<div class="btn btn-group">
+<button class="btn btn-primary" id='Save'>Save</button>
+<button class="btn btn-primary" id='Restore'>Restore</button>
+<button class="btn btn-primary" id='NewTable'>New table</button>
+
+</div>
+</li>
+<li><button class="btn btn-primary" style="margin-top:8px"><i class="fa fa-undo"></i></button></li>
+<li><button class="btn btn-default" style="margin-top:8px;margin-left:10px;"><i class="glyphicon glyphicon-hand-up"></i></button></li>
+
     
-      </ul>
-    </div>
-  </div>
-</nav>
-<script>
-$("#selectbox").change(function () {
-    if ($(this).val() == "#consumergoods") {
-        $('#consumergoods').modal('show');
-      }
-    if ($(this).val() == "#consumergoods2") {
-        $('#consumergoods2').modal('show');
-      }
     
- });
-</script>
-<nav class="navbar navbar-fixed-top" style="background-color:#33B8FF;margin-top:50px;padding:10px 10px 10px 10px">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>                        
-      </button>
-    </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <button class="btn btn-default" style="margin-left:170px;margin-top:10px"><i class="glyphicon glyphicon-hand-up"></i></button>
-    <div class="equip">
+    <li>
     <div class="btn btn-group">
     <button class="btn btn-default" title="Bottle"><img class="objects" src="Photos/bottle.jpeg" ></button>
     <button class="btn btn-default" title="Beaker"><img class="objects" src="Photos/beaker.jpg" ></button>
@@ -208,16 +180,29 @@ $("#selectbox").change(function () {
     <button class="btn btn-default" title="Phmeter"><img class="objects" src="Photos/phmeter.jpeg" ></button>
 
     </div>
-    </div>
-    <button class="btn btn-default" style="margin-top:10px"><i class="fa fa-undo"></i></button>
-
+    </li>
+    
       </ul>
     </div>
-  </div>
+ 
 </nav>
 <script>
-$("button").click(function(){
-  $("button").removeClass("active");
+$("#selectbox").change(function () {
+    if ($(this).val() == "#consumergoods") {
+        $('#consumergoods').modal('show');
+      }
+    if ($(this).val() == "#consumergoods2") {
+        $('#consumergoods2').modal('show');
+      }
+    
+ });
+
+</script>
+
+
+<script>
+$(".btn-default").click(function(){
+  $(".btn-default").removeClass("active");
   $(this).addClass("active");
 });
 
@@ -522,7 +507,7 @@ $("#selectbox2").change(function () {
                 var flag=0;
                 if(!flag){
                   for(var i=0;i<table_n;i++){
-                    if(Math.abs(objects[dobject].x()-basins[i].x())<basins[i].half_width){
+                    if(dobject.id!=4 && Math.abs(objects[dobject].x()-basins[i].x())<basins[i].half_width){
                       console.log("wash("+dobject.toString()+','+i.toString()+')');
                       wash(dobject,i);
                       flag=1;
