@@ -212,6 +212,7 @@ function instantiate(obj,pos){
     str+=pos.y.toString()+',';
     str+=pos.z.toString()+'))';
     console.log(str);
+    journal.push(str);
     if(obj.press!=null){
         pressobjects.push(obj.press);
         pressmap.push((objects.length-1));
@@ -283,4 +284,9 @@ function nextShelfSlot(){
     }
     addTable();
     return shelves[table_n-1].Slotpos(0);
+}
+function Construct(obj){
+    var str='';
+    str+=omap[obj.id];
+    
 }

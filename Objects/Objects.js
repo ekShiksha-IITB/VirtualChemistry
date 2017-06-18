@@ -182,11 +182,11 @@ class Burette extends Equipment{
         var b2=new ThreeBSP(c2);
         var b3=new ThreeBSP(s1);
         var b4=new ThreeBSP(s2);
-        //var b5=new ThreeBSP(c3);
+        var b5=new ThreeBSP(c3);
         b3=b3.subtract(b4);
         b1=b1.union(b3);
         var r=b1.subtract(b2);
-        //r=r.union(b5);
+        r=r.union(b5);
         r=r.toGeometry();
         r=new THREE.Mesh(r,m);
         r.add(c3);
@@ -480,12 +480,14 @@ class Pipette extends Equipment{
             this.yoff=this.height/2;
             this.Mesh.rotation.x+=Math.PI/2;
             console.log("objects["+s.toString()+']'+".pick()");
+            journal.push("objects["+s.toString()+']'+".pick()");
         }
         this.drop=function(s){
             this.yoff=this.radius;
             this.Mesh.position.y-=(this.height/2 - this.radius);
             this.Mesh.rotation.x-=Math.PI/2;
             console.log("objects["+s.toString()+']'+".drop()");
+            journal.push("objects["+s.toString()+']'+".drop()");
         }
         this.onPress=function(){
 
