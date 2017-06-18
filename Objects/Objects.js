@@ -24,7 +24,7 @@ class Equipment{
         this.getPosition=getPosition;
     }
 }
-function Mixture(sol,solcol,vsol,narr,carr,colarr,natarr,nfarr,ind){
+function Mixture(sol='H2O',solcol='blue',vsol,narr,carr,colarr,natarr,nfarr,ind){
     this.Solvent=sol;
     this.SolventColor=solcol;
     this.volume=vsol;
@@ -69,7 +69,6 @@ function Mixture(sol,solcol,vsol,narr,carr,colarr,natarr,nfarr,ind){
     }
 }
 function MixtoString(){
-    new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1])
     var s='new Mixture(';
     s+= "\"" + this.Solvent + "\"";
     s+=',';
@@ -390,42 +389,92 @@ class Petridish extends Equipment{
 }
 class Pipette extends Equipment{
     constructor(v,mix){
-        super();
-        this.id=5;
-        this.radius=Math.pow(3*v/(4*Math.PI),1/3)*1.5;
-        var h=this.radius*60/8;
-        this.height=h;
-        this.sradius=this.radius/5;
-        //this.fillp=fp;
-        this.xoff=0;
-        this.zoff=0;
-        this.yoff=this.radius;
-        this.x=_x;
-        this.y=_y;
-        this.z=_z;
-        this.sety=sety;
-        this.setx=setx;
-        this.setz=setz;
-        this.setPosition=setPosition;
-        this.restrict=restrict;
-        var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.3});
-        var c1= new THREE.CylinderGeometry(this.sradius,this.sradius,this.height,32,32);
-        c1=new THREE.Mesh(c1,m);
-        var c2= new THREE.CylinderGeometry(this.sradius*0.9,this.sradius*0.9,this.height,32,32);
-        c2=new THREE.Mesh(c2,m);
-        var s1=new THREE.SphereGeometry(this.radius,32,32);
-        s1=new THREE.Mesh(s1,m);
-        s1.position.set(0,0,0);
-        var b1=new ThreeBSP(c1);
-        var b2=new ThreeBSP(c2);
-        var b3=new ThreeBSP(s1);
-        b1=b1.union(b3);
-        var r=b1.subtract(b2);
-        r=r.toGeometry();
-        r=new THREE.Mesh(r,m);
-        r.rotation.x+=Math.PI/2;
-        this.Mesh=r;
-        this.half_width=this.radius;
+		super();
+		this.Mixture=mix;
+		this.volume=v;
+		this.id=5;
+		this.radius=Math.pow(3*v/(4*Math.PI),1/3)*1.5;
+		var h=this.radius*8;
+		this.height=h;
+		this.sradius=this.radius/5;
+		this.xoff=0;
+		this.zoff=0;
+		this.yoff=this.radius;
+		this.x=_x;
+		this.y=_y;
+		this.z=_z;
+		this.sety=sety;
+		this.setx=setx;
+		this.setz=setz;
+		this.setPosition=setPosition;
+		this.restrict=restrict;
+		var c3=new THREE.CylinderGeometry(this.sradius,this.sradius,this.radius*1.5,32,1);
+		var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.3});
+		var c1= new THREE.CylinderGeometry(this.sradius*1.0001,this.sradius*1.0001,this.height,32,1);
+		c1=new THREE.Mesh(c1,m);
+		var c2= new THREE.CylinderGeometry(this.sradius*0.9,this.sradius*0.9,this.height,32,1);
+		c2=new THREE.Mesh(c2,m);
+		var s1=new THREE.SphereGeometry(this.radius,32,32);
+		s1=new THREE.Mesh(s1,m);
+		s1.position.set(0,0,0);
+		var b1=new ThreeBSP(c1);
+		var b2=new ThreeBSP(c2);
+		var b3=new ThreeBSP(s1);
+		var b4=new ThreeBSP(c3);
+		b1=b1.union(b3);
+		var r=b1.subtract(b2);
+		b4=b4.subtract(b2);
+		c3=b4.toGeometry();
+		this.press=new THREE.Mesh(c3,new THREE.MeshStandardMaterial({color: "gray",transparent:true,opacity:0.3}));
+		this.press.position.set(0,3.25*this.radius,0);	
+		r=r.toGeometry();
+		r=new THREE.Mesh(r,m);
+		r.rotation.x-=Math.PI/2;
+		this.Mesh=r;
+		this.Mesh.add(this.press);
+		this.half_width=this.radius;
+		this.fl=null;
+        this.Fill=function(){
+            if(this.Mixture.volume==0 && this.fl!=null){
+                this.fl.parent.remove(this.fl);
+                this.fl=null;
+            }
+            else if(this.Mixture.volume!=0){
+                var v1,v2,v3;
+                v3=this.Mixture.volume;
+                v1=Math.min(this.volume/10,v3);
+                v3-=v1;
+                v2=Math.min(this.volume*85/100,v3);
+                v3-=v2;
+                var c=new THREE.MeshBasicMaterial({color: this.Mixture.Color});
+               	var c1=new THREE.CylinderGeometry(this.sradius*0.9,this.sradius*0.9,this.radius*3.13*v1/(this.volume/10),32,1);
+               	c1=new THREE.Mesh(c1,c);
+               	c1.position.set(0,-this.height/2+this.radius*3.13*v1/(this.volume/10)/2,0);
+               	var temp=new THREE.SphereGeometry(0.0000001);
+               	temp=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color:"white",transparent:true,opacity:0}));
+               	temp.add(c1);
+               	if(v3!=0){
+               		var c2=new THREE.CylinderGeometry(this.sradius*0.9,this.sradius*0.9,this.radius*3.13*v3/(this.volume/10),32,1);
+               		c2=new THREE.Mesh(c2,c);               		
+               		c2.position.set(0,this.radius*0.87+this.radius*3.13*v3/(this.volume/10)/2,0);
+               		temp.add(c2);
+               	}
+                if(v2!=0){
+                	var sp=new THREE.SphereGeometry(this.radius*0.9,8,6,0,Math.PI*2,Math.PI-Math.PI*v2/(this.volume*85/100),Math.PI*v2/(this.volume*85/100));
+                	sp=new THREE.Mesh(sp,c);
+                	temp.add(sp);
+                }
+                this.fl=temp;
+                this.Mesh.add(this.fl);
+            }
+        };
+        this.Fill();
+        this.canBePressed=function(){
+        	if(this.Mesh.rotation.x==0){
+        		return 1;
+        	}
+        	return 0;
+        }
         this.pick=function(s){
             this.Mesh.position.y+=(this.height/2 - this.radius);
             this.yoff=this.height/2;
@@ -437,6 +486,15 @@ class Pipette extends Equipment{
             this.Mesh.position.y-=(this.height/2 - this.radius);
             this.Mesh.rotation.x-=Math.PI/2;
             console.log("objects["+s.toString()+']'+".drop()");
+        }
+        this.onPress=function(){
+
+        }
+        this.onPressEnd=function(){
+
+        }
+        this.duringPress=function(){
+
         }
     }
 }

@@ -1,9 +1,9 @@
 var reactions;
 var map=[];
-map.push([1,1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0]);
-map.push([1,1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0]);
-map.push([1,1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0]);
-map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+map.push([1,1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,1]);
+map.push([1,1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,1]);
+map.push([1,1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,1]);
+map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]);
 map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
@@ -18,9 +18,9 @@ map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 var CanBeMaster=[];
-CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]);
-CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]);
-CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]);
+CanBeMaster.push([0,0,0,0,0,[0],0,0,0,0,0,1,0,0,0,0,0]);
+CanBeMaster.push([0,0,0,0,0,[0],0,0,0,0,0,1,0,0,0,0,0]);
+CanBeMaster.push([0,0,0,0,0,[0],0,0,0,0,0,1,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 CanBeMaster.push([[1],[1],[1],0,0,0,0,0,0,[1],0,[0],0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
@@ -53,7 +53,7 @@ function operate(s,t){
 }
 function pour(fi,se){
     s=objects[fi];
-    t=objects[se];
+
     var x=prompt("Tell Volume to transfer ");
     if(x!=null){
         x=parseFloat(x);
@@ -78,6 +78,10 @@ function pourF(fi,se,x){
 }
 function wash(fi,se){
     s=objects[fi];
+    if(map[objects[fi].id][16]==0){
+        resetPosition(fi);
+        return;
+    }
     if(s.Slots!=null){
         for(var i=0;i<s.Slots.length;i++){
             if(s.Slots[i].Slave!=null){
@@ -193,15 +197,26 @@ function isSlave(fi,se){
     }
     return 0;
 }
-function instantiate(obj){
+function instantiate(obj,pos){
     objects.push(obj);
     objectsM.push(obj.Mesh);
     scene.add(obj.Mesh);
+    var str='instantiate(';
+    str+='new '+omap[obj.id]+'(';
+    str+=obj.volume.toString();
+    str+=',';
+    str+=obj.Mixture.toString();
+    str+=',';
+    str+='new THREE.Vector3(';
+    str+=pos.x.toString()+',';
+    str+=pos.y.toString()+',';
+    str+=pos.z.toString()+'))';
+    console.log(str);
     if(obj.press!=null){
-        //console.log("here");
         pressobjects.push(obj.press);
         pressmap.push((objects.length-1));
     }
+    obj.setPosition(pos);
 }
 function move(obj,x,y,z){
     if(typeof x == typeof new THREE.Vector3(0,0,0)){
