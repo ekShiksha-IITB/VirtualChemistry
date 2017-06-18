@@ -277,6 +277,7 @@ $("#selectbox2").change(function () {
   }
 	var state=0;
 	var drag=1;
+  var tablesM=[];
     var pressobjects=[];
     var pressmap=[];
     var prevcor;
@@ -319,51 +320,51 @@ $("#selectbox2").change(function () {
         document.body.appendChild(renderer.domElement);
         var controls = new THREE.OrbitControls( camera, renderer.domElement );
         //This data has to be taken from the database
-        shelves.push(new Shelf(shelf_height));
-        shelves[0].setPosition(0,0,-table_height*2/5);
+        //shelves.push(new Shelf(shelf_height));
+        //shelves[0].setPosition(0,0,-table_height*2/5);
         table_n=2;
         //instantiate(new Beaker(250,150,"blue"));
-        var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
-        var base=new Mixture(undefined,undefined,80,['NaOH'],[1],['green'],[1],[1]);
-        var wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Flask(250,nmix),new THREE.Vector3(-10,0,0));
-        instantiate(new Beaker(100,wat),new THREE.Vector3(25,0,0));
-        // /move(objects[objects.length-1],);
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat),nextShelfSlot());
+        // var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
+        // var base=new Mixture(undefined,undefined,80,['NaOH'],[1],['green'],[1],[1]);
+        // var wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+        // instantiate(new Flask(250,nmix),new THREE.Vector3(-10,0,0));
+        // instantiate(new Beaker(100,wat),new THREE.Vector3(25,0,0));
+        // // /move(objects[objects.length-1],);
+        // wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+        // instantiate(new Bottle(250,wat),nextShelfSlot());
+        // //move(objects[objects.length-1],);
+        // wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+        // instantiate(new Bottle(250,wat),nextShelfSlot());
+        // //move(objects[objects.length-1],nextShelfSlot());
+        // wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+        // instantiate(new Bottle(250,wat),nextShelfSlot());
+        // //move(objects[objects.length-1],nextShelfSlot());
+        // wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+        // instantiate(new Bottle(100,wat),nextShelfSlot());
+        // //move(objects[objects.length-1],nextShelfSlot());
+        // wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+        // instantiate(new Bottle(250,wat),nextShelfSlot());
+        // //move(objects[objects.length-1],nextShelfSlot());
+        // wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+        // instantiate(new Bottle(250,wat),new THREE.Vector3(0,0,0));
+        // //move(objects[objects.length-1],);
+        // wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+        // var xflask=new Bottle(250,wat);
+        // instantiate(xflask,new THREE.Vector3(15,0,0));
+        // //move(objects[objects.length-1],);
+        // shelves.pop();
+        // wat=new Mixture(undefined,undefined,20,[],[],[],[],[]);
+        // var xwatch=new WatchGlass(50,wat);
+        // instantiate(xwatch,new THREE.Vector3(120,0,0));
+        // //move(objects[objects.length-1],);
+        // wat=new Mixture(undefined,undefined,100,[],[],[],[],[]);
+        // var xbstand=new Burette(100,base);
+        // instantiate(xbstand,new THREE.Vector3(170,0,0));
+        // //move(objects[objects.length-1],);
+        // var xpip=new Pipette(10,new Mixture(undefined,undefined,0,[],[],[],[],[]));
+        // instantiate(xpip,new THREE.Vector3(40,0,0));
         //move(objects[objects.length-1],);
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat),nextShelfSlot());
-        //move(objects[objects.length-1],nextShelfSlot());
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat),nextShelfSlot());
-        //move(objects[objects.length-1],nextShelfSlot());
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(100,wat),nextShelfSlot());
-        //move(objects[objects.length-1],nextShelfSlot());
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat),nextShelfSlot());
-        //move(objects[objects.length-1],nextShelfSlot());
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat),new THREE.Vector3(0,0,0));
-        //move(objects[objects.length-1],);
-        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        var xflask=new Bottle(250,wat);
-        instantiate(xflask,new THREE.Vector3(15,0,0));
-        //move(objects[objects.length-1],);
-        shelves.pop();
-        wat=new Mixture(undefined,undefined,20,[],[],[],[],[]);
-        var xwatch=new WatchGlass(50,wat);
-        instantiate(xwatch,new THREE.Vector3(120,0,0));
-        //move(objects[objects.length-1],);
-        wat=new Mixture(undefined,undefined,100,[],[],[],[],[]);
-        var xbstand=new Burette(100,base);
-        instantiate(xbstand,new THREE.Vector3(170,0,0));
-        //move(objects[objects.length-1],);
-        var xpip=new Pipette(10,new Mixture(undefined,undefined,0,[],[],[],[],[]));
-        instantiate(xpip,new THREE.Vector3(40,0,0));
-        //move(objects[objects.length-1],);
-        var xtable=new Table(5);
+        //var xtable=new Table(5);
         //End
         for(var i=0;i<table_n;i++){
           spotLight.push(new THREE.PointLight(0xffffff,1,0,1),);
@@ -374,6 +375,7 @@ $("#selectbox2").change(function () {
         camera.position.set(0,table_height,table_height*4);
         for(var i=0;i<table_n;i++){
             tables.push(new Table(table_height));
+            tablesM.push(tables[tables.length-1].Mesh);
             tables[i].setPosition(i*table_height*2+i*basin_width,-table_height,0);
             scene.add(tables[i].Mesh);
             shelves.push(new Shelf(shelf_height));
@@ -383,6 +385,7 @@ $("#selectbox2").change(function () {
             basins[i].setPosition((2*i+1)*table_height+((1/2)+i)*basin_width,-basin_height,0);
             scene.add(basins[i].Mesh);   
         }
+        
         dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
         dragControls.addEventListener('dragstart',function (event){
             isclick=1;
@@ -390,13 +393,16 @@ $("#selectbox2").change(function () {
             var intersects = _raycaster.intersectObjects( pressobjects ); 
             if (intersects.length>0) {
               for(var i=0;i<pressobjects.length;i++){
-                if(pressobjects[i]==intersects[0]){
+                if(pressobjects[i]==intersects[0].object){
                   if(typeof objects[pressmap[i]].canBePressed == 'function'){
-                    if(objects[pressmap[i]].canBePressed){
+                    if(objects[pressmap[i]].canBePressed()){
                       drag=0;
                     }
-                    break;
-                  }                  
+                  }
+                  else{
+                    drag=0;
+                  }
+                    break;                  
                 }
               }
             }
@@ -422,7 +428,33 @@ $("#selectbox2").change(function () {
         function onDocumentMouseMove( event ){
             isclick=0;
         }
+        function onDocumentMouseUp(event){
+            event.preventDefault();
+            if(state==0)
+              return;
+            mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+            mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+            raycaster.setFromCamera( mouse, camera );
+            var intersects=raycaster.intersectObjects(tablesM);
+            if(intersects.length>0){
+              var v=prompt("Select Volume");
+              if(v!=null){
+                var str='instantiate(';
+                str+='new ';
+                str+=omap[state-1];
+                str+='(';
+                str+=v.toString()+',new Mixture(undefined,undefined,0,[],[],[],[],[])),';
+                str+='new THREE.Vector3(';
+                str+=intersects[0].point.x.toString()+',';
+                str+='0,';
+                str+='0))';
+                console.log(str);
+                eval(str);
+              }
+            }
+        }
         renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
+        renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
         dragControls.addEventListener('dragend',function (event){
             controls.enabled=true;
             if(drag==1){
@@ -435,6 +467,7 @@ $("#selectbox2").change(function () {
         document.getElementById('NewTable').addEventListener('click',function(){
             tables.push(new Table(table_height));
             tables[table_n].setPosition(table_n*table_height*2+table_n*basin_width,-table_height,0);
+            tablesM.push(tables[tables.length-1].Mesh);
             scene.add(tables[table_n].Mesh);
             shelves.push(new Shelf(shelf_height));
             shelves[table_n].setPosition(table_n*shelf_height*2+table_n*basin_width,0,-table_height*0.43);
@@ -513,8 +546,9 @@ $("#selectbox2").change(function () {
               date=new Date();
               et=date.getTime();
               objects[presstate].setPosition(prevcor);
-              //var str=("objects["+presstate.toString()+'].PressFor('+presstate.toString()+','+(et-st).toString()+')');
-              console.log("objects["+presstate.toString()+'].PressFor('+presstate.toString()+','+(et-st).toString()+')');
+              var str="objects["+presstate.toString()+'].PressFor('+presstate.toString()+','+(et-st).toString()+')';
+              journal.push(str);
+              console.log(str);
               objects[presstate].onPressEnd(presstate);
               presstate=null;
             }
@@ -524,8 +558,10 @@ $("#selectbox2").change(function () {
                 if(!flag){
                   for(var i=0;i<table_n;i++){
                     if(Math.abs(objects[dobject].x()-basins[i].x())<basins[i].half_width){
+                      var str="wash("+dobject.toString()+','+i.toString()+')';
+                      journal.push(str);
                       console.log("wash("+dobject.toString()+','+i.toString()+')');
-                        wash(dobject,i);
+                      wash(dobject,i);
                       flag=1;
                       break;
                     }
@@ -566,10 +602,14 @@ $("#selectbox2").change(function () {
                   }
                   if(sobject>=0){
                     operate(dobject,sobject);
+                    var str="operate("+dobject.toString()+','+sobject.toString()+')';
+                    journal.push(str);
                     console.log("operate("+dobject.toString()+','+sobject.toString()+')');
                   }
                   else if(lobject>=0){
                     operate(dobject,lobject);
+                    var str="operate("+dobject.toString()+','+lobject.toString()+')';
+                    journal.push(str);
                     console.log("operate("+dobject.toString()+','+lobject.toString()+')');
                   }
                   else if(typeof objects[dobject].droppable=='function' && !objects[dobject].droppable()){
@@ -585,6 +625,7 @@ $("#selectbox2").change(function () {
                   s+='],';
                   s+=(objects[dobject].x()).toString();
                   s+=',0,0)';
+                  journal.push(s);
                   if(typeof objects[dobject].drop == 'function'){
                     objects[dobject].drop(dobject);
                   }
