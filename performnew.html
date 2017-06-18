@@ -159,26 +159,22 @@ border: 1px solid #ddd;
 </div>
 </li>
 <li><button class="btn btn-primary" style="margin-top:8px"><i class="fa fa-undo"></i></button></li>
-<li><button class="btn btn-default" style="margin-top:8px;margin-left:10px;"><i class="glyphicon glyphicon-hand-up"></i></button></li>
-
-    
-    
+<li><button class="btn btn-default" onclick="changeState(0)" id='b0' style="margin-top:8px;margin-left:10px;"><i class="glyphicon glyphicon-hand-up"></i></button></li>    
     <li>
     <div class="btn btn-group">
-    <button class="btn btn-default" title="Bottle"><img class="objects" src="Photos/bottle.jpeg" ></button>
-    <button class="btn btn-default" title="Beaker"><img class="objects" src="Photos/beaker.jpg" ></button>
-    <button class="btn btn-default" title="Flask"><img class="objects" src="Photos/flask.jpg" ></button>
-    <button class="btn btn-default" title="Test tube"><img class="objects" src="Photos/testtube.jpg" ></button>
-    <button class="btn btn-default" title="Burette"><img class="objects" src="Photos/burette.jpeg" ></button>
-    <button class="btn btn-default" title="Pipette"><img class="objects" src="Photos/pipette.jpg" ></button>
-    <button class="btn btn-default" title="Petridish"><img class="objects" src="Photos/petridish.jpeg" ></button>
-    <button class="btn btn-default" title="BunsenBurner"><img class="objects" src="Photos/bunsenburner.jpeg" ></button>
-    <button class="btn btn-default" title="Weighing machine"><img class="objects" src="Photos/weighingmachine.jpeg" ></button>
-    <button class="btn btn-default" title="Watch glass"><img class="objects" src="Photos/watchglass.jpeg" ></button>
-    <button class="btn btn-default" title="Test tube stand"><img class="objects" src="Photos/testtubestand.jpeg" ></button>
-    <button class="btn btn-default" title="Funnel"><img class="objects" src="Photos/funnel.jpeg" ></button>
-    <button class="btn btn-default" title="Phmeter"><img class="objects" src="Photos/phmeter.jpeg" ></button>
-
+    <button class="btn btn-default" id='b1' onclick="changeState(1)" title="Bottle"><img class="objects" src="Photos/bottle.jpeg" ></button>
+    <button class="btn btn-default" id='b2'  onclick="changeState(2)" title="Beaker"><img class="objects" src="Photos/beaker.jpg" ></button>
+    <button class="btn btn-default" id='b3'  onclick="changeState(3)" title="Flask"><img class="objects" src="Photos/flask.jpg" ></button>
+    <button class="btn btn-default" id='b4'  onclick="changeState(4)" title="Test tube"><img class="objects" src="Photos/testtube.jpg" ></button>
+    <button class="btn btn-default" id='b5'  onclick="changeState(5)" title="Burette"><img class="objects" src="Photos/burette.jpeg" ></button>
+    <button class="btn btn-default" id='b6'  onclick="changeState(6)" title="Pipette"><img class="objects" src="Photos/pipette.jpg" ></button>
+    <button class="btn btn-default" id='b7'  onclick="changeState(7)" title="Petridish"><img class="objects" src="Photos/petridish.jpeg" ></button>
+    <button class="btn btn-default" id='b8'  onclick="changeState(8)" title="BunsenBurner"><img class="objects" src="Photos/bunsenburner.jpeg" ></button>
+    <button class="btn btn-default" id='b9'  onclick="changeState(9)" title="Weighing machine"><img class="objects" src="Photos/weighingmachine.jpeg" ></button>
+    <button class="btn btn-default" id='b10' onclick="changeState(10)"  title="Watch glass"><img class="objects" src="Photos/watchglass.jpeg" ></button>
+    <button class="btn btn-default" id='b11' onclick="changeState(11)"  title="Test tube stand"><img class="objects" src="Photos/testtubestand.jpeg" ></button>
+    <button class="btn btn-default" id='b12' onclick="changeState(12)"  title="Funnel"><img class="objects" src="Photos/funnel.jpeg" ></button>
+    <button class="btn btn-default" id='b13' onclick="changeState(13)"  title="Phmeter"><img class="objects" src="Photos/phmeter.jpeg" ></button>
     </div>
     </li>
     
@@ -267,6 +263,18 @@ $("#selectbox2").change(function () {
 </div>
 
 <script type="text/javascript">
+  function changeState(x){
+    console.log(x);
+    if(x==state)
+      return;
+    state=x;
+    if(x==0)
+      dragControls.activate();
+    else{
+      console.log("here");
+      dragControls.deactivate();
+    }
+  }
 	var state=0;
 	var drag=1;
     var pressobjects=[];
@@ -317,45 +325,44 @@ $("#selectbox2").change(function () {
         //instantiate(new Beaker(250,150,"blue"));
         var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
         var base=new Mixture(undefined,undefined,80,['NaOH'],[1],['green'],[1],[1]);
-        var wat=new Mixture(undefined,undefined,80,[],[],[],[],[])
-        instantiate(new Flask(250,nmix));
-        move(objects[0],-10,0,0);
-        instantiate(new Beaker(100,wat));
-        move(objects[objects.length-1],new THREE.Vector3(25,0,0));
+        var wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
+        instantiate(new Flask(250,nmix),new THREE.Vector3(-10,0,0));
+        instantiate(new Beaker(100,wat),new THREE.Vector3(25,0,0));
+        // /move(objects[objects.length-1],);
         wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat));
-        move(objects[objects.length-1],nextShelfSlot());
+        instantiate(new Bottle(250,wat),nextShelfSlot());
+        //move(objects[objects.length-1],);
         wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat));
-        move(objects[objects.length-1],nextShelfSlot());
+        instantiate(new Bottle(250,wat),nextShelfSlot());
+        //move(objects[objects.length-1],nextShelfSlot());
         wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat));
-        move(objects[objects.length-1],nextShelfSlot());
+        instantiate(new Bottle(250,wat),nextShelfSlot());
+        //move(objects[objects.length-1],nextShelfSlot());
         wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(100,wat));
-        move(objects[objects.length-1],nextShelfSlot());
+        instantiate(new Bottle(100,wat),nextShelfSlot());
+        //move(objects[objects.length-1],nextShelfSlot());
         wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat));
-        move(objects[objects.length-1],nextShelfSlot());
+        instantiate(new Bottle(250,wat),nextShelfSlot());
+        //move(objects[objects.length-1],nextShelfSlot());
         wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        instantiate(new Bottle(250,wat));
-        move(objects[objects.length-1],new THREE.Vector3(0,0,0));
+        instantiate(new Bottle(250,wat),new THREE.Vector3(0,0,0));
+        //move(objects[objects.length-1],);
         wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
         var xflask=new Bottle(250,wat);
-        instantiate(xflask);
-        move(objects[objects.length-1],new THREE.Vector3(15,0,0));
+        instantiate(xflask,new THREE.Vector3(15,0,0));
+        //move(objects[objects.length-1],);
         shelves.pop();
         wat=new Mixture(undefined,undefined,20,[],[],[],[],[]);
         var xwatch=new WatchGlass(50,wat);
-        instantiate(xwatch);
-        move(objects[objects.length-1],120,0,0);
+        instantiate(xwatch,new THREE.Vector3(120,0,0));
+        //move(objects[objects.length-1],);
         wat=new Mixture(undefined,undefined,100,[],[],[],[],[]);
         var xbstand=new Burette(100,base);
-        instantiate(xbstand);
-        move(objects[objects.length-1],new THREE.Vector3(170,0,0));
-        var xpip=new Pipette(10);
-        instantiate(xpip);
-        move(objects[objects.length-1],new THREE.Vector3(40,0,0));
+        instantiate(xbstand,new THREE.Vector3(170,0,0));
+        //move(objects[objects.length-1],);
+        var xpip=new Pipette(10,new Mixture(undefined,undefined,0,[],[],[],[],[]));
+        instantiate(xpip,new THREE.Vector3(40,0,0));
+        //move(objects[objects.length-1],);
         var xtable=new Table(5);
         //End
         for(var i=0;i<table_n;i++){
@@ -382,8 +389,16 @@ $("#selectbox2").change(function () {
             drag=1;
             var intersects = _raycaster.intersectObjects( pressobjects ); 
             if (intersects.length>0) {
-                //console.log('here');
-                drag=0;
+              for(var i=0;i<pressobjects.length;i++){
+                if(pressobjects[i]==intersects[0]){
+                  if(typeof objects[pressmap[i]].canBePressed == 'function'){
+                    if(objects[pressmap[i]].canBePressed){
+                      drag=0;
+                    }
+                    break;
+                  }                  
+                }
+              }
             }
             controls.enabled=false;
             for(var i=0;i<objects.length;i++){
@@ -472,6 +487,7 @@ $("#selectbox2").change(function () {
         var ct=st;
         var dt=0;
         var et;
+        document.getElementById('b0').click();
         function renderScene() {
             date=new Date();
             var temp=date.getTime();
@@ -496,7 +512,7 @@ $("#selectbox2").change(function () {
             if(presstate!=null && pobject==null){
               date=new Date();
               et=date.getTime();
-              resetPosition(presstate);
+              objects[presstate].setPosition(prevcor);
               //var str=("objects["+presstate.toString()+'].PressFor('+presstate.toString()+','+(et-st).toString()+')');
               console.log("objects["+presstate.toString()+'].PressFor('+presstate.toString()+','+(et-st).toString()+')');
               objects[presstate].onPressEnd(presstate);
@@ -507,9 +523,9 @@ $("#selectbox2").change(function () {
                 var flag=0;
                 if(!flag){
                   for(var i=0;i<table_n;i++){
-                    if(objects[dobject.id]!=4 && Math.abs(objects[dobject].x()-basins[i].x())<basins[i].half_width){
+                    if(Math.abs(objects[dobject].x()-basins[i].x())<basins[i].half_width){
                       console.log("wash("+dobject.toString()+','+i.toString()+')');
-                      wash(dobject,i);
+                        wash(dobject,i);
                       flag=1;
                       break;
                     }
