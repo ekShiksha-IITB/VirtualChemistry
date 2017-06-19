@@ -1,3 +1,4 @@
+var expo;
 var geoCache=new Array(17);
 for(var i=0;i<17;i++){
     geoCache[i]=new Array(1000);
@@ -435,11 +436,11 @@ class Pipette extends Equipment{
 		this.half_width=this.radius;
 		this.fl=null;
         this.Fill=function(){
-            if(this.Mixture.volume==0 && this.fl!=null){
+            if(this.fl!=null){
                 this.fl.parent.remove(this.fl);
                 this.fl=null;
             }
-            else if(this.Mixture.volume!=0){
+            if(this.Mixture.volume!=0){
                 var v1,v2,v3;
                 v3=this.Mixture.volume;
                 v1=Math.min(this.volume/10,v3);
@@ -469,6 +470,11 @@ class Pipette extends Equipment{
             }
         };
         this.Fill();
+        this.droppable=function(){
+        	if(this.Mixture.volume==0)
+        		return 1;
+        	return 0;
+        }
         this.canBePressed=function(){
         	if(this.Mesh.rotation.x==0){
         		return 1;
@@ -476,11 +482,13 @@ class Pipette extends Equipment{
         	return 0;
         }
         this.pick=function(s){
+        	if(this.yoff==this.height/2)
+        		return;
             this.Mesh.position.y+=(this.height/2 - this.radius);
             this.yoff=this.height/2;
             this.Mesh.rotation.x+=Math.PI/2;
             console.log("objects["+s.toString()+']'+".pick()");
-            journal.push("objects["+s.toString()+']'+".pick()");
+            journal.push("objects["+s.toString()+']'+".pick()");       
         }
         this.drop=function(s){
             this.yoff=this.radius;
@@ -489,15 +497,31 @@ class Pipette extends Equipment{
             console.log("objects["+s.toString()+']'+".drop()");
             journal.push("objects["+s.toString()+']'+".drop()");
         }
+        this.dir=1;
         this.onPress=function(){
-
+        	if(this.Mixture.volume<this.volume && objects[this.Master].Mixture.volume!=0){
+        		this.dir=1;
+        	}
+        	else{
+        		this.dir=0;
+        	}
         }
         this.onPressEnd=function(){
 
         }
-        this.duringPress=function(){
-
+        this.duringPress=function(fi,dt){
+        	if(this.dir==1){
+        		var x=Math.min(dt/500,this.volume*105/100 - this.Mixture.volume);
+        		x=Math.min(x,objects[this.Master].Mixture.volume);
+        		pourF(this.Master,fi,x);
+        	}
+        	else{
+        		var x=Math.min(dt/500,this.Mixture.volume);
+        		x=Math.min(x,objects[this.Master].volume-objects[this.Master].Mixture.volume);
+        		pourF(fi,this.Master,x);
+        	}
         }
+        this.PressFor=this.duringPress;
     }
 }
 function Table(h){
@@ -706,6 +730,9 @@ class Beaker extends Equipment{
         };
         this.Fill();
         this.half_width=this.radius;
+        this.Slots=Array(1);
+        this.Slots[0]=new Slot(null, new THREE.Vector3(0,0,0),this.height);
+    	this.Slotpos=Slotpos;
     }
 }
 class WatchGlass extends Equipment{
@@ -801,7 +828,6 @@ class Flask extends Equipment{
         this.x=_x;
         this.z=_z;
         this.y=_y;
-        this.fill=ffill;
         this.sety=sety;
         this.setz=setz;
         this.setx=setx;
@@ -810,6 +836,7 @@ class Flask extends Equipment{
         this.fl=null;
         this.Fill=ffill;
         this.Mesh=r;
+        expo=r.toJSON();
         this.Fill();
         var v1=0.3*0.3*0.3;
         var hr=1-(this.Mixture.volume*(1-v1)/this.volume);
@@ -825,9 +852,8 @@ function ffill(){
         this.fl.parent.remove(this.fl);
         this.fl=null;
     }
-    else{
-        if(this.fl!=null)
-            this.fl.parent.remove(this.fl);
+    else if(this.fl!=null){
+        this.fl.parent.remove(this.fl);
         var temp=new THREE.CylinderGeometry(hr*this.radius*0.9,this.radius*0.9,this.height*0.95*(1-hr),32,1);
         temp=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: this.Mixture.Color}));
         this.fl=temp;

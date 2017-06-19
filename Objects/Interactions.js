@@ -18,9 +18,9 @@ map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 var CanBeMaster=[];
+CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,[0],0,0,0,0,0,1,0,0,0,0,0]);
-CanBeMaster.push([0,0,0,0,0,[0],0,0,0,0,0,1,0,0,0,0,0]);
-CanBeMaster.push([0,0,0,0,0,[0],0,0,0,0,0,1,0,0,0,0,0]);
+CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 CanBeMaster.push([[1],[1],[1],0,0,0,0,0,0,[1],0,[0],0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
@@ -42,9 +42,7 @@ var maxhw=[10,10,10,10,10,10,10];
 function operate(s,t){
     var c=map[objects[s].id][objects[t].id];
     if(c==0){
-        // objects[s].setx(prevcor.x);
-        // objects[s].sety(prevcor.y);
-        // objects[s].setz(prevcor.z);
+        console.log('here');    
         resetPosition(s);
     }
     if(c==1){
@@ -70,11 +68,13 @@ function pour(fi,se){
     resetPosition(fi);
 }
 function pourF(fi,se,x){
+    if(x==0)
+        return;
     var s=objects[fi];
     var t=objects[se];
     Transfer(s.Mixture,t.Mixture,x);
-    s.Fill(s.Mixture.volume);
-    t.Fill(t.Mixture.volume);
+    s.Fill();
+    t.Fill();
 }
 function wash(fi,se){
     s=objects[fi];
@@ -101,7 +101,7 @@ function wash(fi,se){
 function Place(fi,se){
     s=objects[fi];
     t=objects[se];
-    if(CanBeMaster[t.id][s.id]==0)
+    if(CanBeMaster[t.id][s.id]===0)
         return 0;
     if(Array.isArray(CanBeMaster[t.id][s.id])){
         for(var i=0;i<CanBeMaster[t.id][s.id].length;i++){
@@ -184,7 +184,7 @@ function Transfer(a,b,vol){
     b.FindColor();
 }
 function isSlave(fi,se){
-    if(CanBeMaster[objects[se].id][objects[fi].id]==0)
+    if(CanBeMaster[objects[se].id][objects[fi].id]===0)
         return 0;
     if(fi==null)
         return 0;
@@ -239,12 +239,12 @@ function resetPosition(s){
         PlaceF(s,prevmaster,prevslot);
     }
     else{
+        if(typeof objects[s].drop == 'function'){
+            objects[s].drop(s);
+        }
         objects[s].setx(prevcor.x);
         objects[s].sety(prevcor.y);
         objects[s].setz(prevcor.z);
-    }
-    if(typeof objects[s].drop == 'function'){
-        objects[s].drop(s);
     }
     updatePos(objects[s]);
 }
