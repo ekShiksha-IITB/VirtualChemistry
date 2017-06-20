@@ -25,109 +25,7 @@ class Equipment{
         this.getPosition=getPosition;
     }
 }
-function Mixture(sol='H2O',solcol='blue',vsol,narr,carr,colarr,natarr,nfarr,ind){
-    this.Solvent=sol;
-    this.SolventColor=solcol;
-    this.volume=vsol;
-    this.Chemicals=new Array(narr.length);
-    this.Indicator=ind;
-    this.PHions=0;
-    for(var i=0;i<narr.length;i++){
-        this.Chemicals[i]=new Chemical(narr[i],carr[i],colarr[i],natarr[i],nfarr[i]);
-    }
-    this.FindNature=function(){
-        this.PHions=0;
-        for(var i=0;i<this.Chemicals.length;i++){
-            this.PHions+=this.Chemicals[i].Concentration*this.Chemicals[i].Nature*this.Chemicals.Nfac;
-        }
-    }
-    this.FindColor=function(){
-        var maxconc=0;
-        var maxcol;
-        for(var i=0;i<this.Chemicals.length;i++){
-            if(this.Chemicals[i].Color!='transparent' && this.Chemicals[i].Color!=undefined ){
-                if(this.Chemicals[i].Concentration > maxconc){
-                    maxcol=this.Chemicals[i].Color;
-                    maxconc=this.Chemicals[i].Concentration;
-                }
-            }
-        }
-        if(maxcol!=undefined)
-            this.Color=maxcol;
-        else
-            this.Color=this.SolventColor;
-        if(this.Color==undefined)
-            this.Color="blue";
-    }
-    this.FindNature();
-    this.FindColor();
-    this.toString=MixtoString;
-    this.Clear=function(){
-        this.Solvent=undefined;
-        this.solcol=undefined;
-        this.volume=0;
-        this.Chemicals=[];
-    }
-}
-function MixtoString(){
-    var s='new Mixture(';
-    s+= "\"" + this.Solvent + "\"";
-    s+=',';
-    s+= "\"" + this.SolventColor.toString() + "\"";
-    s+=',';
-    s+=this.volume.toString();
-    s+=',[';
-    for(var i=0;i<this.Chemicals.length;i++){
-        s+= "\"" + this.Chemicals[i].Name.toString() + "\"" ;
-        if(i!=(this.Chemicals.length-1))
-            s+=',';
-    }
-    s+= ']'
-    s+=',[';
-    for(var i=0;i<this.Chemicals.length;i++){
-        s+= "\"" + this.Chemicals[i].Concentration.toString() + "\"" ;
-        if(i!=(this.Chemicals.length-1))
-            s+=',';
-    }
-    s+= ']'
-    s+=',[';
-    for(var i=0;i<this.Chemicals.length;i++){
-        s+= "\"" + this.Chemicals[i].Color.toString() + "\"" ;
-        if(i!=(this.Chemicals.length-1))
-            s+=',';
-    }
-    s+= ']'
-    s+=',[';
-    for(var i=0;i<this.Chemicals.length;i++){
-        s+= "\"" + this.Chemicals[i].Nature.toString() + "\"" ;
-        if(i!=(this.Chemicals.length-1))
-            s+=',';
-    }
-    s+= ']'
-    s+=',[';
-    for(var i=0;i<this.Chemicals.length;i++){
-        s+= "\"" + this.Chemicals[i].Nfac.toString() + "\"" ;
-        if(i!=(this.Chemicals.length-1))
-            s+=',';
-    }
-    s+= '])'
-    return s;
-}
-function Chemical(nc,cc,col,nat,nf){
-    this.Name=nc;
-    this.Concentration=cc;
-    this.Color=col;
-    this.Nature=nat
-    this.Nfac=nf;
-}
-class Indicator{
-    constructor(name,acidcol,basecol,neutcol){
-        this.Name=name;
-        this.AcidicColor=acidcol;
-        this.BasicColor=basecol;
-        this.neutcol=neutcol;
-    }
-}
+
 function BuretteStand(h,fp){
     this.height=h;
     this.radius=h/50;
@@ -138,7 +36,6 @@ function BuretteStand(h,fp){
     c1.position.set(0,this.height/2,(this.radius*4-this.height/2)/2)
     var c2=new THREE.BoxGeometry(this.height/3,this.radius*1.5,this.height/2);
     c2=new THREE.Mesh(c2,m2);
-    //c2.position.set(0,-this.height/2,-(this.radius*4-this.height/2)/2);
     var c3=new THREE.CylinderGeometry(this.radius/2,this.radius/2,this.height/6,32,1);
     c3=new THREE.Mesh(c3,m);
     c3.rotation.x+=Math.PI/2;
@@ -293,13 +190,13 @@ class Bottle extends Equipment{
             var c3= new THREE.CylinderGeometry(this.radius*0.3,this.radius,this.height*0.2,32,1);
             c3=new THREE.Mesh(c3,m);
             c3.position.set(0,this.height*0.6,0);
-            var c4= new THREE.CylinderGeometry(this.radius*0.2,this.radius*0.9,this.height*0.2,32,1);
+            var c4= new THREE.CylinderGeometry(this.radius*0.3,this.radius*0.9,this.height*0.2,32,1);
             c4=new THREE.Mesh(c4,m);
             c4.position.set(0,this.height*0.6,0);
-            var c5= new THREE.CylinderGeometry(this.radius*0.3,this.radius*0.3,this.height*0.3,32,1);
+            var c5= new THREE.CylinderGeometry(this.radius*0.4,this.radius*0.4,this.height*0.3,32,1);
             c5=new THREE.Mesh(c5,m);
             c5.position.set(0,this.height*0.7,0);
-            var c6= new THREE.CylinderGeometry(this.radius*0.25,this.radius*0.25,this.height*0.5,32,1);
+            var c6= new THREE.CylinderGeometry(this.radius*0.35,this.radius*0.35,this.height*0.5,32,1);
             c6=new THREE.Mesh(c6,m);
             c6.position.set(0,this.height*0.7,0);
             var t=new THREE.TorusGeometry(this.radius,this.radius*0.05,16,32);
@@ -330,6 +227,9 @@ class Bottle extends Equipment{
         this.Fill=Fillb;
         this.Fill(this.Mixture.volume);
         this.half_width=this.radius;
+        this.Slots=Array(1);
+        this.Slots[0]=new Slot(null,new THREE.Vector3(0,0,this.radius*0.3),this.height);
+        this.Slotpos=Slotpos;
     }
 }
 function Fillb(volumef){
@@ -556,71 +456,123 @@ function Table(h){
     this.Mesh.position.set(0,h-this.wood/2,0);
     this.setPosition=setPosition;
 }
-function testTube(v){
-    var h=Math.pow((v*36/Math.PI),1/3)*1.2;
-    this.height=h;
-    this.radius=h/6;
-    this.fillp=fp;
-    var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.3});
-    var c1= new THREE.CylinderGeometry(this.radius,this.radius,this.height,32,32);
-    c1=new THREE.Mesh(c1,m);
-    var c2= new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height,32,32);
-    c2=new THREE.Mesh(c2,m);
-    var s1=new THREE.SphereGeometry(this.radius,32,32);
-    s1=new THREE.Mesh(s1,m);
-    s1.position.set(0,-1*this.height/2,0);
-    var s2=new THREE.SphereGeometry(this.radius*0.9,32,32);
-    var b1=new ThreeBSP(c1);
-    var b2=new ThreeBSP(c2);
-    var b3=new ThreeBSP(s1);
-    b1=b1.union(b3);
-    var r=b1.subtract(b2);
-    r=r.toGeometry();
-    r=new THREE.Mesh(r,m);
-    this.Mesh=r;
-    this.xoff=0;
-    this.yoff=this.height/2 + this.radius;
-    this.zoff=0;
-    this.x=_x;
-    this.y=_y;
-    this.z=_z;
-    this.setx=setx;
-    this.sety=sety;
-    this.setz=setz;
-    this.setPosition=setPosition;
-    this.half_width=this.radius;
+class TestTube extends Equipment{
+	constructor(v,mix){
+		super();
+		this.id=3;	
+	    var h=Math.pow((v*36/Math.PI),1/3)*1.2;
+	    this.height=h;
+	    this.radius=h/6;
+	    this.Mixture=mix;
+	    this.volume=v;
+	    var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.4});
+	    var c1= new THREE.CylinderGeometry(this.radius,this.radius,this.height,32,32);
+	    c1=new THREE.Mesh(c1,m);
+	    var c2= new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height,32,32);
+	    c2=new THREE.Mesh(c2,m);
+	    var s1=new THREE.SphereGeometry(this.radius,16,16,0,Math.PI*2,Math.PI/2,Math.PI/2);
+	    s1=new THREE.Mesh(s1,m);
+	    s1.position.set(0,-1*this.height/2,0);
+	    var b1=new ThreeBSP(c1);
+	    var b2=new ThreeBSP(c2);
+	    var r=b1.subtract(b2);
+	    r=r.toGeometry();
+	    r=new THREE.Mesh(r,m);
+	    r.add(s1);
+	    this.Mesh=r;
+	    this.xoff=0;
+	    this.yoff=this.radius;
+	    this.zoff=0;
+	    this.x=_x;
+	    this.y=_y;
+	    this.z=_z;
+	    this.setx=setx;
+	    this.sety=sety;
+	    this.setz=setz;
+	    this.setPosition=setPosition;
+	    this.half_width=this.radius;
+	    this.Mesh.rotation.x-=Math.PI/2;
+	    this.pick=function(s){
+        	if(this.yoff==(this.height/2 + this.radius))
+        		return;
+            this.Mesh.position.y+=(this.height/2);
+            this.yoff=this.height/2+this.radius;
+            this.Mesh.rotation.x+=Math.PI/2;
+            console.log("objects["+s.toString()+']'+".pick()");
+            journal.push("objects["+s.toString()+']'+".pick()");       
+        }
+        this.drop=function(s){
+            this.yoff=this.radius;
+            this.Mesh.position.y-=(this.height/2);
+            this.Mesh.rotation.x-=Math.PI/2;
+            console.log("objects["+s.toString()+']'+".drop()");
+            journal.push("objects["+s.toString()+']'+".drop()");
+        }
+        this.Fill=function(){
+            if(this.Mixture.volume==0 && this.fl!=null){
+                this.fl.parent.remove(this.fl);
+                this.fl=null;
+            }
+            else if(this.fl!=null){
+                this.fl.material.color.set(this.Mixture.Color);
+                this.fl.scale.y=this.Mixture.volume/this.volume;
+                this.fl.position.set(0,this.height*0.9*this.Mixture.volume*0.5/this.volume-this.height*0.45,0);
+            }
+            else if(this.Mixture.volume!=0){
+                var temp = new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height*0.9,64,1);
+                this.fl=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: this.Mixture.Color}));
+                this.fl.position.set(0,this.height*0.9*this.Mixture.volume*0.5/this.volume-this.height*0.45*1.1,0);
+                this.fl.scale.y=this.Mixture.volume/this.volume;
+                this.Mesh.add(this.fl);
+            }
+        };
+        this.droppable=function(){
+        	if(this.Mixture.volume==0)
+        		return 1;
+        	return 0;
+        }
+        this.pourable=function(){
+        	if(this.Master!=null)
+        		return 1;
+        	return 0;
+        }	
+	}
 }
-function testTubeStand(h){
-    this.height=h;
-    this.wood=h/10;
-    this.radius=h/8;
-    var m=new THREE.MeshStandardMaterial({color: 0x663300});
-    var r=new THREE.BoxGeometry(h,h/2,h/3);
-    var s=new THREE.BoxGeometry(h/1.08,h/2.2,h/3);
-    var c1= new THREE.CylinderGeometry(this.radius,this.radius,h/4,32,1);
-    c1=new THREE.Mesh(c1,m);
-    var c2= new THREE.CylinderGeometry(this.radius,this.radius,h/4,32,1);
-    c2=new THREE.Mesh(c2,m);
-    var c3= new THREE.CylinderGeometry(this.radius,this.radius,h/4,32,1);
-    c3=new THREE.Mesh(c3,m);
-    c1.position.set(-h/3,h/4,0);
-    c2.position.set(h/3,h/4,0);
-    c3.position.set(0,h/4,0);
-    r=new THREE.Mesh(r,m);
-    s=new THREE.Mesh(s,m);
-    var b1=new ThreeBSP(r);
-    var b2=new ThreeBSP(s);
-    var b3=new ThreeBSP(c1);
-    var b4=new ThreeBSP(c2);
-    var b5=new ThreeBSP(c3);
-    var x=b1.subtract(b2);
-    x=x.subtract(b3);
-    x=x.subtract(b4);
-    x=x.subtract(b5);
-    x=x.toGeometry();
-    x=new THREE.Mesh(x,m);
-    this.Mesh=x;
-    this.half_width=h;    
+class TestTubeStand extends Equipment{
+	constructor(){
+		super();
+		var h=10;
+		this.id=10;
+	    this.height=h;
+	    this.wood=h/10;
+	    this.radius=h/7;
+	    var m=new THREE.MeshStandardMaterial({color: 0x663300});
+	    var r=new THREE.BoxGeometry(this.radius*2.5,h/2,h/3);
+	    var s=new THREE.BoxGeometry(this.radius*2.5/1.08,h/2.2,h/3.1);
+	    var c1= new THREE.CylinderGeometry(this.radius,this.radius,h/4,32,1);
+	    c1=new THREE.Mesh(c1,m);
+	    var c2= new THREE.CylinderGeometry(this.radius,this.radius,h/4,32,1);
+	    c2=new THREE.Mesh(c2,m);
+	    var c3= new THREE.CylinderGeometry(this.radius,this.radius,h/4,32,1);
+	    c3=new THREE.Mesh(c3,m);
+	    c3.position.set(0,h/4,0);
+	    r=new THREE.Mesh(r,m);
+	    s=new THREE.Mesh(s,m);
+	    s.position.set(0,0,((h/3)-(h/3.1))/2);
+	    var b1=new ThreeBSP(r);
+	    var b2=new ThreeBSP(s);
+	    var b5=new ThreeBSP(c3);
+	    var x=b1.subtract(b2);
+	    x=x.subtract(b5);
+	    x=x.toGeometry();
+	    x=new THREE.Mesh(x,m);
+	    this.Mesh=x;
+	    this.half_width=this.radius*2.5/2;    
+		this.yoff=h/4;
+		this.Slots=Array(1);
+		this.Slots[0]=new Slot(null,new THREE.Vector3(0,((h/3-h/3.1)/2),0));
+		this.Slotpos=Slotpos;
+	}
 }
 function Shelf(h){
     this.id=13;
@@ -730,8 +682,9 @@ class Beaker extends Equipment{
         };
         this.Fill();
         this.half_width=this.radius;
-        this.Slots=Array(1);
+        this.Slots=Array(2);
         this.Slots[0]=new Slot(null, new THREE.Vector3(0,0,0),this.height);
+    	this.Slots[1]=new Slot(null, new THREE.Vector3(0,0,this.radius*0.9),this.height);
     	this.Slotpos=Slotpos;
     }
 }
@@ -836,12 +789,14 @@ class Flask extends Equipment{
         this.fl=null;
         this.Fill=ffill;
         this.Mesh=r;
-        expo=r.toJSON();
         this.Fill();
         var v1=0.3*0.3*0.3;
         var hr=1-(this.Mixture.volume*(1-v1)/this.volume);
         hr=Math.pow(hr,1/3);
         this.half_width=this.radius;
+        this.Slots=Array(1);
+        this.Slots[0]=new Slot(null,new THREE.Vector3(0,0,this.radius*0.25),this.height);
+        this.Slotpos=Slotpos;
     }
 }
 function ffill(){
@@ -852,8 +807,9 @@ function ffill(){
         this.fl.parent.remove(this.fl);
         this.fl=null;
     }
-    else if(this.fl!=null){
-        this.fl.parent.remove(this.fl);
+    else{
+        if(this.fl!=null)
+            this.fl.parent.remove(this.fl);
         var temp=new THREE.CylinderGeometry(hr*this.radius*0.9,this.radius*0.9,this.height*0.95*(1-hr),32,1);
         temp=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: this.Mixture.Color}));
         this.fl=temp;
@@ -914,6 +870,125 @@ function Basin(w){
     this.axel=sph;
     this.half_width=this.radius;
     this.setPosition=setPosition;
+}
+class PhMeter extends Equipment{
+	constructor(){
+	    super();
+	    this.id=12;
+	    var h=4;
+	    var box=new THREE.BoxGeometry(h,2*h,h/2);
+        var mat=new THREE.MeshStandardMaterial({color:'white'});
+        var mesh=new THREE.Mesh(box,mat);
+        var b1=new ThreeBSP(mesh);
+        var box2=new THREE.BoxGeometry(h*2/3,h/2,h/4);
+        var mesh2=new THREE.Mesh(box2,mat);
+        var display=new THREE.BoxGeometry(h*2/3,h/2,h/8);
+        display=new THREE.Mesh(display,new THREE.MeshStandardMaterial({color:'cyan'}));
+        display.position.set(0,h/2,h/4-h/8);
+        mesh2.position.set(0,h/2,h/4-h/8);
+        var b2=new ThreeBSP(mesh2);
+        b1=b1.subtract(b2);
+        box=b1.toGeometry();
+        mesh=new THREE.Mesh(box,mat);
+        mesh.add(display);
+        var c1=new THREE.CylinderGeometry(h/40,h/40,h,32,1);
+        var m2=new THREE.Mesh(c1,mat);
+        var c2=new THREE.CylinderGeometry(h/40,h/40,h*3/2,32,1);
+        var c3=new THREE.CylinderGeometry(h/40,h/40,3*h,32,1);
+        var m3=new THREE.Mesh(c2,mat);
+        var m4=new THREE.Mesh(c3,mat);
+        m3.rotation.x+=Math.PI/2;
+        m3.position.set(0,h+h,-h*3/4);
+        m2.position.set(0,h/2 + h,0);
+        m4.position.set(0,h*0.5,-h*3/2);
+        mesh.add(m2);
+        mesh.add(m3);
+        mesh.add(m4);
+        this.Mesh=mesh;
+	    this.yoff=h;
+	    this.zoff=h*3/2-h/40;
+	    this.half_width=h/2;
+	}
+}
+class BunsenBurner extends Equipment{
+	constructor(){
+		super();
+		// var blueMaterial = new THREE.MeshPhongMaterial( {color: 0x0000FF } );
+		// var redMaterial = new THREE.MeshPhongMaterial({ color:0xFF0000 });
+		// var meshFaceMaterial = new THREE.MeshFaceMaterial( [ blueMaterial, redMaterial ] );
+
+		// var boxGeometry = new THREE.BoxGeometry( 10, 10, 10 );
+
+		// for ( var face in boxGeometry.faces ) {
+		//     boxGeometry.faces[ face ].materialIndex = 0;
+		// }
+
+		// var sphereGeometry = new THREE.SphereGeometry( 5, 16, 16 );
+		// sphereGeometry.applyMatrix( new THREE.Matrix4().makeTranslation(0, 5, 0) );
+
+		// var mergeGeometry = new THREE.Geometry();
+		// mergeGeometry.merge( boxGeometry, boxGeometry.matrix );
+		// mergeGeometry.merge( sphereGeometry, sphereGeometry.matrix, 1 );
+
+		// var mesh = new THREE.Mesh( mergeGeometry, meshFaceMaterial );
+	    var h=10;
+		this.id=7;
+	    this.height=h;
+	    this.radius=h/10	;
+	    var h1,h2,h3;
+	    var r1,r2,r3;
+	    h1=0.05*h;
+	    h2=0.80*h;
+	    h3=0.15*h;
+	    r1=h/2.5;
+	    r2=this.radius;
+	    r3=this.radius*1.2;
+	    var m1=new THREE.MeshStandardMaterial({color:"blue"});
+	    var m2=new THREE.MeshStandardMaterial({color:"gray"});
+	    var m3=new THREE.MeshStandardMaterial({color:"gold"});
+	    var c1=new THREE.CylinderGeometry(r1,r1,h1,32,1);
+	    var c2=new THREE.CylinderGeometry(r2,r2,h2,32,1);
+	    var c3=new THREE.CylinderGeometry(r2*0.8,r2*0.8,h2,32,1);
+	    var c4=new THREE.CylinderGeometry(r3,r3,h3,32,1);
+	    var c5=new THREE.CylinderGeometry(r2*0.8,r2*0.8,h3,32,1);
+	    c1=new THREE.Mesh(c1,m1);
+	    c2=new THREE.Mesh(c2,m2);
+	    c3=new THREE.Mesh(c3,m2);
+	    c4=new THREE.Mesh(c4,m3);
+	    c5=new THREE.Mesh(c5,m3);
+	    c1.position.set(0,h1/2,0);
+	    var b2=new ThreeBSP(c2);
+	    var b3=new ThreeBSP(c3);
+	    var b4=new ThreeBSP(c4);
+	    var b5=new ThreeBSP(c5);
+	    b2=b2.subtract(b3);
+	    c2=b2.toGeometry();
+	    c2=new THREE.Mesh(c2,m2);
+	    c1.position.set(0,-(h1+h2)/2,0);
+	    b4=b4.subtract(b5);
+	    c4=b4.toGeometry();
+	    c4=new THREE.Mesh(c4,m3);
+	    c4.position.set(0,h2/2+(h3/2),0);
+	    var r=c2;
+	    r.add(c1);
+	    r.add(c4);
+	    this.flame=null;
+	    this.Mesh=r;
+	    this.onPress=function(){
+	        this.flame=new THREE.SphereGeometry(h/8);
+	        this.flame=new THREE.Mesh(this.flame,new THREE.MeshStandardMaterial({color:'red'}));
+	        this.flame.scale.x=0.5;
+	        this.flame.scale.z=0.5;
+	        this.flame.position.set(0,h+h/20,0);
+	        this.Mesh.add(this.flame);
+	    }
+	    this.onPressEnd=function(){
+	        this.flame.parent.remove(this.flame);
+	        this.flame=null;
+	    }
+	    this.yoff=h1+h2/2;
+	    this.half_width=r1;
+	}
 }
 function _x(){
     return this.Mesh.position.x-this.xoff;
