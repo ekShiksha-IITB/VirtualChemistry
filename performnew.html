@@ -15,6 +15,7 @@
     <script src="libs/OrbitControls.js"></script>  
     <script src="libs/DragControls.js"></script>
     <script src="libs/TrackballControls.js"></script>  
+    <script src="Objects/Chemicals.js"></script>  
   <style>
     /* Remove the navbar's default margin-bottom and rounded borders */ 
     .navbar {
@@ -264,14 +265,12 @@ $("#selectbox2").change(function () {
 
 <script type="text/javascript">
   function changeState(x){
-    console.log(x);
     if(x==state)
       return;
     state=x;
     if(x==0)
       dragControls.activate();
     else{
-      console.log("here");
       dragControls.deactivate();
     }
   }
@@ -315,7 +314,7 @@ $("#selectbox2").change(function () {
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMapEnabled = true;
         // add subtle ambient lighting
-        var ambientLight = new THREE.AmbientLight(0x0c0c0c,2);
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c,4);
         scene.add(ambientLight);
         // add spotlight for the shadows
         document.body.appendChild(renderer.domElement);
@@ -324,15 +323,14 @@ $("#selectbox2").change(function () {
         shelves.push(new Shelf(shelf_height));
         shelves[0].setPosition(0,0,-table_height*2/5);
         table_n=1;
-        //instantiate(new Beaker(250,150,"blue"));
-        // var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
-        // var base=new Mixture(undefined,undefined,80,['NaOH'],[1],['green'],[1],[1]);
+        var nmix=new Mixture([]);
+        var base=new Mixture([new Chemical('Water','blue',0,1,'H2O',4,1,18,'blue')]);;
         // var wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        // instantiate(new Flask(250,nmix),new THREE.Vector3(-10,0,0));
+        instantiate(new Flask(250,nmix),nextShelfSlot());
         // instantiate(new Beaker(100,wat),new THREE.Vector3(25,0,0));
         // // /move(objects[objects.length-1],);
         // wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-        // instantiate(new Bottle(250,wat),nextShelfSlot());
+        instantiate(new Bottle(250,base),nextShelfSlot());
         // //move(objects[objects.length-1],);
         // wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
         // instantiate(new Bottle(250,wat),nextShelfSlot());
@@ -444,18 +442,31 @@ $("#selectbox2").change(function () {
                 }
               }
               if(flag){
-                var v=prompt("Select Volume");
-                if(v!=null){
+                if(iscontainer[state-1]){
+                  var v=prompt("Select Volume");
+                  if(v!=null){
+                    var str='instantiate(';
+                    str+='new ';
+                    str+=omap[state-1];
+                    str+='(';
+                    str+=v.toString()+',new Mixture([])),';
+                    str+='new THREE.Vector3(';
+                    str+=intersects[0].point.x.toString()+',';
+                    str+='0,';
+                    str+='0))';
+                    eval(str);
+                  }
+                }
+                else{
                   var str='instantiate(';
                   str+='new ';
                   str+=omap[state-1];
                   str+='(';
-                  str+=v.toString()+',new Mixture(undefined,undefined,0,[],[],[],[],[])),';
+                  str+='),';
                   str+='new THREE.Vector3(';
                   str+=intersects[0].point.x.toString()+',';
                   str+='0,';
                   str+='0))';
-                  console.log(str);
                   eval(str);
                 }
               }
@@ -468,7 +479,7 @@ $("#selectbox2").change(function () {
             if(drag==1){
               dobject=pobject;
             }
-            objects[pobject].restrict(-table_height+objects[pobject].radius,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].radius,0,table_height*2,0,0);
+            objects[pobject].restrict(-table_height+objects[pobject].half_width,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].half_width,0,table_height*2,0,0);
                   updatePos(objects[pobject]);
             pobject=null
         });
@@ -536,7 +547,7 @@ $("#selectbox2").change(function () {
             ct=temp;
             if(pobject!=null){
                 if(drag){
-               		objects[pobject].restrict(-table_height+objects[pobject].radius,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].radius,0,table_height*2,0,0);
+               		objects[pobject].restrict(-table_height+objects[pobject].half_width,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].half_width,0,table_height*2,0,0);
                   updatePos(objects[pobject]);
                 }
                 else{
@@ -578,7 +589,7 @@ $("#selectbox2").change(function () {
                 if(!flag){
                   var lobject=-1;
                   for(var i=0;i<objects.length;i++){
-                      if(!isSlave(i,dobject) &&objects[i]!=objects[dobject] &&(objects[i].y()==0)&& (Math.abs(objects[dobject].x()-objects[i].x())<= objects[i].half_width+objects[dobject].half_width)){
+                      if(!isSlave(i,dobject) &&objects[i]!=objects[dobject] &&(objects[i].z()==0)&& (Math.abs(objects[dobject].x()-objects[i].x())<= objects[i].half_width+objects[dobject].half_width)){
                           if(Place(dobject,i)){
                             flag=1;
                             break;
@@ -608,7 +619,9 @@ $("#selectbox2").change(function () {
                           }
                       }
                   }
-                  if(sobject>=0){
+                  if(sobject>=0){                   
+                    console.log(omap[objects[dobject].id]);
+                    console.log(omap[objects[sobject].id]);
                     operate(dobject,sobject);
                     var str="operate("+dobject.toString()+','+sobject.toString()+')';
                     journal.push(str);
