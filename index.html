@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="backend.js"></script>
+  <script type="text/javascript" src="Objects/backend.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
   <style>
     /* Remove the navbar's default margin-bottom and rounded borders */ 
@@ -22,11 +22,28 @@
       padding: 25px;
     }
 	
-	.jumbotron{
-	background-image:url("chem.jpg");
-	}
+    .jumbotron{
+        background-image:url("chem.jpg");
+    }
 	
-  </style>
+    a{cursor:pointer;}
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+
+   </style>
 </head>
 <body>
 
@@ -109,9 +126,35 @@
 	
 	</div>
     <div class="col-sm-3"> 
-      <a href="perform.html"><p>Perform Experiment</p></a>
-      <a href="perform.html"><img src="perform.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
+      <a data-toggle="modal" data-target="#myModal4"><p>Perform Experiment</p></a>
+      <a data-toggle="modal" data-target="#myModal4"><img src="perform.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
     </div>
+     
+      <div class="modal fade" id="myModal4" role="dialog">
+      <div class="modal-dialog">
+    
+     
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+		  <h4 class="modal-title">List of Experiments</h4>
+        </div>
+        <div class="modal-body">
+		<div style="height:400px; overflow:scroll;">
+          <table class = "TableDetails">
+         
+         </table>
+    </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+	</div>
+
+      
     <div class="col-sm-3"> 
       <a href="demo.html"><p>Demo Experiment</p></a>
       <a href="demo.htmo"><img src="demo.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
@@ -135,23 +178,54 @@
 </footer>
 
 <script type="text/javascript">
+    var id = prompt("Enter User Id");
+    document.getElementById('superSubmit').addEventListener('click',function(){
+        console.log("IN SuperSumbit");
+        if(document.getElementById("Etitle").value!="" && document.getElementById("Eauthor").value!="" && document.getElementById("Eclass").value!="" &&document.getElementById("Eaim").value!="" &&document.getElementById("Emarks").value!="" &&document.getElementById("Eins").value!=""){
+            var Etitle = document.getElementById("Etitle").value;
+            var Eauthor = document.getElementById("Eauthor").value;
+            var Eclass = document.getElementById("Eclass").value;
+            var Eaim = document.getElementById("Eaim").value;
+            var Emarks = document.getElementById("Emarks").value;
+            var Eins = document.getElementById("Eins").value;
+            console.log( "hi89898989" + Etitle + Eins);
+            haveFun(id,"setup",Etitle,Eauthor,Eclass,Eaim,Emarks,Eins);
+            window.location.href = "perform.html";
+        }
+    });
 
-document.getElementById('superSubmit').addEventListener('click',function(){
-    console.log("IN SuperSumbit");
-    if(document.getElementById("Etitle").value!="" && document.getElementById("Eauthor").value!="" && document.getElementById("Eclass").value!="" &&document.getElementById("Eaim").value!="" &&document.getElementById("Emarks").value!="" &&document.getElementById("Eins").value!=""){
-        var Etitle = document.getElementById("Etitle").value;
-        var Eauthor = document.getElementById("Eauthor").value;
-        var Eclass = document.getElementById("Eclass").value;
-        var Eaim = document.getElementById("Eaim").value;
-        var Emarks = document.getElementById("Emarks").value;
-        var Eins = document.getElementById("Eins").value;
-        console.log( "hi89898989" + Etitle + Eins);
-        haveFun(Etitle,Eauthor,Eclass,Eaim,Emarks,Eins);
-        window.location.href = "perform.html";
-    }
-});
+    var ExperimentList = function() {
+        //console.log("Retriving");
+            var Edata;
+            var num = 1;
+            $.ajax({
 
+                    method: "GET",
+                    url: "GetExperimentDetails",
+                    dataType: "HTML",               
+                    //async: false,
+                    success: function(response) {
+                       console.log(response);
+                        Edata = response.split(",");
+                        display = "<tr><th>Sr.No.</th><th>Experiment Name</th><th>Actions</th></tr>";
+                        for (i in Edata){
+                            display += "<tr>";
+                            display += "<td>" + num + "</td>";num++;
+                            display += "<td>" + Edata[i] + "</td>";
+                            display += "<td><button class=\"btn btn-primary\">" + "Perform" + "</button></td>";
+                            display += "</tr>";
+                        }
+                        console.log(display);
+                        $(".TableDetails").html(display);
+                    },
+                    error : function(){
+                              alert("Error Occured");
+                    }
+        });
+        /* response will be saved to data_obj*/
+    }();
 </script>
+
 
 </body>
 </html>
