@@ -272,6 +272,7 @@ function addTable(){
     spotLight[table_n].position.set(table_n*table_height*2+table_n*basin_width, 80, -60);
     spotLight[table_n].castShadow = true;
     scene.add(spotLight[table_n]);
+    tablesM.push(tables[table_n].Mesh);
     table_n++;
     journal.push("addTable()");
     console.log("addTable()");
