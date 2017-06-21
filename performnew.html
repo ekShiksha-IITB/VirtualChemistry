@@ -353,7 +353,7 @@ $("#selectbox2").change(function () {
         scene.add(ambientLight);
         // add spotlight for the shadows
         document.body.appendChild(renderer.domElement);
-        var controls = new THREE.OrbitControls( camera, renderer.domElement );
+        // var controls = new THREE.OrbitControls( camera, renderer.domElement );
         //This data has to be taken from the database
         shelves.push(new Shelf(shelf_height));
         shelves[0].setPosition(0,0,-table_height*2/5);
@@ -403,7 +403,7 @@ $("#selectbox2").change(function () {
                 }
               }
             }
-            controls.enabled=false;
+            // controls.enabled=false;
             for(var i=0;i<objects.length;i++){
                 if(_selected==objectsM[i]){
                     pobject=i;
@@ -473,7 +473,7 @@ $("#selectbox2").change(function () {
         renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
         renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
         dragControls.addEventListener('dragend',function (event){
-            controls.enabled=true;
+            // controls.enabled=true;
             if(drag==1){
               dobject=pobject;
             }
@@ -663,7 +663,7 @@ $("#selectbox2").change(function () {
               pobject=null;
               dobject=null;
             }
-            controls.update();
+            // controls.update();
             requestAnimationFrame(renderScene);
             renderer.render(scene, camera);
         }
