@@ -358,8 +358,8 @@ $("#selectbox2").change(function () {
         shelves.push(new Shelf(shelf_height));
         shelves[0].setPosition(0,0,-table_height*2/5);
         table_n=1;
-        var nmix=new Mixture([new Chemical('Water','green',0,1,'H2O',12,1,18,'red')]);
-        var base=new Mixture([new Chemical('Water','red',0,1,'H2O',12,1,18,'red')]);
+        var nmix=new Mixture([new Chemical('Hydrochloric Acid','green',0,1,'HCl',12,1,18,'green')]);
+        var base=new Mixture([new Chemical('Sodium Hydroxide','red',0,1,'NaOH',12,1,18,'red')]);
         instantiate(new Flask(250,nmix),nextShelfSlot());
         instantiate(new Bottle(250,base),nextShelfSlot());
         //End
