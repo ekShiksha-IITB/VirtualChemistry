@@ -353,36 +353,18 @@ $("#selectbox2").change(function () {
         scene.add(ambientLight);
         // add spotlight for the shadows
         document.body.appendChild(renderer.domElement);
-        // var controls = new THREE.OrbitControls( camera, renderer.domElement );
+        var controls = new THREE.OrbitControls( camera, renderer.domElement );
         //This data has to be taken from the database
         shelves.push(new Shelf(shelf_height));
         shelves[0].setPosition(0,0,-table_height*2/5);
-        table_n=1;
-        var nmix=new Mixture([new Chemical('Hydrochloric Acid','green',0,1,'HCl',12,1,18,'green')]);
-        var base=new Mixture([new Chemical('Sodium Hydroxide','red',0,1,'NaOH',12,1,18,'red')]);
-        instantiate(new Flask(250,nmix),nextShelfSlot());
-        instantiate(new Bottle(250,base),nextShelfSlot());
+        table_n=0;
+        addTable();
+        // var nmix=new Mixture([new Chemical('Hydrochloric Acid','green',0,1,'HCl',12,1,18,'green')]);
+        // var base=new Mixture([new Chemical('Sodium Hydroxide','red',0,1,'NaOH',12,1,18,'red')]);
+        // instantiate(new Flask(250,nmix),nextShelfSlot());
+        // instantiate(new Bottle(250,base),nextShelfSlot());
         //End
-        for(var i=0;i<table_n;i++){
-          spotLight.push(new THREE.PointLight(0xffffff,1,0,1),);
-          spotLight[i].position.set(i*table_height*2+i*basin_width, 80, -60);
-          spotLight[i].castShadow = true;
-          scene.add(spotLight[i]);
-        }
         camera.position.set(0,table_height,table_height*4);
-        for(var i=0;i<table_n;i++){
-            tables.push(new Table(table_height));
-            tablesM.push(tables[tables.length-1].Mesh);
-            tables[i].setPosition(i*table_height*2+i*basin_width,-table_height,0);
-            scene.add(tables[i].Mesh);
-            shelves.push(new Shelf(shelf_height));
-            shelves[i].setPosition(i*shelf_height*2+i*basin_width,0,-table_height*0.43);
-            scene.add(shelves[i].Mesh);
-            basins.push(new Basin(basin_width));
-            basins[i].setPosition((2*i+1)*table_height+((1/2)+i)*basin_width,-basin_height,0);
-            scene.add(basins[i].Mesh);   
-        }
-        
         dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
         dragControls.addEventListener('dragstart',function (event){
             isclick=1;
@@ -403,7 +385,7 @@ $("#selectbox2").change(function () {
                 }
               }
             }
-            // controls.enabled=false;
+            controls.enabled=false;
             for(var i=0;i<objects.length;i++){
                 if(_selected==objectsM[i]){
                     pobject=i;
@@ -473,7 +455,7 @@ $("#selectbox2").change(function () {
         renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
         renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
         dragControls.addEventListener('dragend',function (event){
-            // controls.enabled=true;
+            controls.enabled=true;
             if(drag==1){
               dobject=pobject;
             }
@@ -481,23 +463,7 @@ $("#selectbox2").change(function () {
                   updatePos(objects[pobject]);
             pobject=null
         });
-        document.getElementById('NewTable').addEventListener('click',function(){
-            tables.push(new Table(table_height));
-            tables[table_n].setPosition(table_n*table_height*2+table_n*basin_width,-table_height,0);
-            tablesM.push(tables[tables.length-1].Mesh);
-            scene.add(tables[table_n].Mesh);
-            shelves.push(new Shelf(shelf_height));
-            shelves[table_n].setPosition(table_n*shelf_height*2+table_n*basin_width,0,-table_height*0.43);
-            scene.add(shelves[table_n].Mesh);
-            basins.push(new Basin(basin_width));
-            basins[table_n].setPosition((2*table_n+1)*table_height+((1/2)+table_n)*basin_width,-basin_height,0);
-            scene.add(basins[table_n].Mesh);
-            spotLight.push(new THREE.PointLight(0xffffff,0.4));
-            spotLight[table_n].position.set(table_n*table_height*2+table_n*basin_width, 80, -60);
-            spotLight[table_n].castShadow = true;
-            scene.add(spotLight[table_n]);
-            table_n++;
-        });
+        document.getElementById('NewTable').addEventListener('click',addTable);
         document.getElementById('Save').addEventListener('click',function(){
             var mystring = "";
             for(var i=0;i<objects.length;i++){
@@ -663,7 +629,7 @@ $("#selectbox2").change(function () {
               pobject=null;
               dobject=null;
             }
-            // controls.update();
+            controls.update();
             requestAnimationFrame(renderScene);
             renderer.render(scene, camera);
         }
