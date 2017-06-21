@@ -14,6 +14,11 @@
     <script type="text/javascript" src="libs/ThreeBSP.js"></script>
     <script src="libs/OrbitControls.js"></script>  
     <script src="libs/DragControls.js"></script>
+    <script src="libs/threex.dynamictexture.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
+    <script src="libs/TrackballControls.js"></script>  
+    <script src="Objects/Chemicals.js"></script>
+    <script type="text/javascript" src="Objects/backend.js"></script>
   <style>
     /* Remove the navbar's default margin-bottom and rounded borders */ 
     .navbar {
@@ -22,7 +27,7 @@
     }
     
     /* Add a gray background color and some padding to the footer */
-    footer {
+    .footer {
       background-color: #f2f2f2;
       padding: 25px;
     }
@@ -91,6 +96,27 @@
       margin-bottom:-104px;
      
       }
+    .equip{
+    width:650px;
+    height:50px;
+    background-color:white;
+   text-align:center;
+   border-radius:4px;
+
+    float:right;
+    margin-left:40px;
+    }
+    .objects{
+      width:20px;
+      height:20px;
+border: 1px solid #ddd;
+    border-radius: 4px;
+
+    }
+    .active {
+  background-color: green !important;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+  }
   </style>
 </head>
 <body>
@@ -103,27 +129,16 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>                        
       </button>
-      <a class="navbar-brand" href="#" style="color:white">ekshikhsha</a>
+     <a href="#" class="navbar-brand" style="color:white">ekshiksha</a>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active" ><a href="#" style="color:white">Home</a></li>
+        <li ><a href="#" style="color:white">Home</a></li>
         <li><a href="#" style="color:white">About</a></li>
         <li><a href="#" style="color:white">Join us</a></li>
-    <li> <select id="selectbox">
-   <option selected hidden>Choose equipments</option>
-  <option value="#consumergoods">Test tube</option>
-  <option value="#consumergoods2">Beaker</option>
-  <option value="#consumergoods2">Burner</option>
-  <option value="#consumergoods">Flask</option>
-  <option value="#consumergoods">Pipette</option>
-  <option value="#consumergoods2">Test Tube stand</option>
-  <option value="#consumergoods2">Bottles</option>
-  <option value="#consumergoods">Burette</option>
-  <option value="#consumergoods2">Wash Basin</option>
-</select></li>
-<li><select id="selectbox2">
-  <option selected hidden>Choose chemicals</option>
+
+<li><select id="selectbox2" class="hifi">
+  <!-- <option selected hidden>Choose chemicals</option>
   <optgroup label="Acids">
   <option value="#consumer_goods">Hydrochloric acid</option>
   <option value="#consumer_goods">Sulphuric acid</option>
@@ -135,15 +150,40 @@
   <option>Methyl orange</option>
   <option>Phenolphthalein</option>
   <option>Red litmus</option>
-  <option>Blue litmus</option>
+  <option>Blue litmus</option> -->
     
 </select></li>
-<li><button class="btn btn-primary" id ="Save" style="margin-top:8px;margin-right:10px;margin-left:50px">Save</button></li>
-<li><button class="btn btn-primary" id = "Restore" style="margin-top:8px;margin-right:10px;margin-left:10px">Restore</button></li>
-<li><button class="btn btn-primary" id="NewTable" style="margin-top:8px;margin-right:10px;margin-left:10px">New table</button></li>   
+<li>
+<div class="btn btn-group">
+<button class="btn btn-primary" id='Save'>Save</button>
+<button class="btn btn-primary" id='Restore'>Restore</button>
+<button class="btn btn-primary" id='NewTable'>New table</button>
+
+</div>
+</li>
+<li><button class="btn btn-primary" style="margin-top:8px"><i class="fa fa-undo"></i></button></li>
+<li><button class="btn btn-default" onclick="changeState(0)" id='b0' style="margin-top:8px;margin-left:10px;"><i class="glyphicon glyphicon-hand-up"></i></button></li>    
+    <li>
+    <div class="btn btn-group">
+    <button class="btn btn-default" id='b1' onclick="changeState(1)" title="Bottle"><img class="objects" src="Photos/bottle.jpeg" ></button>
+    <button class="btn btn-default" id='b2'  onclick="changeState(2)" title="Beaker"><img class="objects" src="Photos/beaker.jpg" ></button>
+    <button class="btn btn-default" id='b3'  onclick="changeState(3)" title="Flask"><img class="objects" src="Photos/flask.jpg" ></button>
+    <button class="btn btn-default" id='b4'  onclick="changeState(4)" title="Test tube"><img class="objects" src="Photos/testtube.jpg" ></button>
+    <button class="btn btn-default" id='b5'  onclick="changeState(5)" title="Burette"><img class="objects" src="Photos/burette.jpeg" ></button>
+    <button class="btn btn-default" id='b6'  onclick="changeState(6)" title="Pipette"><img class="objects" src="Photos/pipette.jpg" ></button>
+    <button class="btn btn-default" id='b7'  onclick="changeState(7)" title="Petridish"><img class="objects" src="Photos/petridish.jpeg" ></button>
+    <button class="btn btn-default" id='b8'  onclick="changeState(8)" title="BunsenBurner"><img class="objects" src="Photos/bunsenburner.jpeg" ></button>
+    <button class="btn btn-default" id='b9'  onclick="changeState(9)" title="Weighing machine"><img class="objects" src="Photos/weighingmachine.jpeg" ></button>
+    <button class="btn btn-default" id='b10' onclick="changeState(10)"  title="Watch glass"><img class="objects" src="Photos/watchglass.jpeg" ></button>
+    <button class="btn btn-default" id='b11' onclick="changeState(11)"  title="Test tube stand"><img class="objects" src="Photos/testtubestand.jpeg" ></button>
+    <button class="btn btn-default" id='b12' onclick="changeState(12)"  title="Funnel"><img class="objects" src="Photos/funnel.jpeg" ></button>
+    <button class="btn btn-default" id='b13' onclick="changeState(13)"  title="Phmeter"><img class="objects" src="Photos/phmeter.jpeg" ></button>
+    </div>
+    </li>
+    
       </ul>
     </div>
-  </div>
+ 
 </nav>
 <script>
 $("#selectbox").change(function () {
@@ -155,7 +195,18 @@ $("#selectbox").change(function () {
       }
     
  });
+
 </script>
+
+
+<script>
+$(".btn-default").click(function(){
+  $(".btn-default").removeClass("active");
+  $(this).addClass("active");
+});
+
+</script>
+
 <div class="modal fade" id="consumergoods" data-target="#consumergoods">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -204,16 +255,66 @@ $("#selectbox2").change(function () {
         </button>
         <p><h4 class="modal-title">Provide details</h4></p>
         <form action="#" method="$POST">
-    <input type="text" class="form-control" id="text1" placeholder="Enter volume in mL">
-    <input type="text" class="form-control" id="text2" placeholder="Enter Normality" style="margin-top:20px"><br>
-    <button type="button" class="btn btn-primary"  action="#">Submit</button>
+    <input type="text" class="form-control" id="ChemV" placeholder="Enter volume in mL">
+    <input type="text" class="form-control" id="ChemC" placeholder="Enter Concentration" style="margin-top:20px"><br>
+    <button type="button" id="ChemSub" data-dismiss="modal" class="btn btn-primary">Submit</button>
     
     </form>
       </div>
     </div>
   </div>
 </div>
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div id='myModal' class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Choose a size</h4>
+      </div>
+      <div id='inserthere' class="modal-body">
+        <p>Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div id="vcl"></div>
 <script type="text/javascript">
+  function addEquipment(v){
+    if(v!=0){
+      var str='instantiate(';
+      str+='new ';
+      str+=omap[state-1];
+      str+='(';
+      str+=v.toString()+',new Mixture([])),';
+      str+='new THREE.Vector3(';
+      str+=intersects[0].point.x.toString()+',';
+      str+='0,';
+      str+='0))';
+      eval(str);
+    }
+  }
+  function changeState(x){
+    if(x==state)
+      return;
+    state=x;
+    if(x==0)
+      dragControls.activate();
+    else{
+      dragControls.deactivate();
+    }
+  }
+    var state=0;
+    var drag=1;
+    var tablesM=[];
+    var intersects=[];
+    var pressobjects=[];
+    var pressmap=[];
     var prevcor;
     var prevmaster;
     var prevslot;
@@ -233,17 +334,23 @@ $("#selectbox2").change(function () {
     var dobject=null;
     var pobject=null;
     var dirLight;
+    var journal=[];
+    var isclick=1;
+    var dragControls;
+    var raycaster = new THREE.Raycaster();
+    var mouse = new THREE.Vector2();
     function init() {
         scene = new THREE.Scene();
         // create a camera, which defines where we're looking at.
         camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         // create a render and set the size
         renderer = new THREE.WebGLRenderer();
-        renderer.setClearColor(new THREE.Color(0x436521, 1));
+        renderer.setClearColor(new THREE.Color(0x232323));
+        //renderer.setClearColorHex(new THREE.Color(0x000000, 1));
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMapEnabled = true;
         // add subtle ambient lighting
-        var ambientLight = new THREE.AmbientLight(0x0c0c0c,1);
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c,4);
         scene.add(ambientLight);
         // add spotlight for the shadows
         document.body.appendChild(renderer.domElement);
@@ -251,188 +358,113 @@ $("#selectbox2").change(function () {
         //This data has to be taken from the database
         shelves.push(new Shelf(shelf_height));
         shelves[0].setPosition(0,0,-table_height*2/5);
-        // User Functionality Added here=============================
-        var uid = prompt("User ID");
-        var way = prompt("setup/perform");
-        var eid = null;
-        eid = prompt("Experiment ID");
-//        if(way == 'perform'){
-//            eid = prompt("Experiment ID");
-//        }
-        if(way == 'setup'){
-            table_n=2;
-            //instantiate(new Beaker(250,150,"blue"));
-            var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
-            var wat=new Mixture(undefined,undefined,80,[],[],[],[],[])
-            instantiate(new Flask(250,nmix));
-            move(objects[0],-10,0,0);
-            instantiate(new Beaker(100,wat));
-            move(objects[objects.length-1],new THREE.Vector3(25,0,0));
-            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-            instantiate(new Bottle(250,wat));
-            move(objects[objects.length-1],shelves[0].Slotpos(0));
-            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-            instantiate(new Bottle(250,wat));
-            move(objects[objects.length-1],shelves[0].Slotpos(1));
-            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-            instantiate(new Bottle(250,wat));
-            move(objects[objects.length-1],shelves[0].Slotpos(2));
-            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-            instantiate(new Bottle(100,wat));
-            move(objects[objects.length-1],shelves[0].Slotpos(3));
-            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-            instantiate(new Bottle(250,wat));
-            move(objects[objects.length-1],shelves[0].Slotpos(4));
-            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-            instantiate(new Bottle(250,wat));
-            move(objects[objects.length-1],new THREE.Vector3(0,0,0));
-            wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-            var xflask=new Bottle(250,wat);
-            instantiate(xflask);
-            move(objects[objects.length-1],new THREE.Vector3(15,0,0));
-            shelves.pop();
-            wat=new Mixture(undefined,undefined,20,[],[],[],[],[]);
-            var xwatch=new WatchGlass(50,wat);
-            instantiate(xwatch);
-            move(objects[objects.length-1],120,0,0);
-            wat=new Mixture(undefined,undefined,100,[],[],[],[],[]);
-            var xbstand=new Burette(100,wat);
-            instantiate(xbstand);
-            move(objects[objects.length-1],new THREE.Vector3(170,0,0));
-//            var xpip=new Pipette(10);
-//            instantiate(xpip);
-//            move(objects[objects.length-1],new THREE.Vector3(40,0,0));
-        }
-        else if(way == 'perform'){
-            var dataLoader = function() {
-                        console.log("Retriving");
-                            $.ajax({
-
-                                    method: "GET",
-                                    url: "RetriveObjects?uid=" + uid +"&&way=" + way +"&&eid=" + eid,
-                                    async: false,
-                                    success: function(response) {
-                                        console.log(response);
-                                        var data = response.split("#");
-                                        var n = data.length;
-                                        console.log(n);
-                                        for(var i = 0;i<n;i++){
-                                            console.log(data[i]);
-                                            eval(data[i]);
-                                        }
-                                    },
-                                    error : function(){
-                                              alert("Error Occured");
-                                    }
-                        });
-
-                /* response will be saved to data_obj*/
-                }();
-        }
-       //======================================================================
-//        table_n=2;
-//        //instantiate(new Beaker(250,150,"blue"));
-//        var nmix=new Mixture(undefined,undefined,150,['HCl'],[1],['red'],[1],[1]);
-//        var wat=new Mixture(undefined,undefined,80,[],[],[],[],[])
-//        instantiate(new Flask(250,nmix));
-//        move(objects[0],-10,0,0);
-//        instantiate(new Beaker(100,wat));
-//        move(objects[objects.length-1],new THREE.Vector3(25,0,0));
-//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-//        instantiate(new Bottle(250,wat));
-//        move(objects[objects.length-1],shelves[0].Slotpos(0));
-//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-//        instantiate(new Bottle(250,wat));
-//        move(objects[objects.length-1],shelves[0].Slotpos(1));
-//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-//        instantiate(new Bottle(250,wat));
-//        move(objects[objects.length-1],shelves[0].Slotpos(2));
-//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-//        instantiate(new Bottle(100,wat));
-//        move(objects[objects.length-1],shelves[0].Slotpos(3));
-//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-//        instantiate(new Bottle(250,wat));
-//        move(objects[objects.length-1],shelves[0].Slotpos(4));
-//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-//        instantiate(new Bottle(250,wat));
-//        move(objects[objects.length-1],new THREE.Vector3(0,0,0));
-//        wat=new Mixture(undefined,undefined,80,[],[],[],[],[]);
-//        var xflask=new Bottle(250,wat);
-//        instantiate(xflask);
-//        move(objects[objects.length-1],new THREE.Vector3(15,0,0));
-//        shelves.pop();
-//        wat=new Mixture(undefined,undefined,20,[],[],[],[],[]);
-//        var xwatch=new WatchGlass(50,wat);
-//        instantiate(xwatch);
-//        move(objects[objects.length-1],120,0,0);
-//        wat=new Mixture(undefined,undefined,100,[],[],[],[],[]);
-//        var xbstand=new Burette(100,wat);
-//        instantiate(xbstand);
-//        move(objects[objects.length-1],new THREE.Vector3(170,0,0));
-//        var xpip=new Pipette(10);
-//        instantiate(xpip);
-//        move(objects[objects.length-1],new THREE.Vector3(40,0,0));
-//        
-        //======================================================================
-        var xtable=new Table(5);
+        table_n=0;
+        addTable();
+        // var nmix=new Mixture([new Chemical('Hydrochloric Acid','green',0,1,'HCl',12,1,18,'green')]);
+        // var base=new Mixture([new Chemical('Sodium Hydroxide','red',0,1,'NaOH',12,1,18,'red')]);
+        // instantiate(new Flask(250,nmix),nextShelfSlot());
+        // instantiate(new Bottle(250,base),nextShelfSlot());
         //End
-        for(var i=0;i<table_n;i++){
-          spotLight.push(new THREE.PointLight(0xffffff,1,0,1),);
-          spotLight[i].position.set(i*table_height*2+i*basin_width, 80, -60);
-          spotLight[i].castShadow = true;
-          scene.add(spotLight[i]);
-        }
-        // dirLight = new THREE.DirectionalLight(0xffffff, 2);
-        // dirLight.position.set(0,1,1);
-        // scene.add(dirLight);
         camera.position.set(0,table_height,table_height*4);
-        for(var i=0;i<table_n;i++){
-            tables.push(new Table(table_height));
-            tables[i].setPosition(i*table_height*2+i*basin_width,-table_height,0);
-            scene.add(tables[i].Mesh);
-            shelves.push(new Shelf(shelf_height));
-            shelves[i].setPosition(i*shelf_height*2+i*basin_width,0,-table_height*0.43);
-            scene.add(shelves[i].Mesh);
-            basins.push(new Basin(basin_width));
-            basins[i].setPosition((2*i+1)*table_height+((1/2)+i)*basin_width,-basin_height,0);
-            scene.add(basins[i].Mesh);   
-        }
-        var dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
+        dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
         dragControls.addEventListener('dragstart',function (event){
+            isclick=1;
+            drag=1;
+            intersects = _raycaster.intersectObjects( pressobjects ); 
+            if (intersects.length>0) {
+              for(var i=0;i<pressobjects.length;i++){
+                if(pressobjects[i]==intersects[0].object){
+                  if(typeof objects[pressmap[i]].canBePressed == 'function'){
+                    if(objects[pressmap[i]].canBePressed()){
+                      drag=0;
+                    }
+                  }
+                  else{
+                    drag=0;
+                  }
+                    break;                  
+                }
+              }
+            }
             controls.enabled=false;
             for(var i=0;i<objects.length;i++){
                 if(_selected==objectsM[i]){
                     pobject=i;
                     prevcor=new THREE.Vector3(objects[i].x(),objects[i].y(),objects[i].z());
                     prevmaster=objects[i].Master;
-                    prevslot=objects[i].Masterslot;
-                    objects[i].Master=null;
-                    if(prevmaster!=null)
-                      objects[prevmaster].Slots[prevslot].Slave=null;
+                    if(prevmaster!=null){
+                      prevslot=objects[i].Masterslot;
+                      if(drag)
+                        Dethrone(i,prevmaster,prevslot);
+                    }
                     break;
                 }
             }
+            if(drag==1){
+              if(objects[pobject].Master==null && typeof objects[pobject].pick =='function'){
+                objects[pobject].pick(pobject);
+              }
+            }
         });
+        function onDocumentMouseMove( event ){
+            isclick=0;
+        }
+
+        function onDocumentMouseUp(event){
+            event.preventDefault();
+            if(state==0)
+              return;
+            mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+            mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+            raycaster.setFromCamera( mouse, camera );
+            intersects=raycaster.intersectObjects(tablesM);
+            if(intersects.length>0){
+              var flag=1;
+              for(var i=0;i<objects.length;i++){
+                if(objects[i].z()==0 && Math.abs(objects[i].x()-intersects[0].point.x) < objects[i].half_width+maxhw[state-1]){
+                  flag=0;
+                }
+              }
+              if(flag){
+                if(iscontainer[state-1]){
+                  document.getElementById('inserthere').innerHTML='';
+                  if(choices[state-1].length>1){
+                    for(var j=0;j<choices[state-1].length;j++){
+                      document.getElementById('inserthere').innerHTML+='<button type=\'button\' onclick=\'addEquipment(this.value)\' value='+choices[state-1][j]+ ' class=\'btn btn-default\' data-dismiss=\'modal\'>'+choices[state-1][j]+' ml'+'</button>';
+                    }
+                    $('#myModal').modal('show');
+                  }
+                  else{
+                    addEquipment(choices[state-1][0]);
+                  }
+                }
+                else{
+                  var str='instantiate(';
+                  str+='new ';
+                  str+=omap[state-1];
+                  str+='(';
+                  str+='),';
+                  str+='new THREE.Vector3(';
+                  str+=intersects[0].point.x.toString()+',';
+                  str+='0,';
+                  str+='0))';
+                  eval(str);
+                }
+              }
+            }
+        }
+        renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
+        renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
         dragControls.addEventListener('dragend',function (event){
             controls.enabled=true;
-            dobject=pobject;
+            if(drag==1){
+              dobject=pobject;
+            }
+            objects[pobject].restrict(-table_height+objects[pobject].half_width,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].half_width,0,table_height*2,0,0);
+                  updatePos(objects[pobject]);
+            pobject=null
         });
-        document.getElementById('NewTable').addEventListener('click',function(){
-            tables.push(new Table(table_height));
-            tables[table_n].setPosition(table_n*table_height*2+table_n*basin_width,-table_height,0);
-            scene.add(tables[table_n].Mesh);
-            shelves.push(new Shelf(shelf_height));
-            shelves[table_n].setPosition(table_n*shelf_height*2+table_n*basin_width,0,-table_height*0.43);
-            scene.add(shelves[table_n].Mesh);
-            basins.push(new Basin(basin_width));
-            basins[table_n].setPosition((2*table_n+1)*table_height+((1/2)+table_n)*basin_width,-basin_height,0);
-            scene.add(basins[table_n].Mesh);
-            spotLight.push(new THREE.PointLight(0xffffff,0.4));
-            spotLight[table_n].position.set(table_n*table_height*2+table_n*basin_width, 80, -60);
-            spotLight[table_n].castShadow = true;
-            scene.add(spotLight[table_n]);
-            table_n++;
-        });
+        document.getElementById('NewTable').addEventListener('click',addTable);
         document.getElementById('Save').addEventListener('click',function(){
             var mystring = "";
             for(var i=0;i<objects.length;i++){
@@ -445,18 +477,24 @@ $("#selectbox2").change(function () {
             var addFunc = function() {
             /* ajax request to add data into db */
                   
-                  console.log(uid);
-                  console.log(way);
+                  console.log(UID);
+                  console.log(WAY);
                   console.log(eid);
                   
                   $.ajax({
                       type: "POST",
                       url: "UploadSevlet",
                               data:{
-                                    'uid':uid,
+                                    'uid':UID,
                                     'data':mystring,
-                                    'way':way,
-                                    'eid':eid
+                                    'way':WAY,
+//                                    'eid':eid,
+                                    'title':Etitle,
+                                    'author':Eauthor,
+                                    'class':Eclass,
+                                    'aim':Eaim,
+                                    'marks':Emarks,
+                                    'ins':Eins
                               },
                               error : function(){
                                   alert("Error Occured");
@@ -497,17 +535,126 @@ $("#selectbox2").change(function () {
                 /* response will be saved to data_obj*/
                 }();
         });
+//instantiate(new Bottle(250,new Mixture(new Chemical(Water,blue,undefined,1,H2O,4,1,18,blue,undefined)),new THREE.Vector3(0,34.16666666666667,-20))
+        document.getElementById('ChemSub').addEventListener('click',function(){
+                    console.log("FUN");
+                    if(document.getElementById('ChemV').value!="" && document.getElementById('ChemC').value!=""){
+                        console.log(document.getElementById('ChemV').value + "22" + document.getElementById('ChemC').value );
+                        var t = document.getElementById('selectbox2');
+                        var chemName = t.options[t.selectedIndex].text;
+                        console.log(chemName);
+                        var mystring = "";
+                        //mystring += "instantiate(new Bottle (" + 250 + "," + myMix(document.getElementById('ChemV').value,document.getElementById('ChemC').value,chemName) + "),nextShelfSlot()" + ")";
+                        //instantiate(new Bottle(250,base),nextShelfSlot());
+                        mystring += "instantiate(new Bottle(250,";
+                        var str=myMix(document.getElementById('ChemV').value,document.getElementById('ChemC').value,chemName) + "),nextShelfSlot())";
+                        mystring+=str;
+                        console.log(mystring);
+                        eval(mystring);
+                        alert("Chemical Added Successfully");
+                        document.getElementById('ChemV').value = "";
+                        document.getElementById('ChemC').value = "";
+                    }
+        });
+        function myMix(vol,concn,name){
+            //new Mixture("H2O","blue",80,[],[],[],[],[])
+            //new Mixture([new Chemical('Water','blue',0,1,'H2O',4,1,18,'blue')])
+            var temArr;
+            var s="";
+            var dataLoader = function() {
+                    //console.log("Retriving");
+                    // new Mixture([new Chemical('Water','red',0,1,'H2O',4,1,18,'blue')])
+                    $.ajax({
+                            method: "GET",
+                            url: "GetChemDetails?name=" + name,
+                            async: false,
+                            success: function(response) {
+                                console.log(response);
+                                temArr = response.split(",");
+                                s='new Mixture([new Chemical(';
+                                s+= "\'" + name + "\'";
+                                s+=',';
+                                s+= "\'" + temArr[0]  + "\'";
+                                s+=',';
+                                if(temArr[1]=="acid")
+                                    s+= 1 ;
+                                else
+                                    s+= -1;
+                                s+=',';
+                                s+= temArr[2]  ;
+                                s+=',';
+                                s+= "\'" + temArr[3] + "\'" ;
+                                s+=',';
+                                s+= (concn*vol)/1000; 
+                                s+=',';
+                                s+= temArr[4];
+                                s+=',';
+                                s+= temArr[5];
+                                s+=',';
+                                s+= "\'" + temArr[6];
+                                s+= '\'),';
+                                var mol = (( vol - (concn*vol)/1000 * parseInt(temArr[5]) / parseInt(temArr[4]) ) * 55.5 )/1000;
+                                var molS = mol.toString();
+                                s+="new Chemical('Water','transparent',0,1,'H2O'," + molS + ",1,18,'transparent')" + '])';
+                                //console.log(s);
+                                
+                            },
+                            error : function(){
+                                      alert("Error Occured");
+                            }
+                    });
+            }();
+            console.log(s);
+            return s;
+        }
+        var presstate=null;
         renderScene();
+        var date=new Date();
+        var st=date.getTime();
+        var ct=st;
+        var dt=0;
+        var et;
+        document.getElementById('b0').click();
         function renderScene() {
-            if(objects[pobject]){
-                objects[pobject].restrict(-table_height+objects[pobject].radius,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].radius,0,table_height*2,0,0);
+            date=new Date();
+            var temp=date.getTime();
+            dt=temp-ct;
+            ct=temp;
+            if(pobject!=null){
+                if(drag){
+               		objects[pobject].restrict(-table_height+objects[pobject].half_width,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].half_width,0,table_height*2,0,0);
+                  updatePos(objects[pobject]);
+                }
+                else{
+                  if(presstate==null){
+                    date=new Date();
+                    st=date.getTime();
+                    objects[pobject].onPress(presstate);
+                  }
+                  presstate=pobject;
+                  objects[pobject].duringPress(presstate,dt);
+                  objects[pobject].setPosition(prevcor);
+                }
             }
-            if(objects[dobject]){
+            if(presstate!=null && pobject==null){
+              date=new Date();
+              et=date.getTime();
+              objects[presstate].setPosition(prevcor);
+              var str="objects["+presstate.toString()+'].PressFor('+presstate.toString()+','+(et-st).toString()+')';
+              journal.push(str);
+              console.log(str);
+              objects[presstate].onPressEnd(presstate);
+              presstate=null;
+            }
+            if(dobject!=null && drag && !isclick){
                 var sobject=-1;
                 var flag=0;
                 if(!flag){
                   for(var i=0;i<table_n;i++){
-                    if(Math.abs(objects[dobject].x()-basins[i].x())<basins[i].radius){
+                    if(Math.abs(objects[dobject].x()-basins[i].x())<basins[i].half_width){
+                      var str="wash("+dobject.toString()+','+i.toString()+')';
+                      journal.push(str);
+                      console.log("wash("+dobject.toString()+','+i.toString()+')');
                       wash(dobject,i);
                       flag=1;
                       break;
@@ -517,7 +664,7 @@ $("#selectbox2").change(function () {
                 if(!flag){
                   var lobject=-1;
                   for(var i=0;i<objects.length;i++){
-                      if(objects[i]!=objects[dobject] &&(objects[i].y()==0)&& (Math.abs(objects[dobject].x()-objects[i].x())<= objects[i].half_width+objects[dobject].half_width)){
+                      if(!isSlave(i,dobject) &&objects[i]!=objects[dobject] &&(objects[i].z()==0)&& (Math.abs(objects[dobject].x()-objects[i].x())<= objects[i].half_width+objects[dobject].half_width)){
                           if(Place(dobject,i)){
                             flag=1;
                             break;
@@ -528,30 +675,70 @@ $("#selectbox2").change(function () {
                 if(!flag){
                   var lobject=-1;
                   for(var i=0;i<objects.length;i++){
-                      if(objects[i]!=objects[dobject] &&(objects[i].y()==0)&& (Math.abs(objects[dobject].x()-objects[i].x())<= objects[i].half_width+objects[dobject].radius)){
+                      if(objects[i]!=objects[dobject] && !isSlave(i,dobject) &&(objects[i].z()==0)&& (Math.abs(objects[dobject].x()-objects[i].x())<= objects[i].half_width+objects[dobject].half_width)){
                           if((map[objects[dobject].id][objects[i].id]!=0)){
+                            if(objects[i].Master!=null){
+                              if(map[objects[dobject].id][objects[objects[i].Master].id]!=0){
+                                sobject=objects[i].Master;
+                                flag=1;
+                                break;
+                              }
+                            }
                             sobject=i;
                             flag=1;
                             break;
                           }
                           else{
+                            flag=1;
                             lobject=i;
                           }
                       }
                   }
                   if(sobject>=0){
-                    operate(dobject,sobject)
+                    operate(dobject,sobject);
+                    var str="operate("+dobject.toString()+','+sobject.toString()+')';
+                    journal.push(str);
+                    console.log("operate("+dobject.toString()+','+sobject.toString()+')');
                   }
                   else if(lobject>=0){
                     operate(dobject,lobject);
+                    var str="operate("+dobject.toString()+','+lobject.toString()+')';
+                    journal.push(str);
+                    console.log("operate("+dobject.toString()+','+lobject.toString()+')');
+                  }
+                  else if(typeof objects[dobject].droppable=='function' && !objects[dobject].droppable()){
+                    resetPosition(dobject);
+                    flag=1;
                   }
                 }
                 if(!flag){
+                  var s="";
+                  s+="move(";
+                  s+='objects[';
+                  s+=dobject.toString();
+                  s+='],';
+                  s+=(objects[dobject].x()).toString();
+                  s+=',0,0)';
+                  journal.push(s);
+                  if(typeof objects[dobject].drop == 'function'){
+                    objects[dobject].drop(dobject);
+                  }
+                  console.log(s);
+                  journal.push(s);
                   objects[dobject].sety(0);
                   objects[dobject].setz(0);
+                  updatePos(objects[dobject]);
                 }
                 dobject=null;
                 pobject=null;
+            }
+            if(dobject!=null && drag && isclick){
+              resetPosition(dobject);
+              if(typeof objects[dobject].onClick == 'function'){
+                objects[dobject].onClick();
+              }
+              pobject=null;
+              dobject=null;
             }
             controls.update();
             requestAnimationFrame(renderScene);
@@ -559,6 +746,64 @@ $("#selectbox2").change(function () {
         }
     }
     window.onload = init;
+</script>
+<script>
+      var id;
+      var volume = 0;
+      var normality;
+      var data;
+      var data_cat = "";
+      var data_obj = "";
+      var data_attr = "";
+      var dataLoader = function() {
+        $.ajax({
+          type: "GET",
+          url: "MyServlet",
+          success: function(response) {
+            //    console.log(response);
+            data = response.split(",");
+            data_obj = "<option>Choose</option>";
+            //data_obj = "<option value='#consumer_goods'>" + "Hydrochloric acid" + "</option>";
+            for (obj1 in data){
+                if(data[obj1] == "Acid" || data[obj1] == "Base"){
+                    data_obj += "<optgroup label="+data[obj1]+">"
+                }
+                else{
+                    data_obj += "<option value=\"#consumer_goods\">" + data[obj1] + "</option>";
+                }
+            }
+                                                
+            $(".hifi").html(data_obj);
+          }
+        });
+
+        /* response will be saved to data_obj*/
+      };
+      var addFunc = function() {
+        /* ajax request to add data into db */
+        $.ajax({
+          type: "POST",
+          url: "Upload",
+          data:{
+            'vol':volume,
+            'norm':normality,
+//            'val':$('.attr>form').serialize()
+          },
+          error : function(){
+            alert("Error Occured");
+          },
+          success: function(response) {
+            dataLoader();
+            id+=1;
+            $(".attr").html("");
+            $(".cat-main").html(selectedCategory);
+            $(".categories").hide();
+          }
+          /**/
+
+        });
+      };
+      dataLoader();
 </script>
 </body>
 </html>
