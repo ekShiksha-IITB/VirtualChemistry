@@ -57,17 +57,18 @@ function Mixture(chemarr,ind){
            this.Ph=-Math.log(this.Hions+Math.pow(10,-7));
     }
     this.FindColor=function(){
+    	this.Color='transparent';
     	if(this.Indicator!=undefined){
     		this.Color=this.Indicator.Color(this.Ph);
     	}
     	if(this.Color=='transparent'){
-        var maxconc=0;
+        var maxmoles=0;
         var maxcol='transparent';
         for(var i=0;i<this.Chemicals.length;i++){
-            if(this.Chemicals[i].Color!='transparent' && this.Chemicals[i].Color!='transparent' ){
-                if(this.Chemicals[i].Moles > maxconc){
+            if(this.Chemicals[i].Color!='transparent'){
+                if(this.Chemicals[i].Moles > maxmoles){
                     maxcol=this.Chemicals[i].Color;
-                    maxconc=this.Chemicals[i].Moles;
+                    maxmoles=this.Chemicals[i].Moles;
                 }
             }
         }
