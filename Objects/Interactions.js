@@ -27,7 +27,7 @@ CanBeMaster.push([[1],[1],[1],0,0,0,0,0,0,[1],0,[0],0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+CanBeMaster.push([0,0,0,0,0,0,0,0,0,[0],0,0,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,[0],0,0,0,0,0,0,0,0,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
@@ -203,7 +203,7 @@ function instantiate(obj,pos){
         str+='new '+omap[obj.id]+'(';
         str+=obj.volume.toString();
         str+=',';
-        str+=obj.Mixture.toString();
+        str+=obj.Mixture.toString()+')';
         str+=',';
         str+='new THREE.Vector3(';
         str+=pos.x.toString()+',';
@@ -268,7 +268,7 @@ function addTable(){
     basins.push(new Basin(basin_width));
     basins[table_n].setPosition((2*table_n+1)*table_height+((1/2)+table_n)*basin_width,-basin_height,0);
     scene.add(basins[table_n].Mesh);
-    spotLight.push(new THREE.PointLight(0xffffff,0.4));
+    spotLight.push(new THREE.PointLight(0xffffff,1));
     spotLight[table_n].position.set(table_n*table_height*2+table_n*basin_width, 80, -60);
     spotLight[table_n].castShadow = true;
     scene.add(spotLight[table_n]);

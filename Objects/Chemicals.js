@@ -1,5 +1,4 @@
 var cdata=[];
-
 function Transfer(a,b,vol){
     if(vol==0)
     	return;
@@ -57,6 +56,13 @@ function Mixture(chemarr,ind){
            this.Ph=-Math.log(this.Hions+Math.pow(10,-7));
     }
     this.FindColor=function(){
+    	var iswater=0;
+        for(var i=0;i<this.Chemicals.length;i++){
+        	if(this.Chemicals[i].Name=='Water'){
+        		iswater=1;
+        		break;
+        	}
+        }
     	this.Color='transparent';
     	if(this.Indicator!=undefined){
     		this.Color=this.Indicator.Color(this.Ph);
@@ -64,14 +70,26 @@ function Mixture(chemarr,ind){
     	if(this.Color=='transparent'){
         var maxmoles=0;
         var maxcol='transparent';
-        for(var i=0;i<this.Chemicals.length;i++){
-            if(this.Chemicals[i].Color!='transparent'){
-                if(this.Chemicals[i].Moles > maxmoles){
-                    maxcol=this.Chemicals[i].Color;
-                    maxmoles=this.Chemicals[i].Moles;
-                }
-            }
-        }
+	    if(iswater){
+	        for(var i=0;i<this.Chemicals.length;i++){
+	            if(this.Chemicals[i].Color!='transparent'){
+	                if(this.Chemicals[i].Moles > maxmoles){
+	                    maxcol=this.Chemicals[i].Color;
+	                    maxmoles=this.Chemicals[i].Moles;
+	                }
+	            }
+	        }
+	    }
+	    else{
+	    	for(var i=0;i<this.Chemicals.length;i++){
+	            if(this.Chemicals[i].Col_in_water!='transparent'){
+	                if(this.Chemicals[i].Moles > maxmoles){
+	                    maxcol=this.Chemicals[i].Col_in_water;
+	                    maxmoles=this.Chemicals[i].Moles;
+	                }
+	            }
+	        }	
+	    }
         if(maxcol!='transparent')
             this.Color=maxcol;
         if(this.Color=='transparent')
@@ -93,12 +111,10 @@ function MixtoString(){
 	var s='new Mixture([';
 	for(var i=0;i<this.Chemicals.length;i++){
 		s+=this.Chemicals[i].toString();
-		if(i==this.Chemicals.length-1)
-			s+=']';
-		else
+		if(i!=this.Chemicals.length-1)
 			s+=',';
 	}
-	s+=')';
+	s+='])';
 	return s;
 }
 function Chemical(nc,col,nat,nf,cf,mol,den,mm,colw){

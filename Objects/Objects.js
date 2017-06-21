@@ -1049,6 +1049,9 @@ class WeighingMachine extends Equipment{
 	    this.Mesh=m1;
 		this.yoff=h*0.2;
 		this.half_width=h/2;
+		this.Slots=Array(1);
+		this.Slots[0]=new Slot(null,new THREE.Vector3(0,h*0.2+h*0.25+h/69,0),h);
+		this.Slotpos=Slotpos;
 	}
 }
 function _x(){
