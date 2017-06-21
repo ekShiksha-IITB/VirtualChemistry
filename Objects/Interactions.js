@@ -1,3 +1,4 @@
+var eps=Math.pow(10,-3);
 var reactions;
 var map=[];
 map.push([1,1,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1]);
@@ -39,6 +40,23 @@ var omap=['Bottle','Beaker','Flask','TestTube','Burette','Pipette','Petridish','
 var issmall=[1,1,1,1,0,0,1,0,0,1,1,1,0];
 var iscontainer=[1,1,1,1,1,1,1,0,0,1,0,0,0];
 var maxhw=[10,10,10,10,10,10,10,5,5,5,5,5,5,5,5,];
+var choices=[];
+choices[0]=[100,150,250];
+choices[1]=[100,150,250];
+choices[2]=[100,150,250];
+choices[3]=[100,150,250];
+choices[4]=[50,100];
+choices[5]=[100,150,250];
+choices[6]=[100,150,250];
+choices[7]=[100,150,250];
+choices[8]=[100,150,250];
+choices[9]=[30];
+choices[10]=[100,150,250];
+choices[11]=[100,150,250];
+choices[12]=[100,150,250];
+choices[13]=[100,150,250];
+choices[14]=[100,150,250];
+choices[15]=[100,150,250];
 function operate(s,t){
     var c=map[objects[s].id][objects[t].id];
     if(c==0){   
@@ -51,6 +69,10 @@ function operate(s,t){
 function pour(fi,se){
     s=objects[fi];
     t=objects[se];
+    if(s.Mixture.volume==0){
+        resetPosition(fi);
+        return;
+    }
     if(typeof t.pourable== 'function' && !t.pourable()){
         resetPosition(fi);
         return;
@@ -104,7 +126,6 @@ function wash(fi,se){
 function Place(fi,se){
     s=objects[fi];
     t=objects[se];
-    console.log(CanBeMaster[t.id][s.id].length);
     if(CanBeMaster[t.id][s.id]===0)
         return 0;
     if(Array.isArray(CanBeMaster[t.id][s.id])){
@@ -252,13 +273,15 @@ function addTable(){
     spotLight[table_n].castShadow = true;
     scene.add(spotLight[table_n]);
     table_n++;
+    journal.push("addTable()");
+    console.log("addTable()");
 }
 function nextShelfSlot(){
     for(var i=0;i<table_n;i++){
         for(var j=0;j<9;j++){
             var flag=1;
             for(var k=0;k<objects.length;k++){
-                if(IsSameVector3(objects[k].getPosition(),shelves[i].Slotpos(j))){
+                if(distance(objects[k].getPosition(),shelves[i].Slotpos(j))<eps){
                     flag=0;
                     break;
                 }

@@ -1,3 +1,5 @@
+var cdata=[];
+
 function Transfer(a,b,vol){
     if(vol==0)
     	return;
@@ -37,7 +39,6 @@ function Mixture(chemarr,ind){
     this.Color='transparent';
     this.Temperature=25;
     for(var i=0;i<this.Chemicals.length;i++){
-    	console.log(this.Chemicals[i].Moles*this.Chemicals[i].Molarmass/this.Chemicals[i].Density);
     	this.volume+=this.Chemicals[i].Moles*this.Chemicals[i].Molarmass/this.Chemicals[i].Density;
     }
     this.FindNature=function(){
@@ -64,9 +65,9 @@ function Mixture(chemarr,ind){
         var maxcol='transparent';
         for(var i=0;i<this.Chemicals.length;i++){
             if(this.Chemicals[i].Color!='transparent' && this.Chemicals[i].Color!='transparent' ){
-                if(this.Chemicals[i].Concentration > maxconc){
+                if(this.Chemicals[i].Moles > maxconc){
                     maxcol=this.Chemicals[i].Color;
-                    maxconc=this.Chemicals[i].Concentration;
+                    maxconc=this.Chemicals[i].Moles;
                 }
             }
         }
@@ -88,14 +89,15 @@ function Mixture(chemarr,ind){
     }
 }
 function MixtoString(){
-	var s='new Mixture(';
+	var s='new Mixture([';
 	for(var i=0;i<this.Chemicals.length;i++){
 		s+=this.Chemicals[i].toString();
 		if(i==this.Chemicals.length-1)
-			s+=')';
+			s+=']';
 		else
 			s+=',';
 	}
+	s+=')';
 	return s;
 }
 function Chemical(nc,col,nat,nf,cf,mol,den,mm,colw){
@@ -114,7 +116,7 @@ function ChemToString(){
 	var s='new Chemical(';
     s+=this.Name+',';
     s+=this.Color+',';
-    s+=this.Natur+',';
+    s+=this.Nature+',';
     s+=this.Nfac+',';
     s+=this.Formula+',';
     s+=this.Moles+',';
@@ -124,7 +126,6 @@ function ChemToString(){
     s+=this.Temperature+')';
     return s;
 }
-
 class Indicator{
     constructor(){
         this.color=function(){

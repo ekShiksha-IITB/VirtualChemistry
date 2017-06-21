@@ -807,9 +807,9 @@ function ffill(){
         this.fl.parent.remove(this.fl);
         this.fl=null;
     }
-    else{
+    else if(this.Mixture.volume!=0){
         if(this.fl!=null)
-            this.fl.parent.remove(this.fl);
+        	this.fl.parent.remove(this.fl);
         var temp=new THREE.CylinderGeometry(hr*this.radius*0.9,this.radius*0.9,this.height*0.95*(1-hr),32,1);
         temp=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: this.Mixture.Color}));
         this.fl=temp;
@@ -988,6 +988,67 @@ class BunsenBurner extends Equipment{
 	    }
 	    this.yoff=h1+h2/2;
 	    this.half_width=r1;
+	}
+}
+PrismGeometry = function ( vertices, height ) {
+
+    var Shape = new THREE.Shape();
+
+    ( function f( ctx ) {
+
+        ctx.moveTo( vertices[0].x, vertices[0].y );
+        for (var i=1; i < vertices.length; i++) {
+            ctx.lineTo( vertices[i].x, vertices[i].y );
+        }
+        ctx.lineTo( vertices[0].x, vertices[0].y );
+
+    } )( Shape );
+
+    var settings = { };
+    settings.amount = height;
+    settings.bevelEnabled = false;
+    THREE.ExtrudeGeometry.call( this, Shape, settings );
+
+};
+PrismGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );
+class WeighingMachine extends Equipment{
+	constructor(){
+		super();
+		this.id=8;
+	    var h=15;
+	    var mat1=new THREE.MeshStandardMaterial({color:'cyan'});
+	    var mat2=new THREE.MeshStandardMaterial({color:'silver'});
+	    var mat3=new THREE.MeshBasicMaterial({color:'black'});
+	    var m1=new THREE.BoxGeometry(h,h*0.4,h);
+	    m1=new THREE.Mesh(m1,mat1);
+	    var m2=new THREE.BoxGeometry(h*0.9,h/30,h*0.9);
+	    m2=new THREE.Mesh(m2,mat2);
+	    var m3=new PrismGeometry([new THREE.Vector2(h/2,-h*0.2),new THREE.Vector2(h/2,h*0.2),new THREE.Vector2(h*0.85,-h*0.2)],h);
+	    m3=new THREE.Mesh(m3,mat1);
+	    m3.position.z-=h/2;
+	    m2.position.set(0,h*0.25,0);
+	    var m4=new THREE.BoxGeometry(h/10,h,h/10);
+	    m4=new THREE.Mesh(m4,mat1);
+	    m5=new THREE.BoxGeometry(h/10,h/3,h/2);
+	    var dynamicTexture  = new THREEx.DynamicTexture(256,128);
+	    dynamicTexture.texture.needsUpdate  = true;
+			dynamicTexture.context.font	= "bolder 90px Verdana";
+		dynamicTexture.texture.anisotropy = renderer.getMaxAnisotropy()
+		dynamicTexture.drawText('Hello', 4, 100, 'red');
+	    var material    = new THREE.MeshBasicMaterial({
+		    map : dynamicTexture.texture
+		});
+	    var m5=new THREE.Mesh(m5,material);
+	    m5.position.set(-h/20 - h/2,h-0.2*h+h/6,0);
+	    m4.position.set(-h/20 - h/2,h/2-h*0.2,0);
+	    m1.add(m2);
+	    m1.add(m3);
+	    m1.add(m4);
+	    m1.add(m5);
+		m1.rotation.y-=Math.PI/2
+	    this.Mesh=m1;
+		this.yoff=h*0.2;
+		this.half_width=h/2;
 	}
 }
 function _x(){
