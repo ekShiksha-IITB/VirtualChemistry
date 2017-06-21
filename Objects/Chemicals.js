@@ -70,7 +70,7 @@ function Mixture(chemarr,ind){
     	if(this.Color=='transparent'){
         var maxmoles=0;
         var maxcol='transparent';
-	    if(iswater){
+	    if(iswater==0){
 	        for(var i=0;i<this.Chemicals.length;i++){
 	            if(this.Chemicals[i].Color!='transparent'){
 	                if(this.Chemicals[i].Moles > maxmoles){
