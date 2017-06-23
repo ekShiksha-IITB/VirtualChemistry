@@ -47,11 +47,12 @@ function Mixture(chemarr,ind){
         }
         this.Hions=0;
         for(var i=0;i<this.Chemicals.length;i++){
-            this.Hions+=this.Chemicals[i].Moes*this.Chemicals[i].Nature*this.Chemicals.Nfac;
+            this.Hions+=this.Chemicals[i].Moles*this.Chemicals[i].Nature*this.Chemicals[i].Nfac;
         }
         this.Hions/=this.volume;
-        if(this.Hions<0)
-        	this.Ph=14+Math.log(-this.Hions+Mat.pow(10,-7));
+        if(this.Hions<0){
+        	this.Ph=14+Math.log(-this.Hions+Math.pow(10,-7));
+        }
     	else
            this.Ph=-Math.log(this.Hions+Math.pow(10,-7));
     }
@@ -131,15 +132,15 @@ function Chemical(nc,col,nat,nf,cf,mol,den,mm,colw){
 }
 function ChemToString(){
 	var s='new Chemical(';
-    s+=this.Name+',';
-    s+=this.Color+',';
+    s+='\''+this.Name+'\''+',';
+    s+='\''+this.Color+'\''+',';
     s+=this.Nature+',';
     s+=this.Nfac+',';
-    s+=this.Formula+',';
+    s+='\''+this.Formula+'\''+',';
     s+=this.Moles+',';
     s+=this.Density+',';
     s+=this.Molarmass+',';
-    s+=this.Col_in_water+',';
+    s+='\''+this.Col_in_water+'\''+',';
     s+=this.Temperature+')';
     return s;
 }
