@@ -116,6 +116,20 @@ border: 1px solid #ddd;
   background-color: green !important;
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
   }
+  #text{
+    position: absolute;
+    color:red;
+    font-size: 150%;
+    font-family: "Times New Roman", Times, serif;
+}
+  .navbar-inverse{
+    width:300px;height:150px;margin-left:auto;
+      background:#7f7f7f;
+  background:rgba(255,255,255,0);
+    /*opacity: 0;*/
+    /*overflow:scroll;*/
+    top:50px;
+  }
   </style>
 </head>
 <body>
@@ -133,8 +147,6 @@ border: 1px solid #ddd;
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         <li ><a href="#" style="color:white">Home</a></li>
-        <li><a href="#" style="color:white">About</a></li>
-        <li><a href="#" style="color:white">Join us</a></li>
 
 <li><select id="selectbox2">
   <option selected hidden>Choose chemicals</option>
@@ -183,6 +195,12 @@ border: 1px solid #ddd;
       </ul>
     </div>
  
+</nav>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+<div id="text">
+Item : Bottle<br>
+Volume: 250 ml
+</div>
 </nav>
 <script>
 $("#selectbox").change(function () {
@@ -359,6 +377,7 @@ $("#selectbox2").change(function () {
         shelves[0].setPosition(0,0,-table_height*2/5);
         table_n=0;
         addTable();
+instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-1,1,'Hcl',0.075,1.00,98.00,'white'),new Chemical('Water','transparent',0,1,'H2O',7.9170750000000005,1,18,'transparent')])),nextShelfSlot());
         // var nmix=new Mixture([new Chemical('Hydrochloric Acid','green',0,1,'HCl',12,1,18,'green')]);
         // var base=new Mixture([new Chemical('Sodium Hydroxide','red',0,1,'NaOH',12,1,18,'red')]);
         // instantiate(new Flask(250,nmix),nextShelfSlot());
@@ -399,6 +418,7 @@ $("#selectbox2").change(function () {
                     break;
                 }
             }
+            updateDisplay(pobject);
             if(drag==1){
               if(objects[pobject].Master==null && typeof objects[pobject].pick =='function'){
                 objects[pobject].pick(pobject);
@@ -408,7 +428,28 @@ $("#selectbox2").change(function () {
         function onDocumentMouseMove( event ){
             isclick=0;
         }
-
+        function updateDisplay(i){
+          document.getElementById('text').innerHTML='';
+          if(i!=null){
+            document.getElementById('text').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
+            if(iscontainer[objects[i].id]){
+              document.getElementById('text').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
+              document.getElementById('text').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
+              if(objects[i].Slots!=null){
+                for(var x=0;x<objects[i].Slots.length;x++){
+                  if(objects[i].Slots[x].Slave!=null && omap[objects[objects[i].Slots[x].Slave].id]=='PhMeter')
+                    document.getElementById('text').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
+                }
+              }
+            }
+            else if(omap[objects[i].id]=='PhMeter'){
+              if(objects[i].Master!=null){
+                document.getElementById('text').innerHTML+='Ph: '+Number((objects[objects[i].Master].Ph).toFixed(3))+'<br>';
+              }
+            }
+            //document.getElementById('text').innerHTML+='Name: '+omap[i]+'<br>';
+          }
+        }
         function onDocumentMouseUp(event){
             event.preventDefault();
             if(state==0)
@@ -429,7 +470,7 @@ $("#selectbox2").change(function () {
                   document.getElementById('inserthere').innerHTML='';
                   if(choices[state-1].length>1){
                     for(var j=0;j<choices[state-1].length;j++){
-                      document.getElementById('inserthere').innerHTML+='<button type=\'button\' onclick=\'addEquipment(this.value)\' value='+choices[state-1][j]+ ' class=\'btn btn-default\' data-dismiss=\'modal\'>'+choices[state-1][j]+' ml'+'</button>';
+                      document.getElementById('inserthere').innerHTML+='<button type=\'button\' onclick=\'addEquipment(this.value)\' value='+choices[state-1][j]+ ' class=\'btn btn-primary\' data-dismiss=\'modal\'>'+choices[state-1][j]+' ml'+'</button>&nbsp;&nbsp;&nbsp;';
                     }
                     $('#myModal').modal('show');
                   }
@@ -523,6 +564,7 @@ $("#selectbox2").change(function () {
                   presstate=pobject;
                   objects[pobject].duringPress(presstate,dt);
                   objects[pobject].setPosition(prevcor);
+                  updateDisplay(pobject);
                 }
             }
             if(presstate!=null && pobject==null){
@@ -533,6 +575,7 @@ $("#selectbox2").change(function () {
               journal.push(str);
               console.log(str);
               objects[presstate].onPressEnd(presstate);
+              updateDisplay(presstate); 
               presstate=null;
             }
             if(dobject!=null && drag && !isclick){
@@ -553,7 +596,9 @@ $("#selectbox2").change(function () {
                 if(!flag){
                   var lobject=-1;
                   for(var i=0;i<objects.length;i++){
+                      //console.log()
                       if(!isSlave(i,dobject) &&objects[i]!=objects[dobject] &&(objects[i].z()==0)&& (Math.abs(objects[dobject].x()-objects[i].x())<= objects[i].half_width+objects[dobject].half_width)){
+                          //console.log("here");
                           if(Place(dobject,i)){
                             flag=1;
                             break;
@@ -585,15 +630,12 @@ $("#selectbox2").change(function () {
                   }
                   if(sobject>=0){
                     operate(dobject,sobject);
-                    var str="operate("+dobject.toString()+','+sobject.toString()+')';
-                    journal.push(str);
-                    console.log("operate("+dobject.toString()+','+sobject.toString()+')');
+                    //var str="operate("+dobject.toString()+','+sobject.toString()+')';
+                    //journal.push(str);
+                    //console.log("operate("+dobject.toString()+','+sobject.toString()+')');
                   }
                   else if(lobject>=0){
-                    operate(dobject,lobject);
-                    var str="operate("+dobject.toString()+','+lobject.toString()+')';
-                    journal.push(str);
-                    console.log("operate("+dobject.toString()+','+lobject.toString()+')');
+                    resetPosition(dobject);
                   }
                   else if(typeof objects[dobject].droppable=='function' && !objects[dobject].droppable()){
                     resetPosition(dobject);
@@ -617,6 +659,14 @@ $("#selectbox2").change(function () {
                   objects[dobject].sety(0);
                   objects[dobject].setz(0);
                   updatePos(objects[dobject]);
+                }
+                objects[dobject].update();
+                objects[dobject].updateMaster();
+                objects[dobject].updateSlaves();
+                if(prevmaster!=null){
+                  objects[prevmaster].update();
+                  objects[prevmaster].updateMaster();
+                  objects[prevmaster].updateSlaves();
                 }
                 dobject=null;
                 pobject=null;
