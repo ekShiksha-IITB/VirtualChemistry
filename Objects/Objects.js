@@ -23,6 +23,24 @@ class Equipment{
         this.Masterslot=null;
         this.Slots=null;
         this.getPosition=getPosition;
+        this.tag=null;
+        this.update=function(){};
+        this.updateSlaves=function(){
+        	if(this.Slots==null)
+        		return;
+        	for(var i=0;i<this.Slots.length;i++){
+        		if(this.Slots[i].Slave!=null){
+        			objects[this.Slots[i].Slave].update();
+        			objects[this.Slots[i].Slave].updateSlaves();
+        		}
+        	}
+        }
+        this.updateMaster=function(){
+        	if(this.Master==null)
+        		return;
+        	objects[this.Master].update();
+        	objects[this.Master].updateMaster();
+        }
     }
 }
 
@@ -114,7 +132,7 @@ class Burette extends Equipment{
         };
         this.Fill();
         this.Slots=new Array(2);
-        this.Slots[0]=new Slot(null,new THREE.Vector3(0,this.height/2,0));
+        this.Slots[0]=new Slot(null,new THREE.Vector3(0,Math.max(0,this.sh-8),0),17);
         this.Slots[1]=new Slot(null,new THREE.Vector3(0,this.sh*6/200,0),17);
         this.Slotpos=Slotpos;
         this.half_width=this.sh/6;
@@ -144,7 +162,7 @@ class Burette extends Equipment{
 		        if(trans2!=0){
 		            pourF(fi,this.Slots[1].Slave,trans2);
 		        }
-		        this.Mixture.volume-=trans;
+		        this.Mixture.Reduce(trans);
 		        this.Fill();
                 if(this.Mixture.volume==0){
                     this.stream.parent.remove(this.stream);
@@ -156,13 +174,13 @@ class Burette extends Equipment{
             var trans=Math.min(dt/100,this.Mixture.volume);
             var trans2=0;
             if(this.Slots[1].Slave!=null){
-            	trans2=Math.min(trans,this.Slots[1].Slave.volume-this.Slots[1].Slave.Mixture.volume);
+            	trans2=Math.min(trans,objects[this.Slots[1].Slave].volume-objects[this.Slots[1].Slave].Mixture.volume);
             }
             trans-=trans2;
 	        if(trans2!=0){
-	            pourF(fi,this.Slots[1].Slave,trans);
+	            pourF(fi,this.Slots[1].Slave,trans2);
 	        }
-	        this.Mixture.volume-=trans;
+	        this.Mixture.Reduce(trans);
 	        this.Fill();
         }
     }
@@ -227,8 +245,9 @@ class Bottle extends Equipment{
         this.Fill=Fillb;
         this.Fill(this.Mixture.volume);
         this.half_width=this.radius;
-        this.Slots=Array(1);
+        this.Slots=Array(2);
         this.Slots[0]=new Slot(null,new THREE.Vector3(0,0,this.radius*0.3),this.height);
+        this.Slots[1]=new Slot(null,new THREE.Vector3(0,Math.max(0,this.height-8),0),this.height);
         this.Slotpos=Slotpos;
     }
 }
@@ -251,22 +270,17 @@ function Fillb(volumef){
     }
 }
 class Petridish extends Equipment{ 
-    constructor(h){
+    constructor(v,mix){
         super();
+        var h=v*3/20;
+        this.Mixture=mix;
+        this.volume=v;
         this.height=h;
         this.radius=h*2;
         this.id=9;
         this.xoff=0;
         this.zoff=0;
         this.yoff=h/2;
-        this.setPosition=setPosition;
-        this.x=_x;
-        this.y=_y;
-        this.z=_z;
-        this.sety=sety;
-        this.setz=setz;
-        this.setx=setx;
-        this.restrict=restrict;
         var m=new THREE.MeshLambertMaterial({color: "white"});
         var s1=new THREE.SphereGeometry(this.radius,32,32);
         s1=new THREE.Mesh(s1,m);
@@ -417,8 +431,10 @@ class Pipette extends Equipment{
         	}
         	else{
         		var x=Math.min(dt/500,this.Mixture.volume);
-        		x=Math.min(x,objects[this.Master].volume-objects[this.Master].Mixture.volume);
-        		pourF(fi,this.Master,x);
+        		var y=Math.min(x,objects[this.Master].volume-objects[this.Master].Mixture.volume);
+        		x-=y;
+        		pourF(fi,this.Master,y);
+        		this.Mixture.Reduce(x);
         	}
         }
         this.PressFor=this.duringPress;
@@ -794,8 +810,9 @@ class Flask extends Equipment{
         var hr=1-(this.Mixture.volume*(1-v1)/this.volume);
         hr=Math.pow(hr,1/3);
         this.half_width=this.radius;
-        this.Slots=Array(1);
+        this.Slots=Array(2);
         this.Slots[0]=new Slot(null,new THREE.Vector3(0,0,this.radius*0.25),this.height);
+        this.Slots[1]=new Slot(null,new THREE.Vector3(0,Math.max(this.height-8,0),0),this.height);
         this.Slotpos=Slotpos;
     }
 }
@@ -883,7 +900,15 @@ class PhMeter extends Equipment{
         var box2=new THREE.BoxGeometry(h*2/3,h/2,h/4);
         var mesh2=new THREE.Mesh(box2,mat);
         var display=new THREE.BoxGeometry(h*2/3,h/2,h/8);
-        display=new THREE.Mesh(display,new THREE.MeshStandardMaterial({color:'cyan'}));
+        this.dynamicTexture  = new THREEx.DynamicTexture(200,128);
+        this.dynamicTexture.texture.needsUpdate  = true;
+            this.dynamicTexture.context.font= "bolder 90px Verdana";
+        this.dynamicTexture.texture.anisotropy = renderer.getMaxAnisotropy()
+        this.dynamicTexture.drawText('5.46', 4, 100, 'red');
+        var material    = new THREE.MeshBasicMaterial({
+            map : this.dynamicTexture.texture
+        });
+        display=new THREE.Mesh(display,material);
         display.position.set(0,h/2,h/4-h/8);
         mesh2.position.set(0,h/2,h/4-h/8);
         var b2=new ThreeBSP(mesh2);
@@ -908,88 +933,116 @@ class PhMeter extends Equipment{
 	    this.yoff=h;
 	    this.zoff=h*3/2-h/40;
 	    this.half_width=h/2;
+        this.write=function(w){
+            w=w.toFixed(2);
+            this.dynamicTexture.clear('black');
+            this.dynamicTexture.drawText(w,4,100,'red');
+        }
+        this.write(7.00);
+        this.update=function(){
+            if(this.Master!=null){
+                this.write(objects[this.Master].Mixture.Ph);
+            }
+            else{
+                this.write(7);
+            }
+        }
 	}
 }
-class BunsenBurner extends Equipment{
-	constructor(){
-		super();
-		// var blueMaterial = new THREE.MeshPhongMaterial( {color: 0x0000FF } );
-		// var redMaterial = new THREE.MeshPhongMaterial({ color:0xFF0000 });
-		// var meshFaceMaterial = new THREE.MeshFaceMaterial( [ blueMaterial, redMaterial ] );
 
-		// var boxGeometry = new THREE.BoxGeometry( 10, 10, 10 );
-
-		// for ( var face in boxGeometry.faces ) {
-		//     boxGeometry.faces[ face ].materialIndex = 0;
-		// }
-
-		// var sphereGeometry = new THREE.SphereGeometry( 5, 16, 16 );
-		// sphereGeometry.applyMatrix( new THREE.Matrix4().makeTranslation(0, 5, 0) );
-
-		// var mergeGeometry = new THREE.Geometry();
-		// mergeGeometry.merge( boxGeometry, boxGeometry.matrix );
-		// mergeGeometry.merge( sphereGeometry, sphereGeometry.matrix, 1 );
-
-		// var mesh = new THREE.Mesh( mergeGeometry, meshFaceMaterial );
-	    var h=10;
-		this.id=7;
-	    this.height=h;
-	    this.radius=h/10	;
-	    var h1,h2,h3;
-	    var r1,r2,r3;
-	    h1=0.05*h;
-	    h2=0.80*h;
-	    h3=0.15*h;
-	    r1=h/2.5;
-	    r2=this.radius;
-	    r3=this.radius*1.2;
-	    var m1=new THREE.MeshStandardMaterial({color:"blue"});
-	    var m2=new THREE.MeshStandardMaterial({color:"gray"});
-	    var m3=new THREE.MeshStandardMaterial({color:"gold"});
-	    var c1=new THREE.CylinderGeometry(r1,r1,h1,32,1);
-	    var c2=new THREE.CylinderGeometry(r2,r2,h2,32,1);
-	    var c3=new THREE.CylinderGeometry(r2*0.8,r2*0.8,h2,32,1);
-	    var c4=new THREE.CylinderGeometry(r3,r3,h3,32,1);
-	    var c5=new THREE.CylinderGeometry(r2*0.8,r2*0.8,h3,32,1);
-	    c1=new THREE.Mesh(c1,m1);
-	    c2=new THREE.Mesh(c2,m2);
-	    c3=new THREE.Mesh(c3,m2);
-	    c4=new THREE.Mesh(c4,m3);
-	    c5=new THREE.Mesh(c5,m3);
-	    c1.position.set(0,h1/2,0);
-	    var b2=new ThreeBSP(c2);
-	    var b3=new ThreeBSP(c3);
-	    var b4=new ThreeBSP(c4);
-	    var b5=new ThreeBSP(c5);
-	    b2=b2.subtract(b3);
-	    c2=b2.toGeometry();
-	    c2=new THREE.Mesh(c2,m2);
-	    c1.position.set(0,-(h1+h2)/2,0);
-	    b4=b4.subtract(b5);
-	    c4=b4.toGeometry();
-	    c4=new THREE.Mesh(c4,m3);
-	    c4.position.set(0,h2/2+(h3/2),0);
-	    var r=c2;
-	    r.add(c1);
-	    r.add(c4);
-	    this.flame=null;
-	    this.Mesh=r;
-	    this.onPress=function(){
-	        this.flame=new THREE.SphereGeometry(h/8);
-	        this.flame=new THREE.Mesh(this.flame,new THREE.MeshStandardMaterial({color:'red'}));
-	        this.flame.scale.x=0.5;
-	        this.flame.scale.z=0.5;
-	        this.flame.position.set(0,h+h/20,0);
-	        this.Mesh.add(this.flame);
-	    }
-	    this.onPressEnd=function(){
-	        this.flame.parent.remove(this.flame);
-	        this.flame=null;
-	    }
-	    this.yoff=h1+h2/2;
-	    this.half_width=r1;
+    class BunsenBurner extends Equipment{
+		constructor(){
+			super();
+		    var h=10;
+			this.id=7;
+		    this.height=h;
+		    this.radius=h/10	;
+		    var h1,h2,h3;
+		    var r1,r2,r3;
+		    h1=0.05*h;
+		    h2=0.80*h;
+		    h3=0.15*h;
+		    r1=h/2.5;
+		    r2=this.radius;
+		    r3=this.radius*1.2;
+		    var m1=new THREE.MeshStandardMaterial({color:"blue"});
+		    var m2=new THREE.MeshStandardMaterial({color:"gray"});
+		    var m3=new THREE.MeshStandardMaterial({color:"gold"});
+		    var c1=new THREE.CylinderGeometry(r1,r1,h1,32,1);
+		    var c2=new THREE.CylinderGeometry(r2,r2,h2,32,1);
+		    var c3=new THREE.CylinderGeometry(r2*0.8,r2*0.8,h2,32,1);
+		    var c4=new THREE.CylinderGeometry(r3,r3,h3,32,1);
+		    var c5=new THREE.CylinderGeometry(r2*0.8,r2*0.8,h3,32,1);
+		    c1=new THREE.Mesh(c1,m1);
+		    c2=new THREE.Mesh(c2,m2);
+		    c3=new THREE.Mesh(c3,m2);
+		    c4=new THREE.Mesh(c4,m3);
+		    c5=new THREE.Mesh(c5,m3);
+		    c1.position.set(0,h1/2,0);
+		    var b2=new ThreeBSP(c2);
+		    var b3=new ThreeBSP(c3);
+		    var b4=new ThreeBSP(c4);
+		    var b5=new ThreeBSP(c5);
+		    b2=b2.subtract(b3);
+		    c2=b2.toGeometry();
+		    c2=new THREE.Mesh(c2,m2);
+		    c1.position.set(0,-(h1+h2)/2,0);
+		    b4=b4.subtract(b5);
+		    c4=b4.toGeometry();
+		    c4=new THREE.Mesh(c4,m3);
+		    c4.position.set(0,h2/2+(h3/2),0);
+		    var r=c2;
+		    r.add(c1);
+		    r.add(c4);
+		    var m4=new THREE.CylinderGeometry(this.radius*6,this.radius*6,this.radius*0.1,32,1);
+		    m4=new THREE.Mesh(m4,m2);
+		    m4.position.set(0,h2/2+h3+h3,0);
+		    var h4=h3;
+		    r.add(m4);
+		    var ht=(h1+h2+h3+h4)*Math.sqrt(3)/2;
+		    var m5=new THREE.CylinderGeometry(this.radius*0.1,this.radius*0.1,(h1+h2+h3+h4)*2/Math.sqrt(3),32,1);
+		    m5=new THREE.Mesh(m5,m2);
+		    m5.rotation.x+=Math.PI/6;
+		    m5.position.set(0,h3*0.8,-this.radius*6);
+		    m5.rotateY+=Math.PI/3;
+		    r.add(m5);
+		    var m6=new THREE.CylinderGeometry(this.radius*0.1,this.radius*0.1,(h1+h2+h3+h4)*2/Math.sqrt(3),32,1);
+		    m6=new THREE.Mesh(m6,m2);
+		    m6.rotation.x+=Math.PI/6;
+		    m6.position.set(0,h3*0.8,-this.radius*6);
+		    m6.rotation.y+=Math.PI/3;
+		    var temp=new THREE.Mesh();
+		    temp.add(m6);
+		    temp.rotation.y+=Math.PI*2/3;
+		    r.add(temp);
+		    var m7=new THREE.CylinderGeometry(this.radius*0.1,this.radius*0.1,(h1+h2+h3+h4)*2/Math.sqrt(3),32,1);
+		    m7=new THREE.Mesh(m7,m2);
+		    m7.rotation.x+=Math.PI/6;
+		    m7.position.set(0,h3*0.8,-this.radius*6);
+		    m7.rotation.y+=Math.PI/3;
+		    temp=new THREE.Mesh();
+		    temp.add(m7);
+		    temp.rotation.y-=Math.PI*2/3;
+		    r.add(temp);
+		    this.flame=null;
+		    this.Mesh=r;
+		    this.onPress=function(){
+		        this.flame=new THREE.SphereGeometry(h/8);
+		        this.flame=new THREE.Mesh(this.flame,new THREE.MeshStandardMaterial({color:'red'}));
+		        this.flame.scale.x=0.5;
+		        this.flame.scale.z=0.5;
+		        this.flame.position.set(0,h*1.15/2,0);
+		        this.Mesh.add(this.flame);
+		    }
+		    this.onPressEnd=function(){
+		        this.flame.parent.remove(this.flame);
+		        this.flame=null;
+		    }
+		    this.yoff=h1+h2/2;
+		    this.onPress();
+		    this.half_width=r1*2.1;
+		}
 	}
-}
 PrismGeometry = function ( vertices, height ) {
 
     var Shape = new THREE.Shape();
@@ -1030,13 +1083,13 @@ class WeighingMachine extends Equipment{
 	    var m4=new THREE.BoxGeometry(h/10,h,h/10);
 	    m4=new THREE.Mesh(m4,mat1);
 	    m5=new THREE.BoxGeometry(h/10,h/3,h/2);
-	    var dynamicTexture  = new THREEx.DynamicTexture(256,128);
-	    dynamicTexture.texture.needsUpdate  = true;
-			dynamicTexture.context.font	= "bolder 90px Verdana";
-		dynamicTexture.texture.anisotropy = renderer.getMaxAnisotropy()
-		dynamicTexture.drawText('Hello', 4, 100, 'red');
+	    this.dynamicTexture  = new THREEx.DynamicTexture(350,128);
+	    this.dynamicTexture.texture.needsUpdate  = true;
+			this.dynamicTexture.context.font	= "bolder 90px Verdana";
+		this.dynamicTexture.texture.anisotropy = renderer.getMaxAnisotropy()
+		this.dynamicTexture.drawText('Hello', 4, 100, 'red');
 	    var material    = new THREE.MeshBasicMaterial({
-		    map : dynamicTexture.texture
+		    map : this.dynamicTexture.texture
 		});
 	    var m5=new THREE.Mesh(m5,material);
 	    m5.position.set(-h/20 - h/2,h-0.2*h+h/6,0);
@@ -1052,6 +1105,82 @@ class WeighingMachine extends Equipment{
 		this.Slots=Array(1);
 		this.Slots[0]=new Slot(null,new THREE.Vector3(0,h*0.2+h*0.25+h/69,0),h);
 		this.Slotpos=Slotpos;
+		this.write=function(w){
+			if(typeof w != 'string')
+				w=w.toString();
+			var dp=0;
+			for(dp;dp<w.length;dp++){
+				dp=dp;
+				if(w[dp]=='.')
+					break;
+			}
+			var f=w.slice(0,dp);
+			var s='';
+			if(dp<w.length){
+				s=w.slice(dp+1,w.length);
+			}
+			if(s.length>2){
+				s=s.slice(0,2);
+			}
+			while(f.length<2){
+				f='0'+f;
+			}
+			while(s.length<2){
+				s+='0';
+			}
+			var r=f+'.'+s+' g';
+			this.dynamicTexture.clear('black');
+			this.dynamicTexture.drawText(r,4,100,'red');
+		}
+		this.write(0);
+		this.update=function(){
+			if(this.Slots[0].Slave!=null){
+				this.write(objects[this.Slots[0].Slave].Mixture.weight);
+			}
+			else{
+				this.write(0);
+			}
+		}
+	}
+}
+class Funnel extends Equipment{
+	constructor(){
+		super();
+		this.id=11;
+		var h=8;
+        var r=h/2;
+        var mat=new THREE.MeshPhysicalMaterial({color:"white"});
+        var m1=new THREE.CylinderGeometry(r,r,r/2,32,1);
+        m1=new THREE.Mesh(m1,mat);
+        var m2=new THREE.CylinderGeometry(r*0.95,r*0.95,r/2,32,1);
+        m2=new THREE.Mesh(m2,mat);
+        var b1=new ThreeBSP(m1);
+        var b2=new ThreeBSP(m2);
+        b1=b1.subtract(b2);
+        var m3=new THREE.CylinderGeometry(r,r/5,h/4,32,1);
+        m3=new THREE.Mesh(m3,mat);
+        var m4=new THREE.CylinderGeometry(r*0.95,r/5-r*0.05,h/4,32,1);
+        m4=new THREE.Mesh(m4,mat);
+        m3.position.set(0,-h/8-h/8,0);
+        m4.position.set(0,-h/8-h/8,0);
+        var b3=new ThreeBSP(m3);
+        var b4=new ThreeBSP(m4);
+        b1=b1.union(b3);
+        b1=b1.subtract(b4);
+        var m5=new THREE.CylinderGeometry(r/5,r/5,h,32,1);
+        var m6=new THREE.CylinderGeometry(r/5 -r*0.05,r/5-r*0.05,h,32,1);
+        m5=new THREE.Mesh(m5,mat);
+        m6=new THREE.Mesh(m6,mat);
+        m5.position.set(0,-h/8-h/4-h/2,0);
+        m6.position.set(0,-h/8-h/4-h/2,0);
+        var b5=new ThreeBSP(m5);
+        var b6=new ThreeBSP(m6);
+        b1=b1.union(b5);
+        b1=b1.subtract(b6);
+        b1=b1.toGeometry();
+        this.yoff=h+h/4+h/8;
+        this.half_width=r;
+        this.Mesh=new THREE.Mesh(b1,mat);
 	}
 }
 function _x(){

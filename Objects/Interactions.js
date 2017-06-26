@@ -1,5 +1,5 @@
 var eps=Math.pow(10,-3);
-var reactions;
+var reactions=[];
 var map=[];
 map.push([1,1,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1]);
 map.push([1,1,1,1,1,0,0,0,0,1,0,0,0,0,0,0,1]);
@@ -19,9 +19,9 @@ map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 map.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 var CanBeMaster=[];
-CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,[0],0,0,0,0]);
-CanBeMaster.push([0,0,0,0,0,[0],0,0,0,0,0,0,[1],0,0,0,0]);
-CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,[0],0,0,0,0]);
+CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,[1],[0],0,0,0,0]);
+CanBeMaster.push([0,0,0,0,0,[0],0,0,0,0,0,[0],[1],0,0,0,0]);
+CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,[1],[0],0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 CanBeMaster.push([[1],[1],[1],0,0,0,0,0,0,[1],0,[0],0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
@@ -44,10 +44,10 @@ var choices=[];
 choices[0]=[100,150,250];
 choices[1]=[100,150,250];
 choices[2]=[100,150,250];
-choices[3]=[100,150,250];
+choices[3]=[20,30];
 choices[4]=[50,100];
 choices[5]=[10,20];
-choices[6]=[];
+choices[6]=[20];
 choices[7]=[100,150,250];
 choices[8]=[100,150,250];
 choices[9]=[30];
@@ -77,6 +77,22 @@ function pour(fi,se){
         resetPosition(fi);
         return;
     }
+    if(s.Slots!=null){
+        for(var i=0;i<s.Slots.length;i++){
+            if(s.Slots[i].Slave!=null){
+                resetPosition(fi);
+                return;
+            }
+        }
+    }
+    if(t.Slots!=null){
+        for(var i=0;i<t.Slots.length;i++){
+            if(t.Slots[i].Slave!=null && omap[objects[t.Slots[i].Slave].id]=='Pipette'){
+                resetPosition(fi);
+                return;
+            }
+        }
+    }
     var x=prompt("Tell Volume to transfer ");
     if(x!=null){
         x=parseFloat(x);
@@ -87,6 +103,9 @@ function pour(fi,se){
             alert("Not enough capacity to transfer");
         }
         else{
+            var str='pourF('+fi+','+se+','+x+')';
+            console.log(str);
+            journal.push(str);
             pourF(fi,se,x);
         }
     }
@@ -128,6 +147,12 @@ function Place(fi,se){
     t=objects[se];
     if(CanBeMaster[t.id][s.id]===0)
         return 0;
+    if(s.Slots!=null){
+        for(var i=0;i<s.Slots.length;i++){
+            if(s.Slots[i].Slave!=null && omap[objects[s.Slots[i].Slave].id]=='Pipette')
+                return 0;
+        }
+    }
     if(Array.isArray(CanBeMaster[t.id][s.id])){
         for(var i=0;i<CanBeMaster[t.id][s.id].length;i++){
             var j=CanBeMaster[t.id][s.id][i];
