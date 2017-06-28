@@ -36,6 +36,11 @@ CanBeMaster.push([1,1,1,1,0,0,1,0,0,1,1,1,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+var isanimated=[];
+isanimated['pourF']=true;
+isanimated['move']=true;
+isanimated['PressFor']=true;
+isanimated['washF']=true;
 var omap=['Bottle','Beaker','Flask','TestTube','Burette','Pipette','Petridish','BunsenBurner','WeighingMachine','WatchGlass','TestTubeStand','Funnel','PhMeter','Shelf','Table','Basin'];
 var issmall=[1,1,1,1,0,0,1,0,0,1,1,1,0];
 var iscontainer=[1,1,1,1,1,1,1,0,0,1,0,0,0];
@@ -111,6 +116,8 @@ function pour(fi,se){
             });
         }
     }
+    resetPosition(fi);
+
 }
 function pourF(fi,se,x){
     if(x==0)
@@ -127,20 +134,20 @@ function ApourF(fi,se,x,cb){
     var s=objects[fi];
     var t=objects[se];
     var temp=s.getPosition();
-    Amove(s,t.getPosition().x,t.getPosition().y+t.height,t.getPosition().z,function(){
-        Transfer(s.Mixture,t.Mixture,x);
-        s.Fill();
-        t.Fill();
-        Amove(objects[fi],temp.x,temp.y,temp.z,function(){
-            if(cb!=undefined)
-                cb();
-            else if(callback!=undefined)
-                callback();
+    Amove(s,t.getPosition().x+t.inradius+s.inradius,t.getPosition().y+t.height+5,t.getPosition().z,function(){
+        rotatez(s,Math.PI*3/5,function(){
+            Transfer(s.Mixture,t.Mixture,x);
+            s.Fill();
+            t.Fill();
+        },function(){
+            Amove(objects[fi],temp.x,temp.y,temp.z,function(){
+                if(cb!=undefined)
+                    cb();
+                else if(callback!=undefined)
+                    callback();
+            });
         });       
     });
-    
-    if(callback!=undefined)
-        callback();
 }
 function wash(fi,se){
     s=objects[fi];
@@ -161,7 +168,7 @@ function wash(fi,se){
             var str="washF("+fi.toString()+','+se.toString()+')';
             journal.push(str);
             console.log(str);
-            AwashF(fi,se,function(){
+                F(fi,se,function(){
                 resetPosition(fi);
             });
         }
@@ -341,7 +348,7 @@ function movex(obj,x,cb){
     function loop(){
         date=new Date();
         ct=date.getTime();
-        dt=ct-pt;   
+        dt=ct-pt;
         pt=ct;
         if(dir*(obj.x()+dir*dt/25)>=dir*x){
             move(obj,x,obj.y(),obj.z());
@@ -411,6 +418,63 @@ function movez(obj,z,cb){
         renderer.render(scene, camera);
     }
     loop();
+}
+function rotatez(obj,th,cb,cb2){
+    var fcb=cb;
+    if(fcb==undefined)
+        fcb=callback;
+    var date=new Date();
+    var dt=0,ct=0;
+    var ipos=obj.getPosition();
+    var mas=new THREE.Mesh();
+    obj.Mesh.position.set(+obj.inradius,obj.yoff-obj.height,0);
+    mas.add(obj.Mesh);
+    mas.position.set(ipos.x-obj.inradius,ipos.y+obj.height,ipos.z);
+    scene.add(mas);
+    var pt=date.getTime();
+    function loop1(){
+        date=new Date();
+        ct=date.getTime();
+        dt=ct-pt;
+        pt=ct;
+        if(1*(mas.rotation.z+1*dt/1000) >=1*th){
+            mas.rotation.z=th;
+            if(cb!=undefined)
+                cb();
+            loop2();
+            return;
+        }
+        else{
+            mas.rotation.z+=1*dt/1000;
+        }
+        controls.update();
+        requestAnimationFrame(loop1);
+        renderer.render(scene, camera);
+    }
+    function loop2(){
+        date=new Date();
+        ct=date.getTime();
+        dt=ct-pt;
+        pt=ct;
+        if(1*(mas.rotation.z-1*dt/1000) <=0){
+            mas.rotation.z=0;
+            obj.Mesh.parent.remove(obj.Mesh);
+            obj.setPosition(ipos);
+            scene.add(obj.Mesh);
+            if(cb2!=undefined)
+                cb2();
+            else if(callback!=undefined)
+                callback();
+            return;
+        }
+        else{
+            mas.rotation.z-=1*dt/1000;
+        }
+        controls.update();
+        requestAnimationFrame(loop2);
+        renderer.render(scene, camera);
+    }
+    loop1();   
 }
 function resetPosition(s){
     if(prevmaster!=null){
