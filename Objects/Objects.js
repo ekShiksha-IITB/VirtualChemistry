@@ -76,20 +76,21 @@ class Burette extends Equipment{
         var h=Math.pow((24*24*v/Math.PI),1/3)*1.2;
         this.volume=v;
         this.sh=h+17;
-        this.height=h;
+        this.bheight=h;
+        this.height=this.sh;
         this.radius=h/24;
         this.bs=new BuretteStand(this.sh);
         var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.5});
-        var c1= new THREE.CylinderGeometry(this.radius,this.radius,this.height,32,32);
+        var c1= new THREE.CylinderGeometry(this.radius,this.radius,this.bheight,32,32);
         c1=new THREE.Mesh(c1,m);
-        var c2= new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height,32,32);
+        var c2= new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.bheight,32,32);
         c2=new THREE.Mesh(c2,m);
         var s1=new THREE.CylinderGeometry(this.radius,this.radius*0.2,this.radius*3,32,1);
         s1=new THREE.Mesh(s1,m);
-        s1.position.set(0,-1*(this.height+3*this.radius)/2,0);
+        s1.position.set(0,-1*(this.bheight+3*this.radius)/2,0);
         var s2=new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.18,this.radius*3,32,1);
         s2=new THREE.Mesh(s2,m);
-        s2.position.set(0,-1*(this.height+3*this.radius)/2,0);
+        s2.position.set(0,-1*(this.bheight+3*this.radius)/2,0);
         var c3=new THREE.CylinderGeometry(this.radius*1.2,this.radius*1.2,this.radius*3.0,32,1);
         c3= new THREE.Mesh(c3,m);
         c3.rotation.z+=Math.PI/2;
@@ -107,10 +108,10 @@ class Burette extends Equipment{
         r=new THREE.Mesh(r,m);
         r.add(c3);
         this.press=c3;
-        this.bs.Mesh.position.set(0,-this.sh+this.height/2,0);
+        this.bs.Mesh.position.set(0,-this.sh+this.bheight/2,0);
         this.Mesh=r;
         this.Mesh.add(this.bs.Mesh);
-        this.yoff=this.sh*203/200-this.height/2;
+        this.yoff=this.sh*203/200-this.bheight/2;
         this.fl=null;   
         this.Fill=function(){
             if(this.Mixture.volume==0 && this.fl!=null){
@@ -119,13 +120,13 @@ class Burette extends Equipment{
             }
             else if(this.fl!=null){
                 this.fl.material.color.set(this.Mixture.Color);
-                this.fl.position.set(0,(this.height*0.9*this.Mixture.volume*0.5)/this.volume-this.height*0.45,0);
+                this.fl.position.set(0,(this.bheight*0.9*this.Mixture.volume*0.5)/this.volume-this.bheight*0.45,0);
                 this.fl.scale.y=this.Mixture.volume/this.volume;
             }
             else if(this.Mixture.volume!=0){
-                var temp = new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.height*0.9,64,1);
+                var temp = new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.bheight*0.9,64,1);
                 this.fl=new THREE.Mesh(temp,new THREE.MeshBasicMaterial({color: this.Mixture.Color}));
-                this.fl.position.set(0,(this.height*0.9*this.Mixture.volume*0.5)/this.volume-this.height*0.45,0);
+                this.fl.position.set(0,(this.bheight*0.9*this.Mixture.volume*0.5)/this.volume-this.bheight*0.45,0);
                 this.fl.scale.y=v=this.Mixture.volume/this.volume;
                 this.Mesh.add(this.fl);
             }
@@ -141,7 +142,7 @@ class Burette extends Equipment{
             if(this.Mixture.volume!=0){
                 this.stream=new THREE.CylinderGeometry(this.radius*0.2,this.radius*0.2,17);
                 this.stream=new THREE.Mesh(this.stream,new THREE.MeshBasicMaterial({color: this.Mixture.Color}));
-                this.stream.position.set(0,-(this.height+15)/2,0);
+                this.stream.position.set(0,-(this.bheight+15)/2,0);
                 this.Mesh.add(this.stream);
             }
         }
@@ -182,6 +183,35 @@ class Burette extends Equipment{
 	        }
 	        this.Mixture.Reduce(trans);
 	        this.Fill();
+        }
+        this.APressFor = function(fi,t){
+            objects[fi].onPress();
+            var date=new Date();
+            var pt=date.getTime();
+            var ct,dt;
+            var tt=0;
+            function loop(){
+                date=new Date();
+                ct=date.getTime();
+                dt=ct-pt;
+                if(tt+dt>t){
+                    dt=t-tt;
+                    tt=t;
+                }
+                else
+                    tt+=dt;
+                pt=ct;
+                console.log(dt);
+                objects[fi].duringPress(fi,dt);
+                if(tt>=t){
+                    objects[fi].onPressEnd();
+                    return;
+                }
+                controls.update();
+                requestAnimationFrame(loop);   
+                renderer.render(scene, camera);               
+            }
+            loop();
         }
     }
 }
@@ -299,7 +329,20 @@ class Petridish extends Equipment{
         r=r.toGeometry();
         r=new THREE.Mesh(r,m);
         this.Mesh=r;
-        this.half_width=this.radius;
+        this.half_width=this.radius*Math.sqrt(3)/2;
+        this.Fill=function(){
+            if(this.fl!=null){
+                this.fl.parent.remove(this.fl);
+                this.fl=null;
+            }
+            if(this.Mixture.volume!=0){
+                var th=(Math.PI/3) * this.Mixture.volume/this.volume;
+                this.fl=new THREE.CylinderGeometry(this.radius*0.95*Math.sin(th),this.radius*0.95*Math.sin(th),0.001,32,1);
+                this.fl=new THREE.Mesh(this.fl,new THREE.MeshBasicMaterial({color:this.Mixture.Color}));
+                this.fl.position.set(0,this.radius-this.height/2-this.radius*Math.cos(th),0);
+                this.Mesh.add(this.fl);
+            }
+        }
     }
 }
 class Pipette extends Equipment{
@@ -438,6 +481,35 @@ class Pipette extends Equipment{
         	}
         }
         this.PressFor=this.duringPress;
+        this.APressFor = function(fi,t){
+            objects[fi].onPress();
+            var date=new Date();
+            var pt=date.getTime();
+            var ct,dt;
+            var tt=0;
+            function loop(){
+                date=new Date();
+                ct=date.getTime();
+                dt=ct-pt;
+                if(tt+dt>t){
+                    dt=t-tt;
+                    tt=t;
+                }
+                else
+                    tt+=dt;
+                pt=ct;
+                console.log(dt);
+                objects[fi].duringPress(fi,dt);
+                if(tt>=t){
+                    objects[fi].onPressEnd();
+                    return;
+                }
+                controls.update();
+                requestAnimationFrame(loop);   
+                renderer.render(scene, camera);               
+            }
+            loop();
+        }
     }
 }
 function Table(h){
@@ -840,7 +912,7 @@ function Basin(w){
     hp=w*7/6;
     this.xoff=0;
     this.yoff=w*7/12;
-    this.zoff=0;
+    this.zoff=0;    
     var m1=new THREE.MeshLambertMaterial({color:0xf1f4f6});
     var m2=new THREE.MeshStandardMaterial({color:"gray"});
     var m3=new THREE.MeshStandardMaterial({color:"white"});
@@ -1178,9 +1250,23 @@ class Funnel extends Equipment{
         b1=b1.union(b5);
         b1=b1.subtract(b6);
         b1=b1.toGeometry();
+        this.height=h+h/4+r/2;
         this.yoff=h+h/4+h/8;
         this.half_width=r;
         this.Mesh=new THREE.Mesh(b1,mat);
+        this.drop=function(){
+            this.Mesh.rotation.x-=(Math.PI/2-Math.atan(0.32));
+            this.yoff=Math.sin(Math.atan(0.2))*(h+h/4+h/8)+h/4;
+            this.setPosition(this.getPosition());
+        }
+        this.pick=function(){
+            if(this.yoff== h+h/4+h/8)
+                return;
+            this.Mesh.rotation.x+=(Math.PI/2-Math.atan(0.32));
+            this.yoff=h+h/4+h/8; 
+            this.setPosition(this.getPosition());
+        }
+        this.drop();
 	}
 }
 function _x(){

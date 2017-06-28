@@ -106,10 +106,11 @@ function pour(fi,se){
             var str='pourF('+fi+','+se+','+x+')';
             console.log(str);
             journal.push(str);
-            pourF(fi,se,x);
+            ApourF(fi,se,x,function(){
+                resetPosition(fi);
+            });
         }
     }
-    resetPosition(fi);
 }
 function pourF(fi,se,x){
     if(x==0)
@@ -119,6 +120,27 @@ function pourF(fi,se,x){
     Transfer(s.Mixture,t.Mixture,x);
     s.Fill();
     t.Fill();
+}
+function ApourF(fi,se,x,cb){
+    if(x==0)
+        return;
+    var s=objects[fi];
+    var t=objects[se];
+    var temp=s.getPosition();
+    Amove(s,t.getPosition().x,t.getPosition().y+t.height,t.getPosition().z,function(){
+        Transfer(s.Mixture,t.Mixture,x);
+        s.Fill();
+        t.Fill();
+        Amove(objects[fi],temp.x,temp.y,temp.z,function(){
+            if(cb!=undefined)
+                cb();
+            else if(callback!=undefined)
+                callback();
+        });       
+    });
+    
+    if(callback!=undefined)
+        callback();
 }
 function wash(fi,se){
     s=objects[fi];
@@ -136,11 +158,33 @@ function wash(fi,se){
     }
     if(confirm('Are you sure you want to wash this equipment?')){
         if (typeof s.Fill == 'function') {
-            s.Mixture=new Mixture([]);
-            s.Fill();
+            var str="washF("+fi.toString()+','+se.toString()+')';
+            journal.push(str);
+            console.log(str);
+            AwashF(fi,se,function(){
+                resetPosition(fi);
+            });
         }
     }
-    resetPosition(fi);
+}
+function washF(fi,se){
+    s=objects[fi];
+    s.Mixture=new Mixture([]);
+    s.Fill();
+}
+function AwashF(fi,se,cb){
+    var temp=objects[fi].getPosition();
+    console.log(basins[se].x());
+    Amove(objects[fi],basins[se].x(),0,5,function(){
+        washF(fi,se);
+        Amove(objects[fi],temp.x,temp.y,temp.z,function(){
+            if(cb!=undefined)
+                cb();
+            else if(callback!=undefined)
+                callback();
+        }); 
+    });
+
 }
 function Place(fi,se){
     s=objects[fi];
@@ -171,6 +215,14 @@ function Place(fi,se){
         }
     }
     return 0;
+}
+function APlaceF(fi,se,i){
+    s=objects[fi];
+    t=objects[se];
+    Amove(s,t.Slotpos(i).x,t.Slotpos(i).y,t.Slotpos(i).z);
+    t.Slots[i].Slave=fi;
+    s.Master=se;
+    s.Masterslot=i;
 }
 function PlaceF(fi,se,i){
     var str="PlaceF(";
@@ -204,7 +256,7 @@ function Dethrone(fi,se,i){
     t.Slots[i].Slave=null;
     s.Master=null;
 }
-
+var ADethrone=Dethrone;
 function isSlave(fi,se){
     if(CanBeMaster[objects[se].id][objects[fi].id]===0)
         return 0;
@@ -265,6 +317,100 @@ function move(obj,x,y,z){
             }
         }
     }
+}
+function Amove(obj,x,y,z,cb){
+    console.log("here");
+    var fcb;
+    if(cb!=undefined)
+        fcb=cb;
+    else
+        fcb=callback;
+    movez(obj,z,function(){
+        movey(obj,y,function(){
+            movex(obj,x,fcb);
+        });
+    });
+}
+function movex(obj,x,cb){
+    var date=new Date();
+    var pt=date.getTime();
+    var dt=0,ct=0;
+    var dir=1;
+    if(obj.x()>x)
+        dir=-1;
+    function loop(){
+        date=new Date();
+        ct=date.getTime();
+        dt=ct-pt;   
+        pt=ct;
+        if(dir*(obj.x()+dir*dt/25)>=dir*x){
+            move(obj,x,obj.y(),obj.z());
+            if(cb!=undefined)
+                cb();
+            return;
+        }
+        else{
+            move(obj,obj.x()+dir*dt/25,obj.y(),obj.z());    
+        }
+        controls.update();
+        requestAnimationFrame(loop);
+        renderer.render(scene, camera);
+    }
+    loop();
+}
+function movey(obj,y,cb){
+    var date=new Date();
+    var pt=date.getTime();
+    var dt=0,ct=0;
+    var dir=1;
+    if(obj.y()>y)
+        dir=-1;
+    function loop(){
+        date=new Date();
+        ct=date.getTime();
+        dt=ct-pt;   
+        pt=ct;
+        if(dir*(obj.y()+dir*dt/25) >=dir*y){
+            move(obj,obj.x(),y,obj.z());
+            if(cb!=undefined)
+                cb();
+            return;
+        }
+        else{
+            move(obj,obj.x(),obj.y()+dir*dt/25,obj.z());    
+        }
+        controls.update();
+        requestAnimationFrame(loop);
+        renderer.render(scene, camera);
+    }
+    loop();
+}
+function movez(obj,z,cb){
+    var date=new Date();
+    var pt=date.getTime();
+    var dt=0,ct=0;
+    var dir=1;
+    if(obj.z()>z)
+        dir=-1;
+    function loop(){
+        date=new Date();
+        ct=date.getTime();
+        dt=ct-pt;   
+        pt=ct;
+        if(dir*(obj.z()+dir*dt/25) >=dir*z){
+            move(obj,obj.x(),obj.y(),z);
+            if(cb!=undefined)
+                cb();
+            return;
+        }
+        else{
+            move(obj,obj.x(),obj.y(),obj.z()+dir*dt/25);    
+        }
+        controls.update();
+        requestAnimationFrame(loop);
+        renderer.render(scene, camera);
+    }
+    loop();
 }
 function resetPosition(s){
     if(prevmaster!=null){

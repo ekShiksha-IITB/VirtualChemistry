@@ -1,11 +1,12 @@
 var cdata=[];
 cdata['HCl']=[];
 var rdata=[];
+rdata['HCl']=[];
 class Reaction{
-    constructor(){
-        this.Products=[];  
-        this.Balance=[];      
-        this.Catalyst=null;
+    constructor(pr,ba,cat){
+        this.Products=pr;  
+        this.Balance=ba;      
+        this.Catalyst=cat;
     }
 }
 function Transfer(a,b,vol){
@@ -72,7 +73,8 @@ function Mixture(chemarr,ind){
     this.FindNature=function(){
         if(this.volume==0){
         	this.Hions=0;
-        	this.Ph=0;
+        	this.Ph=7;
+            return;
         }
         this.Hions=0;
         for(var i=0;i<this.Chemicals.length;i++){
@@ -151,7 +153,6 @@ function Mixture(chemarr,ind){
         for(var i=0;i<this.Chemicals.length;i++){
             this.Chemicals[i].Moles-=(this.Chemicals[i].Moles*v)/this.volume;
         }
-        console.log(this.Chemicals[0].Moles);
         this.volume-=v;
         this.FindWeight();
     }
