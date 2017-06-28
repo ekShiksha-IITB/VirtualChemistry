@@ -116,7 +116,7 @@ border: 1px solid #ddd;
   background-color: green !important;
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
   }
-  #text{
+  #dtext{
     position: absolute;
     color:red;
     font-size: 150%;
@@ -197,7 +197,7 @@ border: 1px solid #ddd;
  
 </nav>
 <nav class="navbar navbar-inverse navbar-fixed-top">
-<div id="text">
+<div id="dtext">
 Item : Bottle<br>
 Volume: 250 ml
 </div>
@@ -378,6 +378,7 @@ $("#selectbox2").change(function () {
         shelves[0].setPosition(0,0,-table_height*2/5);
         table_n=0;
         addTable();
+instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-1,1,'Hcl',0.075,1.00,98.00,'white'),new Chemical('Water','transparent',0,1,'H2O',7.9170750000000005,1,18,'transparent')])),nextShelfSlot());
         // var nmix=new Mixture([new Chemical('Hydrochloric Acid','green',0,1,'HCl',12,1,18,'green')]);
         // var base=new Mixture([new Chemical('Sodium Hydroxide','red',0,1,'NaOH',12,1,18,'red')]);
         // instantiate(new Flask(250,nmix),nextShelfSlot());
@@ -429,25 +430,25 @@ $("#selectbox2").change(function () {
             isclick=0;
         }
         function updateDisplay(i){
-          document.getElementById('text').innerHTML='';
+          document.getElementById('dtext').innerHTML='';
           if(i!=null){
-            document.getElementById('text').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
+            document.getElementById('dtext').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
             if(iscontainer[objects[i].id]){
-              document.getElementById('text').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
-              document.getElementById('text').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
+              document.getElementById('dtext').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
+              document.getElementById('dtext').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
               if(objects[i].Slots!=null){
                 for(var x=0;x<objects[i].Slots.length;x++){
                   if(objects[i].Slots[x].Slave!=null && omap[objects[objects[i].Slots[x].Slave].id]=='PhMeter')
-                    document.getElementById('text').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
+                    document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
                 }
               }
             }
             else if(omap[objects[i].id]=='PhMeter'){
               if(objects[i].Master!=null){
-                document.getElementById('text').innerHTML+='Ph: '+Number((objects[objects[i].Master].Ph).toFixed(3))+'<br>';
+                document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[objects[i].Master].Ph).toFixed(3))+'<br>';
               }
             }
-            //document.getElementById('text').innerHTML+='Name: '+omap[i]+'<br>';
+            //document.getElementById('dtext').innerHTML+='Name: '+omap[i]+'<br>';
           }
         }
         function onDocumentMouseUp(event){
@@ -510,7 +511,9 @@ $("#selectbox2").change(function () {
         document.getElementById('NewTable').addEventListener('click',addTable);
         document.getElementById('Save').addEventListener('click',function(){
            callback=undefined;
-           AwashF(0,0);
+           //objects[1].APressFor(1,1000);
+           //rotatez(objects[0],Math.PI*3/5);
+           //AwashF(0,0);
            //Amove(objects[0],0,0,0);
            //APlaceF(0,1,1);
            //  var mystring = "";
@@ -550,6 +553,7 @@ $("#selectbox2").change(function () {
         var ct=st;
         var dt=0;
         var et;
+
         document.getElementById('b0').click();
         function renderScene() {
             date=new Date();
@@ -577,7 +581,7 @@ $("#selectbox2").change(function () {
               date=new Date();
               et=date.getTime();
               objects[presstate].setPosition(prevcor);
-              var str="objects["+presstate.toString()+'].PressFor('+presstate.toString()+','+(et-st).toString()+')';
+              var str='PressFor('+presstate.toString()+','+(et-st).toString()+')';
               journal.push(str);
               console.log(str);
               objects[presstate].onPressEnd(presstate);
