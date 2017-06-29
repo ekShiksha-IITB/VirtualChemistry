@@ -5,7 +5,8 @@ function arrtoChem(arr){
 	chem =new Chemical(arr[0],arr[3],arr[1],arr[6],arr[2],0,arr[7],arr[8],arr[9]);
 	return chem;
 }
-function dbtocdata(arr){
+function dbtocdata(str){
+	var arr=srt.split(',');
 	var len=arr[0];
 	var l=1;
 	var r=10;
@@ -44,10 +45,11 @@ function strtoreac(str){
 	rdata[r[0][1]][r[1][1]]=new Reaction(products,balance,catalyst);
 	rdata[r[1][1]][r[0][1]]=rdata[r[0][1]][r[1][1]]; 
 }
-function dbtordata(arr){
-	var len=arr[0];
-	for(var i=1;i<=len;i++){
-		arrtoreac(str[i]);
+function dbtordata(str){
+	var arr=stl.split(',');
+	var len=parseInt(arr[0]);
+	for(var i=0;i<len;i++){
+		arrtoreac(arr[3*i+1]+','+arr[3*i+2]+','+arr[3*i+3]);
 	}
 }
 var FetchChemical = function() {
