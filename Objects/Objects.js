@@ -1271,19 +1271,24 @@ class Funnel extends Equipment{
         this.yoff=h+h/4+h/8;
         this.half_width=r;
         this.Mesh=new THREE.Mesh(b1,mat);
-        this.drop=function(){
+        this.drop=function(s){
             this.Mesh.rotation.x-=(Math.PI/2-Math.atan(0.32));
             this.yoff=Math.sin(Math.atan(0.2))*(h+h/4+h/8)+h/4;
             this.setPosition(this.getPosition());
+            console.log("objects["+s.toString()+']'+".drop()");
+            journal.push("objects["+s.toString()+']'+".drop()"); 
         }
-        this.pick=function(){
+        this.pick=function(s){
             if(this.yoff== h+h/4+h/8)
                 return;
             this.Mesh.rotation.x+=(Math.PI/2-Math.atan(0.32));
             this.yoff=h+h/4+h/8; 
-            this.setPosition(this.getPosition());
+            this.setPosition(this.getPosition());            
+            console.log("objects["+s.toString()+']'+".pick()");
+            journal.push("objects["+s.toString()+']'+".pick()"); 
         }
-        this.drop();
+        this.Mesh.rotation.x-=(Math.PI/2-Math.atan(0.32));
+        this.yoff=Math.sin(Math.atan(0.2))*(h+h/4+h/8)+h/4;
 	}
 }
 function _x(){
