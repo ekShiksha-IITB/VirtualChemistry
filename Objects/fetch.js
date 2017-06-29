@@ -44,7 +44,7 @@ function strtoreac(str){
 	rdata[r[0][1]][r[1][1]]=new Reaction(products,balance,catalyst);
 	rdata[r[1][1]][r[0][1]]=rdata[r[0][1]][r[1][1]]; 
 }
-function dptordata(arr){
+function dbtordata(arr){
 	var len=arr[0];
 	for(var i=1;i<=len;i++){
 		arrtoreac(str[i]);
