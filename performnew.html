@@ -18,6 +18,7 @@
     <script src="libs/dat.gui.min.js"></script>
     <script src="libs/TrackballControls.js"></script>  
     <script src="Objects/Chemicals.js"></script>
+    <script src="Objects/fetch.js"></script>
   <style>
     /* Remove the navbar's default margin-bottom and rounded borders */ 
     .navbar {
@@ -283,7 +284,6 @@ $("#selectbox2").change(function () {
 </div>
 <div id="myModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
-
     <!-- Modal content-->
     <div id='myModal' class="modal-content">
       <div class="modal-header">
@@ -292,6 +292,7 @@ $("#selectbox2").change(function () {
       </div>
       <div id='inserthere' class="modal-body">
         <p>Some text in the modal.</p>
+        <div class="form-group"><br><input type="text" id="ltxt" class="form-control" placeholder="Attach a label (optional)"> </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -302,7 +303,7 @@ $("#selectbox2").change(function () {
 </div>
 <div id="vcl"></div>
 <script type="text/javascript">
-  function addEquipment(v){
+  function addEquipment(v,label){
     if(v!=0){
       var str='instantiate(';
       str+='new ';
@@ -312,7 +313,11 @@ $("#selectbox2").change(function () {
       str+='new THREE.Vector3(';
       str+=intersects[0].point.x.toString()+',';
       str+='0,';
-      str+='0))';
+      str+='0)'
+      if(ltxt.value!=null){
+          str+=','+'\''+ltxt.value+'\'';
+      }
+      str+=')';
       eval(str);
     }
   }
@@ -325,7 +330,8 @@ $("#selectbox2").change(function () {
     else{
       dragControls.deactivate();
     }
-  } var callback=undefined;
+  } var curdisp=0;
+    var callback=undefined;
     var state=0;
     var drag=1;
     var tablesM=[];
@@ -357,7 +363,34 @@ $("#selectbox2").change(function () {
     var controls;
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2();
+    function updateDisplay(i){
+      document.getElementById('dtext').innerHTML='';
+      if(i!=null){
+        curdisp=i;
+        document.getElementById('dtext').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
+        if(iscontainer[objects[i].id]){
+          document.getElementById('dtext').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
+          document.getElementById('dtext').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
+          if(objects[i].Slots!=null){
+            for(var x=0;x<objects[i].Slots.length;x++){
+              if(objects[i].Slots[x].Slave!=null && omap[objects[objects[i].Slots[x].Slave].id]=='PhMeter')
+                document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
+            }
+          }
+        }
+        if(objects[i].label!=undefined){
+            document.getElementById('dtext').innerHTML+='Label: '+objects[i].label+'<br>'; 
+        }
+        else if(omap[objects[i].id]=='PhMeter'){
+          if(objects[i].Master!=null){
+            document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[objects[i].Master].Mixture.Ph).toFixed(3))+'<br>';
+          }
+        }
+        //document.getElementById('dtext').innerHTML+='Name: '+omap[i]+'<br>';
+      }
+    }
     function init() {
+      getfromdb();
         scene = new THREE.Scene();
         // create a camera, which defines where we're looking at.
         camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -378,7 +411,7 @@ $("#selectbox2").change(function () {
         shelves[0].setPosition(0,0,-table_height*2/5);
         table_n=0;
         addTable();
-instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-1,1,'Hcl',0.075,1.00,98.00,'white'),new Chemical('Water','transparent',0,1,'H2O',7.9170750000000005,1,18,'transparent')])),nextShelfSlot());
+instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','transparent',-1,1,'Hcl',0.075,1.00,98.00,'transparent'),new Chemical('Water','transparent',0,1,'H2O',7.9170750000000005,1,18,'transparent')])),nextShelfSlot());
         // var nmix=new Mixture([new Chemical('Hydrochloric Acid','green',0,1,'HCl',12,1,18,'green')]);
         // var base=new Mixture([new Chemical('Sodium Hydroxide','red',0,1,'NaOH',12,1,18,'red')]);
         // instantiate(new Flask(250,nmix),nextShelfSlot());
@@ -429,28 +462,7 @@ instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-
         function onDocumentMouseMove( event ){
             isclick=0;
         }
-        function updateDisplay(i){
-          document.getElementById('dtext').innerHTML='';
-          if(i!=null){
-            document.getElementById('dtext').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
-            if(iscontainer[objects[i].id]){
-              document.getElementById('dtext').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
-              document.getElementById('dtext').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
-              if(objects[i].Slots!=null){
-                for(var x=0;x<objects[i].Slots.length;x++){
-                  if(objects[i].Slots[x].Slave!=null && omap[objects[objects[i].Slots[x].Slave].id]=='PhMeter')
-                    document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
-                }
-              }
-            }
-            else if(omap[objects[i].id]=='PhMeter'){
-              if(objects[i].Master!=null){
-                document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[objects[i].Master].Ph).toFixed(3))+'<br>';
-              }
-            }
-            //document.getElementById('dtext').innerHTML+='Name: '+omap[i]+'<br>';
-          }
-        }
+
         function onDocumentMouseUp(event){
             event.preventDefault();
             if(state==0)
@@ -471,11 +483,13 @@ instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-
               }
               if(flag){
                 if(iscontainer[state-1]){
-                  document.getElementById('inserthere').innerHTML='';
                   if(choices[state-1].length>1){
+                  document.getElementById('inserthere').innerHTML='';
+
                     for(var j=0;j<choices[state-1].length;j++){
                       document.getElementById('inserthere').innerHTML+='<button type=\'button\' onclick=\'addEquipment(this.value)\' value='+choices[state-1][j]+ ' class=\'btn btn-primary\' data-dismiss=\'modal\'>'+choices[state-1][j]+' ml'+'</button>&nbsp;&nbsp;&nbsp;';
                     }
+                    document.getElementById('inserthere').innerHTML+='<div class="form-group"><br><input type="text" id="ltxt" class="form-control" placeholder="Attach a label (optional)"> </div>';
                     $('#myModal').modal('show');
                   }
                   else{
@@ -553,8 +567,26 @@ instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-
         var ct=st;
         var dt=0;
         var et;
-
         document.getElementById('b0').click();
+        function onDocumentMouseDown(event){
+            event.preventDefault();
+            mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+            mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+            raycaster.setFromCamera( mouse, camera );
+            intersects=raycaster.intersectObjects(objectsM);
+            var pobject=null;
+            if(intersects.length>0){
+              for(var i=0;i<objects.length;i++){
+                if(objects[i].Mesh == intersects[0].object){
+                  pobject=i;
+                }
+              }
+              if(pobject!=null){
+                updateDisplay(pobject);           
+              }
+            }
+        }
+        renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
         function renderScene() {
             date=new Date();
             var temp=date.getTime();
