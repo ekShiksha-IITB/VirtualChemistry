@@ -788,6 +788,7 @@ class WatchGlass extends Equipment{
         this.volume=v;
         this.height=h;
         this.radius=this.height*2;
+        this.inradius=this.radius*0.9;
         this.xoff=0;
         this.yoff=this.height/(2*0.9);
         this.zoff=0;
@@ -936,31 +937,43 @@ function Basin(w){
     r.add(basin);   
     var tap=new THREE.CylinderGeometry(w*0.07,w*0.07,w/4,32,1);
     tap=new THREE.Mesh(tap,m2);
-    var noz=new THREE.CylinderGeometry(w*0.04,w*0.04,w/3,32,1);
-    noz=new THREE.Mesh(noz,m2);
-    var sph=new THREE.SphereGeometry(w*0.071,32);
-    sph=new THREE.Mesh(sph,m3);
-    sph.position.set(0,w/8,0);
+    this.noz=new THREE.CylinderGeometry(w*0.04,w*0.04,w/3,32,1);
+    this.noz=new THREE.Mesh(this.noz,m2);
+    this.sph=new THREE.SphereGeometry(w*0.071,32);
+    this.sph=new THREE.Mesh(this.sph,m3);
+    this.sph.position.set(0,w/8,0);
     var axel=new THREE.CylinderGeometry(w*0.02,w*0.02,w/6,32,1);
     axel=new THREE.Mesh(axel,m3);
     axel.rotation.x+=Math.PI/2-Math.PI/12;
     axel.position.set(0,(w/40),(w/12)*1.73/2);
-    sph.add(axel);        
-    tap.add(sph);
-    var vent=new THREE.CylinderGeometry(w*0.04,w*0.04,w/20,32,1);
-    vent=new THREE.Mesh(vent,m2);
-    noz.rotation.x+=Math.PI/2;
-    noz.position.set(0,w/20,w/6);
-    vent.position.set(0,w/45,(w/3)-(w*0.05));
-    tap.add(vent);
-    tap.add(noz);
+    this.sph.add(axel);        
+    tap.add(this.sph);
+    this.vent=new THREE.CylinderGeometry(w*0.04,w*0.04,w/20,32,1);
+    this.vent=new THREE.Mesh(this.vent,m2);
+    this.noz.rotation.x+=Math.PI/2;
+    this.noz.position.set(0,w/20,w/6);
+    this.vent.position.set(0,w/45,(w/3)-(w*0.05));
+    tap.add(this.vent);
+    tap.add(this.noz);
     tap.position.set(0,w+w/8,-w*0.38);
     r.add(tap);
+    this.stream=new THREE.Mesh(new THREE.CylinderGeometry(w*0.04,w*0.04,w,32,1),new THREE.MeshBasicMaterial({color:'blue',transparent:true,opacity:0.4}));
+    this.stream.position.set(0,-w/2,0);
+    this.on=function(){
+        this.sph.rotation.y+=Math.PI/4;
+        this.vent.add(this.stream);
+    }
+    this.off=function(){
+        this.sph.rotation.y-=Math.PI/4;
+        this.stream.parent.remove(this.stream);
+    }
+    this.on();
+    this.off();  
     this.x=_x;
     this.y=_y;
     this.z=_z;
     this.Mesh=r;
-    this.axel=sph;
+    this.axel=this.sph;
     this.half_width=this.radius;
     this.setPosition=setPosition;
 }

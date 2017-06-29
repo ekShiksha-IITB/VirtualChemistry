@@ -103,21 +103,24 @@ function pour(fi,se){
         x=parseFloat(x);
          if(x>s.Mixture.volume){
             alert("Not enough fluid to transfer");
+            resetPosition(fi);
         }
         else if(x>(t.volume-t.Mixture.volume)){
             alert("Not enough capacity to transfer");
+            resetPosition(fi);
+            
         }
         else{
             var str='pourF('+fi+','+se+','+x+')';
             console.log(str);
             journal.push(str);
-            ApourF(fi,se,x,function(){
-                resetPosition(fi);
+            dmove(s,t.getPosition().x+t.inradius+s.inradius,t.getPosition().y+t.height+5,t.getPosition().z,function(){
+                ApourF(fi,se,x,function(){
+                    resetPosition(fi);
+                });
             });
         }
     }
-    resetPosition(fi);
-
 }
 function pourF(fi,se,x){
     if(x==0)
@@ -168,8 +171,10 @@ function wash(fi,se){
             var str="washF("+fi.toString()+','+se.toString()+')';
             journal.push(str);
             console.log(str);
-                F(fi,se,function(){
-                resetPosition(fi);
+            dmove(objects[fi],basins[se].x(),0,5,function(){
+                AwashF(fi,se,function(){
+                    resetPosition(fi);
+                });
             });
         }
     }
@@ -183,15 +188,44 @@ function AwashF(fi,se,cb){
     var temp=objects[fi].getPosition();
     console.log(basins[se].x());
     Amove(objects[fi],basins[se].x(),0,5,function(){
-        washF(fi,se);
-        Amove(objects[fi],temp.x,temp.y,temp.z,function(){
+        movey(objects[fi],-12,function(){
+            movez(objects[fi],-2,function(){
+                basins[se].on();
+                cdelay(500,function(){
+                    rotatez(objects[fi],Math.PI*2/3,function(){basins[se].off();washF(fi,se);},function(){
+                        movez(objects[fi],5,function(){
+                            movey(objects[fi],0,function(){
+                                Amove(objects[fi],temp.x,temp.y,temp.z,function(){
+                                    if(cb!=undefined)
+                                        cb();
+                                    else if(callback!=undefined)
+                                        callback();
+                                });
+                            });
+                        })
+                    });
+                });
+            });
+        }); 
+    });
+}
+function cdelay(t,cb){
+    var date=new Date();
+    var it=date.getTime();
+    function loop(){
+        date=new Date();
+        if(date.getTime()-it >= t){
             if(cb!=undefined)
                 cb();
             else if(callback!=undefined)
                 callback();
-        }); 
-    });
-
+            return;
+        }
+        controls.update();
+        requestAnimationFrame(loop);
+        renderer.render(scene, camera);
+    }
+    loop();
 }
 function Place(fi,se){
     s=objects[fi];
@@ -326,7 +360,25 @@ function move(obj,x,y,z){
     }
 }
 function Amove(obj,x,y,z,cb){
-    console.log("here");
+    var fcb;
+    if(cb!=undefined)
+        fcb=cb;
+    else
+        fcb=callback;
+    if(obj.x()==x && obj.y()==y && obj.z()==z){
+        if(fcb!=undefined)
+            fcb();
+        return;
+    }
+    movez(obj,15,function(){
+        movey(obj,y,function(){
+            movex(obj,x,function(){
+                movez(obj,z,fcb);
+            });
+        });
+    });
+}
+function dmove(obj,x,y,z,cb){
     var fcb;
     if(cb!=undefined)
         fcb=cb;
@@ -334,7 +386,11 @@ function Amove(obj,x,y,z,cb){
         fcb=callback;
     movez(obj,z,function(){
         movey(obj,y,function(){
-            movex(obj,x,fcb);
+            movex(obj,x,function(){
+                if(fcb!=undefined){
+                    fcb();   
+                }
+            });
         });
     });
 }
