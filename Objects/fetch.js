@@ -51,7 +51,6 @@ function strtoreac(str){
 	}
 	rdata[r[0][1]][r[1][1]]=new Reaction(products,balance,catalyst);
 	rdata[r[1][1]][r[0][1]]=rdata[r[0][1]][r[1][1]]; 
-	console.log(rdata[r[0][1]][r[1][1]]);
 }
 function dbtordata(str){
 	var arr=str.split(',');
