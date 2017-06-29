@@ -1,7 +1,6 @@
 var cdata=[];
-cdata['HCl']=[];
 var rdata=[];
-rdata['HCl']=[];
+cdata['Ferric Chloride']=new Chemical('Ferric Chloride','light brown',-1,0,'FeCl3',0.16,2.9,162,'brown',undefined);
 class Reaction{
     constructor(pr,ba,cat){
         this.Products=pr;  
@@ -15,7 +14,7 @@ function Transfer(a,b,vol){
     vol=Math.min(vol,a.volume);
     for(var i=0;i<a.Chemicals.length;i++){
         var flag=0;
-        if(a.Chemicals[i].Moles>0){
+        if(a.Chemicals[i].Moles>Math.pow(10,-10)){
             for(var j=0;j<b.Chemicals.length;j++){
                 if(b.Chemicals[j].Name==a.Chemicals[i].Name){
                     var tr=a.Chemicals[i].Moles*vol/a.volume;
@@ -52,6 +51,8 @@ function Transfer(a,b,vol){
     }
     a.volume-=vol;
     b.volume+=vol;
+    if(a.volume < Math.pow(10,-10))
+        a.volume=0;
     a.FindWeight();
     b.FindWeight();
     b.FindNature();

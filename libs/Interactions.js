@@ -36,6 +36,12 @@ CanBeMaster.push([1,1,1,1,0,0,1,0,0,1,1,1,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 CanBeMaster.push([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+var isanimated=[];
+isanimated['pourF']=true;
+isanimated['move']=true;
+isanimated['PressFor']=true;
+isanimated['washF']=true;
+isanimated['PlaceF']=true;
 var omap=['Bottle','Beaker','Flask','TestTube','Burette','Pipette','Petridish','BunsenBurner','WeighingMachine','WatchGlass','TestTubeStand','Funnel','PhMeter','Shelf','Table','Basin'];
 var issmall=[1,1,1,1,0,0,1,0,0,1,1,1,0];
 var iscontainer=[1,1,1,1,1,1,1,0,0,1,0,0,0];
@@ -96,18 +102,28 @@ function pour(fi,se){
     var x=prompt("Tell Volume to transfer ");
     if(x!=null){
         x=parseFloat(x);
-         if(x>s.Mixture.volume){
+        if(Math.abs(s.Mixture.volume-x)<Math.pow(10,-5)){
+            x=Math.min(x,s.Mixture.volume);
+        }
+        if(x>s.Mixture.volume){
             alert("Not enough fluid to transfer");
+            resetPosition(fi);
         }
         else if(x>(t.volume-t.Mixture.volume)){
             alert("Not enough capacity to transfer");
+            resetPosition(fi);
+            
         }
         else{
             var str='pourF('+fi+','+se+','+x+')';
             console.log(str);
             journal.push(str);
-            ApourF(fi,se,x,function(){
-                resetPosition(fi);
+            dragControls.deactivate();
+            dmove(s,t.getPosition().x+s.inradius,t.getPosition().y+t.height+5,t.getPosition().z,function(){
+                ApourF(fi,se,x,function(){
+                    resetPosition(fi);
+                    dragControls.activate();
+                });
             });
         }
     }
@@ -127,20 +143,17 @@ function ApourF(fi,se,x,cb){
     var s=objects[fi];
     var t=objects[se];
     var temp=s.getPosition();
-    Amove(s,t.getPosition().x,t.getPosition().y+t.height,t.getPosition().z,function(){
-        Transfer(s.Mixture,t.Mixture,x);
-        s.Fill();
-        t.Fill();
-        Amove(objects[fi],temp.x,temp.y,temp.z,function(){
-            if(cb!=undefined)
-                cb();
-            else if(callback!=undefined)
-                callback();
+    Amove(s,t.getPosition().x+s.inradius,t.getPosition().y+t.height+5,t.getPosition().z,function(){
+        rotatep(fi,se,x,Math.PI*3/5,function(){
+        },function(){
+            Amove(objects[fi],temp.x,temp.y,temp.z,function(){
+                if(cb!=undefined)
+                    cb();
+                else if(callback!=undefined)
+                    callback();
+            });
         });       
     });
-    
-    if(callback!=undefined)
-        callback();
 }
 function wash(fi,se){
     s=objects[fi];
@@ -158,11 +171,17 @@ function wash(fi,se){
     }
     if(confirm('Are you sure you want to wash this equipment?')){
         if (typeof s.Fill == 'function') {
+         
             var str="washF("+fi.toString()+','+se.toString()+')';
             journal.push(str);
             console.log(str);
-            AwashF(fi,se,function(){
-                resetPosition(fi);
+                    dragControls.deactivate();
+            dmove(objects[fi],basins[se].x(),0,5,function(){
+                AwashF(fi,se,function(){
+                    resetPosition(fi);
+                    dragControls.activate();
+                    
+                });
             });
         }
     }
@@ -176,15 +195,44 @@ function AwashF(fi,se,cb){
     var temp=objects[fi].getPosition();
     console.log(basins[se].x());
     Amove(objects[fi],basins[se].x(),0,5,function(){
-        washF(fi,se);
-        Amove(objects[fi],temp.x,temp.y,temp.z,function(){
+        movey(objects[fi],-12,function(){
+            movez(objects[fi],-2,function(){
+                basins[se].on();
+                cdelay(500,function(){
+                    rotatez(objects[fi],Math.PI*2/3,function(){basins[se].off();washF(fi,se);},function(){
+                        movez(objects[fi],5,function(){
+                            movey(objects[fi],0,function(){
+                                Amove(objects[fi],temp.x,temp.y,temp.z,function(){
+                                    if(cb!=undefined)
+                                        cb();
+                                    else if(callback!=undefined)
+                                        callback();
+                                });
+                            });
+                        })
+                    });
+                });
+            });
+        }); 
+    });
+}
+function cdelay(t,cb){
+    var date=new Date();
+    var it=date.getTime();
+    function loop(){
+        date=new Date();
+        if(date.getTime()-it >= t){
             if(cb!=undefined)
                 cb();
             else if(callback!=undefined)
                 callback();
-        }); 
-    });
-
+            return;
+        }
+        controls.update();
+        requestAnimationFrame(loop);
+        renderer.render(scene, camera);
+    }
+    loop();
 }
 function Place(fi,se){
     s=objects[fi];
@@ -217,12 +265,12 @@ function Place(fi,se){
     return 0;
 }
 function APlaceF(fi,se,i){
-    s=objects[fi];
-    t=objects[se];
-    Amove(s,t.Slotpos(i).x,t.Slotpos(i).y,t.Slotpos(i).z);
+    var s=objects[fi];
+    var t=objects[se];
     t.Slots[i].Slave=fi;
     s.Master=se;
     s.Masterslot=i;
+    Amove(s,t.Slotpos(i).x,t.Slotpos(i).y,t.Slotpos(i).z);
 }
 function PlaceF(fi,se,i){
     var str="PlaceF(";
@@ -271,7 +319,10 @@ function isSlave(fi,se){
     }
     return 0;
 }
-function instantiate(obj,pos){
+function instantiate(obj,pos,label){
+    console.log(label);
+    if(label!=undefined)
+        obj.label=label;
     objects.push(obj);
     objectsM.push(obj.Mesh);
     scene.add(obj.Mesh);
@@ -285,7 +336,11 @@ function instantiate(obj,pos){
         str+='new THREE.Vector3(';
         str+=pos.x.toString()+',';
         str+=pos.y.toString()+',';
-        str+=pos.z.toString()+'))';
+        str+=pos.z.toString()+')';
+        if(label!=undefined){
+            str+=','+label;
+        }
+        str+=')';
     }
     else{
         var str='instantiate(';
@@ -293,7 +348,11 @@ function instantiate(obj,pos){
         str+='new THREE.Vector3(';
         str+=pos.x.toString()+',';
         str+=pos.y.toString()+',';
-        str+=pos.z.toString()+'))';
+        str+=pos.z.toString()+')';
+        if(label!=undefined){
+            str+=','+label;
+        }
+        str+=')';
     }
     console.log(str);
     journal.push(str);
@@ -319,16 +378,36 @@ function move(obj,x,y,z){
     }
 }
 function Amove(obj,x,y,z,cb){
-    console.log("here");
     var fcb;
     if(cb!=undefined)
         fcb=cb;
     else
         fcb=callback;
-    movez(obj,20,function(){
+    if(Math.abs(obj.x()-x)<Math.pow(10,-5) && Math.abs(obj.y()-y)<Math.pow(10,-5) && Math.abs(obj.z()-z)<Math.pow(10,-5)){
+        if(fcb!=undefined)
+            fcb();
+        return;
+    }
+    movez(obj,15,function(){
         movey(obj,y,function(){
             movex(obj,x,function(){
                 movez(obj,z,fcb);
+            });
+        });
+    });
+}
+function dmove(obj,x,y,z,cb){
+    var fcb;
+    if(cb!=undefined)
+        fcb=cb;
+    else
+        fcb=callback;
+    movez(obj,z,function(){
+        movey(obj,y,function(){
+            movex(obj,x,function(){
+                if(fcb!=undefined){
+                    fcb();   
+                }
             });
         });
     });
@@ -343,7 +422,7 @@ function movex(obj,x,cb){
     function loop(){
         date=new Date();
         ct=date.getTime();
-        dt=ct-pt;   
+        dt=ct-pt;
         pt=ct;
         if(dir*(obj.x()+dir*dt/25)>=dir*x){
             move(obj,x,obj.y(),obj.z());
@@ -361,6 +440,7 @@ function movex(obj,x,cb){
     loop();
 }
 function movey(obj,y,cb){
+    //console.log(y);
     var date=new Date();
     var pt=date.getTime();
     var dt=0,ct=0;
@@ -413,6 +493,158 @@ function movez(obj,z,cb){
         renderer.render(scene, camera);
     }
     loop();
+}
+function rotatep(fi,se,x,th,cb,cb2){
+    obj=objects[fi];
+    obj2=objects[se];
+    var fcb=cb;
+    if(fcb==undefined)
+        fcb=callback;
+    var date=new Date();
+    var dt=0,ct=0;
+    var ipos=obj.getPosition();
+    var mas=new THREE.Mesh();
+    obj.Mesh.position.set(+obj.inradius,obj.yoff-obj.height,0);
+    mas.add(obj.Mesh);
+    mas.position.set(ipos.x-obj.inradius,ipos.y+obj.height,ipos.z);
+    scene.add(mas);
+    var pt=date.getTime();
+    var sh=(obj2.height+5+obj.height);
+    if(obj2.sh!=undefined){
+        sh=(obj2.height+5+obj.height-17);
+    }
+    var stream=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,sh,32,1),new THREE.MeshBasicMaterial({color:obj.Mixture.Color}));
+    stream.position.set(mas.position.x,mas.position.y-(sh)/2,mas.position.z);
+    var sf=0;
+    var ppr=x/th;
+    var ctrans=0;
+    function loop1(){
+        date=new Date();
+        ct=date.getTime();
+        dt=ct-pt;
+        pt=ct;
+        if(mas.rotation.z >= th/2 && !sf){
+            sf=1;
+            scene.add(stream);
+        }
+        if(1*(mas.rotation.z+1*dt/1000) >=1*th){
+            mas.rotation.z=th;
+            if(cb!=undefined)
+                cb();
+            loop2();
+            return;
+        }
+        else{
+            ctrans=(dt/1000)*ppr;
+            mas.rotation.z+=dt/1000;
+        }
+        if(sf){
+            ctrans=Math.min(ctrans,x);
+            pourF(fi,se,ctrans);
+            x-=ctrans;
+        }
+        totalUpdate(objects[fi]);
+        totalUpdate(objects[se]);
+        controls.update();
+        requestAnimationFrame(loop1);
+        renderer.render(scene, camera);
+    }
+    function loop2(){
+        date=new Date();
+        ct=date.getTime();
+        dt=ct-pt;
+        pt=ct;
+        if(mas.rotation.z <= th/2 && sf){
+            pourF(fi,se,x);
+            totalUpdate(objects[se]);
+            totalUpdate(objects[fi]);
+            sf=0;
+            scene.remove(stream);
+        }
+        if(1*(mas.rotation.z-1*dt/1000) <=0){
+            mas.rotation.z=0;
+            obj.Mesh.parent.remove(obj.Mesh);
+            obj.setPosition(ipos);
+            scene.add(obj.Mesh);
+            if(cb2!=undefined)
+                cb2();
+            else if(callback!=undefined)
+                callback();
+            return;
+        }
+        else{
+            ctrans=(dt/1000)*ppr;
+            mas.rotation.z-=1*dt/1000;
+        }
+        if(sf){
+            ctrans=Math.min(ctrans,x);
+            pourF(fi,se,ctrans);
+            x-=ctrans;
+        }
+        totalUpdate(objects[fi]);
+        totalUpdate(objects[se]);
+        controls.update();
+        requestAnimationFrame(loop2);
+        renderer.render(scene, camera);
+    }
+    loop1();   
+}
+function rotatez(obj,th,cb,cb2){
+    var fcb=cb;
+    if(fcb==undefined)
+        fcb=callback;
+    var date=new Date();
+    var dt=0,ct=0;
+    var ipos=obj.getPosition();
+    var mas=new THREE.Mesh();
+    obj.Mesh.position.set(+obj.inradius,obj.yoff-obj.height,0);
+    mas.add(obj.Mesh);
+    mas.position.set(ipos.x-obj.inradius,ipos.y+obj.height,ipos.z);
+    scene.add(mas);
+    var pt=date.getTime();
+    function loop1(){
+        date=new Date();
+        ct=date.getTime();
+        dt=ct-pt;
+        pt=ct;
+        if(1*(mas.rotation.z+1*dt/1000) >=1*th){
+            mas.rotation.z=th;
+            if(cb!=undefined)
+                cb();
+            loop2();
+            return;
+        }
+        else{
+            mas.rotation.z+=1*dt/1000;
+        }
+        controls.update();
+        requestAnimationFrame(loop1);
+        renderer.render(scene, camera);
+    }
+    function loop2(){
+        date=new Date();
+        ct=date.getTime();
+        dt=ct-pt;
+        pt=ct;
+        if(1*(mas.rotation.z-1*dt/1000) <=0){
+            mas.rotation.z=0;
+            obj.Mesh.parent.remove(obj.Mesh);
+            obj.setPosition(ipos);
+            scene.add(obj.Mesh);
+            if(cb2!=undefined)
+                cb2();
+            else if(callback!=undefined)
+                callback();
+            return;
+        }
+        else{
+            mas.rotation.z-=1*dt/1000;
+        }
+        controls.update();
+        requestAnimationFrame(loop2);
+        renderer.render(scene, camera);
+    }
+    loop1();   
 }
 function resetPosition(s){
     if(prevmaster!=null){

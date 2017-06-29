@@ -24,7 +24,13 @@ class Equipment{
         this.Slots=null;
         this.getPosition=getPosition;
         this.tag=null;
-        this.update=function(){};
+        this.label=undefined;
+        this.update=function(){
+            if(objects[curdisp]==this){
+                updateDisplay(curdisp);
+            }
+
+        };
         this.updateSlaves=function(){
         	if(this.Slots==null)
         		return;
@@ -43,7 +49,11 @@ class Equipment{
         }
     }
 }
-
+function totalUpdate(obj){
+    obj.update();
+    obj.updateSlaves();
+    obj.updateMaster();
+}
 function BuretteStand(h,fp){
     this.height=h;
     this.radius=h/50;
@@ -79,8 +89,9 @@ class Burette extends Equipment{
         this.bheight=h;
         this.height=this.sh;
         this.radius=h/24;
+        this.inradius=this.radius*0.9;
         this.bs=new BuretteStand(this.sh);
-        var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.5});
+        var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.7});
         var c1= new THREE.CylinderGeometry(this.radius,this.radius,this.bheight,32,32);
         c1=new THREE.Mesh(c1,m);
         var c2= new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.bheight,32,32);
@@ -201,10 +212,11 @@ class Burette extends Equipment{
                 else
                     tt+=dt;
                 pt=ct;
-                console.log(dt);
                 objects[fi].duringPress(fi,dt);
                 if(tt>=t){
                     objects[fi].onPressEnd();
+                    if(callback!=undefined)
+                        callback();
                     return;
                 }
                 controls.update();
@@ -223,6 +235,7 @@ class Bottle extends Equipment{
         this.height=h;
         this.radius=this.height/2;
         this.yoff=this.height/2;
+        this.inradius=this.radius*0.3;
         this.id=0;
         this.Mixture=mixt;
         var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.5});
@@ -247,15 +260,10 @@ class Bottle extends Equipment{
             var c6= new THREE.CylinderGeometry(this.radius*0.35,this.radius*0.35,this.height*0.5,32,1);
             c6=new THREE.Mesh(c6,m);
             c6.position.set(0,this.height*0.7,0);
-            var t=new THREE.TorusGeometry(this.radius,this.radius*0.05,16,32);
-            t=new THREE.Mesh(t,m);
-            t.rotation.x+=Math.PI/2;
-            t.position.set(0,this.height/2,0);
             c2.position.set(0,this.height*0.049,0);
             c1.position.set(0,0,0);
             var b1=new ThreeBSP(c1);
             var b2=new ThreeBSP(c2);
-            var b3=new ThreeBSP(t);
             var b4=new ThreeBSP(c3);
             var b5=new ThreeBSP(c4);
             var b6=new ThreeBSP(c5);
@@ -269,7 +277,7 @@ class Bottle extends Equipment{
             geoCache[this.id][this.volume]=r;
         }
         r=new THREE.Mesh(r,m);
-        this.height*=1.5;
+        this.height*=1.35;
         this.fl=null;
         this.Mesh=r;
         this.Fill=Fillb;
@@ -311,6 +319,7 @@ class Petridish extends Equipment{
         this.xoff=0;
         this.zoff=0;
         this.yoff=h/2;
+        this.inradius=this.radius*Math.sin(Math.PI/3);
         var m=new THREE.MeshLambertMaterial({color: "white"});
         var s1=new THREE.SphereGeometry(this.radius,32,32);
         s1=new THREE.Mesh(s1,m);
@@ -444,15 +453,17 @@ class Pipette extends Equipment{
             this.Mesh.position.y+=(this.height/2 - this.radius);
             this.yoff=this.height/2;
             this.Mesh.rotation.x+=Math.PI/2;
-            console.log("objects["+s.toString()+']'+".pick()");
-            journal.push("objects["+s.toString()+']'+".pick()");       
+            this.sety(0);
+            console.log("objects["+s.toString()+']'+".pick("+s+")");
+            journal.push("objects["+s.toString()+']'+".pick("+s+")");       
         }
         this.drop=function(s){
             this.yoff=this.radius;
             this.Mesh.position.y-=(this.height/2 - this.radius);
             this.Mesh.rotation.x-=Math.PI/2;
-            console.log("objects["+s.toString()+']'+".drop()");
-            journal.push("objects["+s.toString()+']'+".drop()");
+            this.sety(0);
+            console.log("objects["+s.toString()+']'+".drop("+s+")");
+            journal.push("objects["+s.toString()+']'+".drop("+s+")");
         }
         this.dir=1;
         this.onPress=function(){
@@ -467,7 +478,7 @@ class Pipette extends Equipment{
 
         }
         this.duringPress=function(fi,dt){
-        	if(this.dir==1){
+            if(this.dir==1){
         		var x=Math.min(dt/500,this.volume*105/100 - this.Mixture.volume);
         		x=Math.min(x,objects[this.Master].Mixture.volume);
         		pourF(this.Master,fi,x);
@@ -477,10 +488,15 @@ class Pipette extends Equipment{
         		var y=Math.min(x,objects[this.Master].volume-objects[this.Master].Mixture.volume);
         		x-=y;
         		pourF(fi,this.Master,y);
-        		this.Mixture.Reduce(x);
+                this.Mixture.Reduce(x);
         	}
+            //console.log("after"+objects[this.Master].Mixture.volume);
         }
-        this.PressFor=this.duringPress;
+        this.PressFor=function(fi,t){
+            this.onPress();
+            this.duringPress(fi,t);
+            this.onPressEnd();
+        }
         this.APressFor = function(fi,t){
             objects[fi].onPress();
             var date=new Date();
@@ -498,10 +514,11 @@ class Pipette extends Equipment{
                 else
                     tt+=dt;
                 pt=ct;
-                console.log(dt);
                 objects[fi].duringPress(fi,dt);
                 if(tt>=t){
                     objects[fi].onPressEnd();
+                    if(callback!=undefined)
+                        callback();
                     return;
                 }
                 controls.update();
@@ -553,6 +570,7 @@ class TestTube extends Equipment{
 	    this.radius=h/6;
 	    this.Mixture=mix;
 	    this.volume=v;
+        this.inradius=this.radius*0.9;
 	    var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.4});
 	    var c1= new THREE.CylinderGeometry(this.radius,this.radius,this.height,32,32);
 	    c1=new THREE.Mesh(c1,m);
@@ -718,6 +736,7 @@ class Beaker extends Equipment{
         this.xoff=0;
         this.yoff=this.height/(2*0.9);
         this.zoff=0;
+        this.inradius=this.radius*0.9;
         this.setPosition=setPosition;
         this.x=_x;
         this.y=_y;
@@ -785,6 +804,7 @@ class WatchGlass extends Equipment{
         this.volume=v;
         this.height=h;
         this.radius=this.height*2;
+        this.inradius=this.radius*0.9;
         this.xoff=0;
         this.yoff=this.height/(2*0.9);
         this.zoff=0;
@@ -832,6 +852,7 @@ class Flask extends Equipment{
         this.Mixture=mixt;
         this.height=h;
         this.radius=h/2;
+        this.inradius=this.radius*0.25;
         this.x=0;
         this.y=0;
         this.z=0;
@@ -932,31 +953,43 @@ function Basin(w){
     r.add(basin);   
     var tap=new THREE.CylinderGeometry(w*0.07,w*0.07,w/4,32,1);
     tap=new THREE.Mesh(tap,m2);
-    var noz=new THREE.CylinderGeometry(w*0.04,w*0.04,w/3,32,1);
-    noz=new THREE.Mesh(noz,m2);
-    var sph=new THREE.SphereGeometry(w*0.071,32);
-    sph=new THREE.Mesh(sph,m3);
-    sph.position.set(0,w/8,0);
+    this.noz=new THREE.CylinderGeometry(w*0.04,w*0.04,w/3,32,1);
+    this.noz=new THREE.Mesh(this.noz,m2);
+    this.sph=new THREE.SphereGeometry(w*0.071,32);
+    this.sph=new THREE.Mesh(this.sph,m3);
+    this.sph.position.set(0,w/8,0);
     var axel=new THREE.CylinderGeometry(w*0.02,w*0.02,w/6,32,1);
     axel=new THREE.Mesh(axel,m3);
     axel.rotation.x+=Math.PI/2-Math.PI/12;
     axel.position.set(0,(w/40),(w/12)*1.73/2);
-    sph.add(axel);        
-    tap.add(sph);
-    var vent=new THREE.CylinderGeometry(w*0.04,w*0.04,w/20,32,1);
-    vent=new THREE.Mesh(vent,m2);
-    noz.rotation.x+=Math.PI/2;
-    noz.position.set(0,w/20,w/6);
-    vent.position.set(0,w/45,(w/3)-(w*0.05));
-    tap.add(vent);
-    tap.add(noz);
+    this.sph.add(axel);        
+    tap.add(this.sph);
+    this.vent=new THREE.CylinderGeometry(w*0.04,w*0.04,w/20,32,1);
+    this.vent=new THREE.Mesh(this.vent,m2);
+    this.noz.rotation.x+=Math.PI/2;
+    this.noz.position.set(0,w/20,w/6);
+    this.vent.position.set(0,w/45,(w/3)-(w*0.05));
+    tap.add(this.vent);
+    tap.add(this.noz);
     tap.position.set(0,w+w/8,-w*0.38);
     r.add(tap);
+    this.stream=new THREE.Mesh(new THREE.CylinderGeometry(w*0.04,w*0.04,w,32,1),new THREE.MeshBasicMaterial({color:'blue',transparent:true,opacity:0.4}));
+    this.stream.position.set(0,-w/2,0);
+    this.on=function(){
+        this.sph.rotation.y+=Math.PI/4;
+        this.vent.add(this.stream);
+    }
+    this.off=function(){
+        this.sph.rotation.y-=Math.PI/4;
+        this.stream.parent.remove(this.stream);
+    }
+    this.on();
+    this.off();  
     this.x=_x;
     this.y=_y;
     this.z=_z;
     this.Mesh=r;
-    this.axel=sph;
+    this.axel=this.sph;
     this.half_width=this.radius;
     this.setPosition=setPosition;
 }
@@ -1017,6 +1050,9 @@ class PhMeter extends Equipment{
             }
             else{
                 this.write(7);
+            }
+            if(objects[curdisp]==this){
+                updateDisplay(curdisp);
             }
         }
 	}
@@ -1212,7 +1248,10 @@ class WeighingMachine extends Equipment{
 			else{
 				this.write(0);
 			}
-		}
+		  if(objects[curdisp]==this){
+                updateDisplay(curdisp);
+            }
+        }
 	}
 }
 class Funnel extends Equipment{
@@ -1250,9 +1289,28 @@ class Funnel extends Equipment{
         b1=b1.union(b5);
         b1=b1.subtract(b6);
         b1=b1.toGeometry();
+        this.height=h+h/4+r/2;
         this.yoff=h+h/4+h/8;
         this.half_width=r;
         this.Mesh=new THREE.Mesh(b1,mat);
+        this.drop=function(s){
+            this.Mesh.rotation.x-=(Math.PI/2-Math.atan(0.32));
+            this.yoff=Math.sin(Math.atan(0.2))*(h+h/4+h/8)+h/4;
+            this.setPosition(this.getPosition());
+            console.log("objects["+s.toString()+']'+".drop("+s+")");
+            journal.push("objects["+s.toString()+']'+".drop("+s+")"); 
+        }
+        this.pick=function(s){
+            if(this.yoff== h+h/4+h/8)
+                return;
+            this.Mesh.rotation.x+=(Math.PI/2-Math.atan(0.32));
+            this.yoff=h+h/4+h/8; 
+            this.setPosition(this.getPosition());            
+            console.log("objects["+s.toString()+']'+".pick("+s+")");
+            journal.push("objects["+s.toString()+']'+".pick("+s+")"); 
+        }
+        this.Mesh.rotation.x-=(Math.PI/2-Math.atan(0.32));
+        this.yoff=Math.sin(Math.atan(0.2))*(h+h/4+h/8)+h/4;
 	}
 }
 function _x(){
@@ -1328,4 +1386,10 @@ function updatePos(obj){
 }
 function IsSameVector3(a,b){
     return ((a.x==b.x) && (a.y==b.y) && (a.z==b.z));
+}
+function APressFor(fi,t){
+    objects[fi].APressFor(fi,t);
+}
+function PressFor(fi,t){
+    objects[fi].PressFor(fi,t);
 }
