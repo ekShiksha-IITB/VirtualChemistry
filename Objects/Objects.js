@@ -24,7 +24,13 @@ class Equipment{
         this.Slots=null;
         this.getPosition=getPosition;
         this.tag=null;
-        this.update=function(){};
+        this.label=undefined;
+        this.update=function(){
+            if(objects[curdisp]==this){
+                updateDisplay(curdisp);
+            }
+
+        };
         this.updateSlaves=function(){
         	if(this.Slots==null)
         		return;
@@ -43,7 +49,11 @@ class Equipment{
         }
     }
 }
-
+function totalUpdate(obj){
+    obj.update();
+    obj.updateSlaves();
+    obj.updateMaster();
+}
 function BuretteStand(h,fp){
     this.height=h;
     this.radius=h/50;
@@ -81,7 +91,7 @@ class Burette extends Equipment{
         this.radius=h/24;
         this.inradius=this.radius*0.9;
         this.bs=new BuretteStand(this.sh);
-        var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.5});
+        var m=new THREE.MeshStandardMaterial({color: "white",transparent:true,opacity:0.7});
         var c1= new THREE.CylinderGeometry(this.radius,this.radius,this.bheight,32,32);
         c1=new THREE.Mesh(c1,m);
         var c2= new THREE.CylinderGeometry(this.radius*0.9,this.radius*0.9,this.bheight,32,32);
@@ -443,6 +453,7 @@ class Pipette extends Equipment{
             this.Mesh.position.y+=(this.height/2 - this.radius);
             this.yoff=this.height/2;
             this.Mesh.rotation.x+=Math.PI/2;
+            this.sety(0);
             console.log("objects["+s.toString()+']'+".pick("+s+")");
             journal.push("objects["+s.toString()+']'+".pick("+s+")");       
         }
@@ -450,6 +461,7 @@ class Pipette extends Equipment{
             this.yoff=this.radius;
             this.Mesh.position.y-=(this.height/2 - this.radius);
             this.Mesh.rotation.x-=Math.PI/2;
+            this.sety(0);
             console.log("objects["+s.toString()+']'+".drop("+s+")");
             journal.push("objects["+s.toString()+']'+".drop("+s+")");
         }
@@ -466,7 +478,7 @@ class Pipette extends Equipment{
 
         }
         this.duringPress=function(fi,dt){
-        	if(this.dir==1){
+            if(this.dir==1){
         		var x=Math.min(dt/500,this.volume*105/100 - this.Mixture.volume);
         		x=Math.min(x,objects[this.Master].Mixture.volume);
         		pourF(this.Master,fi,x);
@@ -476,10 +488,15 @@ class Pipette extends Equipment{
         		var y=Math.min(x,objects[this.Master].volume-objects[this.Master].Mixture.volume);
         		x-=y;
         		pourF(fi,this.Master,y);
-        		this.Mixture.Reduce(x);
+                this.Mixture.Reduce(x);
         	}
+            //console.log("after"+objects[this.Master].Mixture.volume);
         }
-        this.PressFor=this.duringPress;
+        this.PressFor=function(fi,t){
+            this.onPress();
+            this.duringPress(fi,t);
+            this.onPressEnd();
+        }
         this.APressFor = function(fi,t){
             objects[fi].onPress();
             var date=new Date();
@@ -497,7 +514,6 @@ class Pipette extends Equipment{
                 else
                     tt+=dt;
                 pt=ct;
-                console.log(dt);
                 objects[fi].duringPress(fi,dt);
                 if(tt>=t){
                     objects[fi].onPressEnd();
@@ -1035,6 +1051,9 @@ class PhMeter extends Equipment{
             else{
                 this.write(7);
             }
+            if(objects[curdisp]==this){
+                updateDisplay(curdisp);
+            }
         }
 	}
 }
@@ -1229,7 +1248,10 @@ class WeighingMachine extends Equipment{
 			else{
 				this.write(0);
 			}
-		}
+		  if(objects[curdisp]==this){
+                updateDisplay(curdisp);
+            }
+        }
 	}
 }
 class Funnel extends Equipment{
