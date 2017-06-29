@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ekshikhsha</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="../Objects/Objects.js"></script>
+    <script type="text/javascript" src="../Objects/Interactions.js"></script>    
+    <script type="text/javascript" src="../libs/ThreeBSP.js"></script>
+    <script src="../libs/OrbitControls.js"></script>  
+    <script src="../libs/DragControls.js"></script>
+    <script src="../libs/TrackballControls.js"></script>  
+  <style>
+    /* Remove the navbar's default margin-bottom and rounded borders */ 
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
+    
+    /* Add a gray background color and some padding to the footer */
+    .footer {
+      background-color: #f2f2f2;
+      padding: 25px;
+    }
+    
+    .jumbotron{
+    background-image:url("chem.jpg");
+    }
+    .largebox{
+      width:1300px;
+      height:900px;
+      top:-20px;
+      margin-left:-80px;
+       position:relative;
+        border:1px solid black;
+        border-radius:3px;
+        margin-top:50px;
+        background-color:#343436;
+         box-shadow: 2px 2px 4px black;
+
+        }
+      .largebox2{
+      width:400px;
+      height:300px;
+      border:1px solid black;
+      border-radius:3px;
+      margin-left:75px;
+      margin-top:80px;
+      background-color:white;
+      box-shadow: 2px 2px 4px black;
+    
+      }
+      #canvas1{
+      border:1px solid black;
+      margin-left:75px;
+      margin-top:20px;
+      border-radius:3px;
+      background-color:white;
+       box-shadow: 2px 2px 4px black;
+
+      }
+      #selectbox{
+      width:200px;
+      height:30px;
+      margin-left:100px;
+      margin-top:10px;
+      }
+      #canvas2{
+      border:1px solid black;
+      border-radius:3px;
+      position:relative;
+      top:-728px;
+      margin-left:520px;
+      background-color:white;
+       box-shadow: 2px 2px 4px black;
+
+      }
+      
+       #selectbox2{
+      width:200px;
+      height:30px;
+      margin-left:10px;
+      margin-top:10px;
+      }
+      #add{
+      margin-left:348px;
+      margin-bottom:-104px;
+     
+      }
+	  .equip{
+	  width:650px;
+	  height:50px;
+	  background-color:white;
+	 text-align:center;
+	 border-radius:4px;
+
+	  float:right;
+	  margin-left:40px;
+	  }
+	  .objects{
+	  	width:20px;
+	  	height:20px;
+border: 1px solid #ddd;
+    border-radius: 4px;
+
+	  }
+	  .active {
+  background-color: green !important;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: 5px;
+}
+.dropdown-submenu:hover .dropdown-menu {
+    display: block;
+	
+}
+a{cursor:pointer;}
+#overlay{
+position:fixed;
+width:30%;
+height:30%;
+margin-top:100px;
+right:0;
+background-color:rgba(0,0,0,0.5);
+z-index:2;
+
+}
+
+.overlay {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: rgb(0,0,0);
+    overflow-x: hidden;
+    transition: 0.5s;
+}
+
+.overlay-content {
+    position: relative;
+    top: 25%;
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+	color:white;
+}
+.overlay .closebtn {
+    position: absolute;
+    top: 20px;
+    right: 45px;
+    font-size: 60px;
+}
+
+
+	  
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-fixed-top" style="background-color:black;">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+     
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li ><a href="#" style="color:white">Home</a></li>
+        <li><a href="#" style="color:white">About</a></li>
+        <li><a href="#" style="color:white">Join us</a></li>
+
+<li>
+   <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" data-hover="dropdown" style="margin-top:8px">Choose chemicals
+    <span class="caret"></span></button>
+    <ul class="dropdown-menu" data-toggle="dropdown">
+      <li class="dropdown-submenu">
+        <a class="test" tabindex="-1" href="#">Acids<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a tabindex="-1" data-toggle="modal" data-target="#myModal3">Hydrochloric acid</a></li>
+          <li><a tabindex="-1" data-toggle="modal" data-target="#myModal3">Sulphuric acid</a></li>
+          <li><a tabindex="-1" data-toggle="modal" data-target="#myModal3">Phosphoric acid</a></li>
+        </ul>
+      </li>
+      <li class="dropdown-submenu">
+        <a class="test" tabindex="-1" href="#">Bases<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a tabindex="-1" data-toggle="modal" data-target="#myModal3">Sodium Hydroxide</a></li>
+          <li><a tabindex="-1" data-toggle="modal" data-target="#myModal3">Ammonium Hydroxide</a></li>
+        </ul>
+      </li>
+       <li class="dropdown-submenu">
+        <a class="test" tabindex="-1" href="#">Indicators<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a tabindex="-1" href="#">Methyl orange</a></li>
+          <li><a tabindex="-1" href="#">Phenolphthalein</a></li>
+           <li><a tabindex="-1" href="#">Blue litmus</a></li>
+            <li><a tabindex="-1" href="#">Red litmus</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</li>
+<script>
+$(document).ready(function(){
+  $('.dropdown-submenu a.test').on("click", function(e){
+    $(this).next('ul').toggle();
+    e.stopPropagation();
+    e.preventDefault();
+	
+  });
+});
+</script>
+<li>
+<div class="btn btn-group">
+<button class="btn btn-primary">Save</button>
+<button class="btn btn-primary">Restore</button>
+<button class="btn btn-primary">New table</button>
+
+</div>
+</li>
+<li><button class="btn btn-primary" style="margin-top:8px"><i class="fa fa-undo"></i></button></li>
+<li><button class="btn btn-default" style="margin-top:8px;margin-left:10px;"><i class="glyphicon glyphicon-hand-up"></i></button></li>
+
+		
+		
+		<li>
+		<div class="btn btn-group">
+		<button class="btn btn-default" title="Bottle"><img class="objects" src="bottle.jpeg" ></button>
+		<button class="btn btn-default" title="Beaker"><img class="objects" src="beaker.jpg" ></button>
+		<button class="btn btn-default" title="Flask"><img class="objects" src="flask.jpg" ></button>
+		<button class="btn btn-default" title="Test tube"><img class="objects" src="testtube.jpg" ></button>
+		<button class="btn btn-default" title="Burette"><img class="objects" src="burette.jpeg" ></button>
+		<button class="btn btn-default" title="Pipette"><img class="objects" src="pipette.jpg" ></button>
+		<button class="btn btn-default" title="Petridish"><img class="objects" src="petridish.jpeg" ></button>
+		<button class="btn btn-default" title="BunsenBurner"><img class="objects" src="bunsenburner.jpeg" ></button>
+		<button class="btn btn-default" title="Weighing machine"><img class="objects" src="weighingmachine.jpeg" ></button>
+		<button class="btn btn-default" title="Watch glass"><img class="objects" src="watchglass.jpeg" ></button>
+		<button class="btn btn-default" title="Test tube stand"><img class="objects" src="testtubestand.jpeg" ></button>
+		<button class="btn btn-default" title="Funnel"><img class="objects" src="funnel.jpeg" ></button>
+		<button class="btn btn-default" title="Phmeter"><img class="objects" src="phmeter.jpeg" ></button>
+
+		</div>
+		</li>
+		
+      </ul>
+    </div>
+ 
+</nav>"
+<nav class="navbar navbar-inverse navbar-fixed-top" style="margin-top:50px;width:30%;height:100px;margin-left:auto">
+  
+      
+    </ul>
+  </div>
+</nav>
+
+
+
+<script>
+$(".btn-default").click(function(){
+  $(".btn-default").removeClass("active");
+  $(this).addClass("active");
+});
+
+</script>
+
+
+
+
+</script>
+<div class="modal fade" id="myModal3" data-target="#myModal3">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header orange">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+
+        </button>
+        <p><h4 class="modal-title">Provide details</h4></p>
+        <form action="#" method="$POST">
+		<input type="text" class="form-control" id="text1" placeholder="Enter volume in mL">
+		<input type="text" class="form-control" id="text2" placeholder="Enter Normality" style="margin-top:20px"><br>
+		<button type="button" class="btn btn-primary"  action="#">Submit</button>
+		
+		</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script type="text/javascript">
+    var prevcor;  
+    var scene,camera,renderer;
+    var basin_width=30;
+    var objects=[];
+    var objectsM=[];
+    var objectsC=[];
+    var table_n;
+    var table_height=50;
+    var basin_height=50;
+    var shelf_height=table_height;
+    var tables=[];
+    var basins=[];
+    var shelves=[];
+    var spotLight=[];
+    var dobject=-1;
+    var pobject=-1;
+    function init() {
+        scene = new THREE.Scene();
+        // create a camera, which defines where we're looking at.
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // create a render and set the size
+        renderer = new THREE.WebGLRenderer();
+
+        renderer.setClearColor(new THREE.Color(0x436521, 1));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+        // add subtle ambient lighting
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+        scene.add(ambientLight);
+        // add spotlight for the shadows
+        document.body.appendChild(renderer.domElement);
+        var controls = new THREE.OrbitControls( camera, renderer.domElement );
+        //This data has to be taken from the database
+        shelves.push(new Shelf(shelf_height));
+        shelves[0].setPosition(0,0,-table_height*2/5);
+        table_n=5;
+        objects.push(new Bottle(250,150,"blue"));
+        objects.push(new Bottle(100,100,"blue"));
+        objects.push(new Bottle(250,75,"blue"));
+        objects.push(new Beaker(250,250,"blue"));
+        objects.push(new Bottle(250,100,"blue"));
+        objects.push(new Beaker(100,20,"blue"));
+        objects.push(new Bottle(250,60,"blue"));
+        objects.push(new Beaker(250,100,"blue"));
+        objectsC.push(new THREE.Vector3(-10,0,0));
+        objectsC.push(new THREE.Vector3(25,0,0));
+        objectsC.push(shelves[0].slot(0));
+        objectsC.push(shelves[0].slot(1));
+        objectsC.push(shelves[0].slot(2));
+        objectsC.push(shelves[0].slot(3));
+        objectsC.push(shelves[0].slot(4));
+        objectsC.push(new THREE.Vector3(0,0,0));
+        var xflask=new Flask(200,200,"blue");
+        objectsC.push(new THREE.Vector3(15,0,0));
+        objects.push(xflask);
+        //scene.add(xflask.Mesh);
+        shelves.pop();
+        var xpet=new Petridish(3);
+        scene.add(xpet.Mesh);
+        xpet.setPosition(-20,0,0);
+        var xwatch=new WatchGlass(50,40,"blue");
+        scene.add(xwatch.Mesh);
+        xwatch.setPosition(120,0,0);
+        var xbstand=new BuretteStand(30);
+        scene.add(xbstand.Mesh);
+        xbstand.Mesh.position.x=140;
+        xbstand.Mesh.position.y=17 ;
+        //End
+        for(var i=0;i<table_n;i++){
+          spotLight.push(new THREE.PointLight(0xffffff,0.4));
+          spotLight[i].position.set(i*table_height*2+i*basin_width, 80, -60);
+          spotLight[i].castShadow = true;
+          scene.add(spotLight[i]);
+        }
+        camera.position.set(0,table_height,table_height*4);
+        for(var i=0;i<table_n;i++){
+            tables.push(new Table(table_height));
+            tables[i].setPosition(i*table_height*2+i*basin_width,-table_height,0);
+            scene.add(tables[i].Mesh);
+            shelves.push(new Shelf(shelf_height));
+            shelves[i].setPosition(i*shelf_height*2+i*basin_width,0,-table_height*2/5);
+            scene.add(shelves[i].Mesh);
+            basins.push(new Basin(basin_width));
+            basins[i].setPosition((2*i+1)*table_height+((1/2)+i)*basin_width,-basin_height,0);
+            scene.add(basins[i].Mesh);   
+        }
+        for(var i=0;i<objects.length;i++){
+            scene.add(objects[i].Mesh);
+            objectsM.push(objects[i].Mesh);
+            objects[i].setPosition(objectsC[i].x,objectsC[i].y,objectsC[i].z);
+        }
+        objectsM.pop();
+        var dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
+        objectsM.push(objects[objects.length-1].Mesh);
+        dragControls.addEventListener('dragstart',function (event){
+            controls.enabled=false;
+            for(var i=0;i<objects.length;i++){
+                if(_selected==objectsM[i]){
+                    pobject=i;
+                    prevcor=new THREE.Vector3(objects[i].x(),objects[i].y(),objects[i].z());
+                    break;
+                }
+            }
+        });
+        dragControls.addEventListener('dragend',function (event){
+            controls.enabled=true;
+            dobject=pobject;
+        });
+        renderScene();
+        function renderScene() {
+            if(pobject!=-1){
+                objects[pobject].restrict(-table_height+objects[pobject].radius,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].radius,0,table_height*2,0,0);
+            }
+            if(dobject!=-1){
+                var f=-1;
+                var flag=0;
+                if(objects[dobject].id<=7 && objects[dobject].y()>=2*shelf_height/3){
+                  for(var i=0;i<table_n;i++){
+                    if(Math.abs(objects[dobject].x()-shelves[i].x())<shelves[i].radius){
+                      if(place(objects[dobject],shelves[i])){
+                        f=-2;
+                      }
+                      break;
+                    }
+                  }
+                }
+                if(f==-1){
+                  for(var i=0;i<table_n;i++){
+                    if(Math.abs(objects[dobject].x()-basins[i].x())<basins[i].radius){
+                      wash(objects[dobject],basins[i]);
+                      f=-2;
+                      break;
+                    }
+                  }
+                }
+                if(f==-1){
+                  for(var i=0;i<objects.length;i++){
+                      if(i!=dobject &&(objects[i].y()==0)&& (Math.abs(objects[dobject].x()-objects[i].x())<= objects[i].radius+objects[dobject].radius) && (map[objects[dobject].id][objects[i].id]!=0)){
+                            f=i;
+                            break;
+                      }
+                  }
+                }
+                if(f==-1){
+                    objects[dobject].sety(0);
+                    objects[dobject].setz(0);
+                    objectsC[dobject]=new THREE.Vector3(objects[dobject].x(),objects[dobject].y(),objects[dobject].z());
+                }
+                else if(f>=0){
+                  operate(objects[dobject],objects[f]);
+                }
+                dobject=-1;
+                pobject=-1;
+            }
+            controls.update();
+            requestAnimationFrame(renderScene);
+            renderer.render(scene, camera);
+        }
+    }
+    window.onload = init;
+</script>
+<nav class="navbar navbar-inverse navbar-fixed-bottom" style="width:12%">
+<span style="font-size:30px;cursor:pointer;color:white" onclick="openNav()">&#9776; Open</span>
+</nav>
+  <div id="sidenav" class="overlay">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <div class="overlay-content">
+ <h4>Title:- </h4>
+ <div id="exp_title">
+ <p>This section is for title</p>
+ <p>-------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+ </div>
+ <h4>Aim of the Experiment:- </h4>
+ <div id="exp_aim">
+ <p>This section is for Aim</p>
+ <p>-------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+ </div>
+ <h4> Author:-</h4>
+ <div id="exp_author">
+ <p>This section is for Author </p>
+  <p>-------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+ </div>
+ <h4>Class:-</h4>
+ <div id="exp_class">
+ <p>This section is for standard</p>
+ <p>-------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+</div>
+<h4>Maximum mark:-</h4>
+ <div id="exp_marks">
+ <p>This section is for maximum mark</p>
+ <p>-------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+</div>
+<h4> Instructions:-     </h4>
+ <div id="exp_instructions">
+ <p>This section is for instructions </p>
+  <p>-------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+
+</div>
+ </div> 
+
+ <script>
+function openNav() {
+    document.getElementById("sidenav").style.width = "50%";
+}
+
+function closeNav() {
+    document.getElementById("sidenav").style.width = "0%";
+}
+</script> 
+</body>
+</html>
