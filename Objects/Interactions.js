@@ -41,6 +41,7 @@ isanimated['pourF']=true;
 isanimated['move']=true;
 isanimated['PressFor']=true;
 isanimated['washF']=true;
+isanimated['PlaceF']=true;
 var omap=['Bottle','Beaker','Flask','TestTube','Burette','Pipette','Petridish','BunsenBurner','WeighingMachine','WatchGlass','TestTubeStand','Funnel','PhMeter','Shelf','Table','Basin'];
 var issmall=[1,1,1,1,0,0,1,0,0,1,1,1,0];
 var iscontainer=[1,1,1,1,1,1,1,0,0,1,0,0,0];

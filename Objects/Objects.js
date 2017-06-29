@@ -443,15 +443,15 @@ class Pipette extends Equipment{
             this.Mesh.position.y+=(this.height/2 - this.radius);
             this.yoff=this.height/2;
             this.Mesh.rotation.x+=Math.PI/2;
-            console.log("objects["+s.toString()+']'+".pick()");
-            journal.push("objects["+s.toString()+']'+".pick()");       
+            console.log("objects["+s.toString()+']'+".pick("+s+")");
+            journal.push("objects["+s.toString()+']'+".pick("+s+")");       
         }
         this.drop=function(s){
             this.yoff=this.radius;
             this.Mesh.position.y-=(this.height/2 - this.radius);
             this.Mesh.rotation.x-=Math.PI/2;
-            console.log("objects["+s.toString()+']'+".drop()");
-            journal.push("objects["+s.toString()+']'+".drop()");
+            console.log("objects["+s.toString()+']'+".drop("+s+")");
+            journal.push("objects["+s.toString()+']'+".drop("+s+")");
         }
         this.dir=1;
         this.onPress=function(){
@@ -1275,8 +1275,8 @@ class Funnel extends Equipment{
             this.Mesh.rotation.x-=(Math.PI/2-Math.atan(0.32));
             this.yoff=Math.sin(Math.atan(0.2))*(h+h/4+h/8)+h/4;
             this.setPosition(this.getPosition());
-            console.log("objects["+s.toString()+']'+".drop()");
-            journal.push("objects["+s.toString()+']'+".drop()"); 
+            console.log("objects["+s.toString()+']'+".drop("+s+")");
+            journal.push("objects["+s.toString()+']'+".drop("+s+")"); 
         }
         this.pick=function(s){
             if(this.yoff== h+h/4+h/8)
@@ -1284,8 +1284,8 @@ class Funnel extends Equipment{
             this.Mesh.rotation.x+=(Math.PI/2-Math.atan(0.32));
             this.yoff=h+h/4+h/8; 
             this.setPosition(this.getPosition());            
-            console.log("objects["+s.toString()+']'+".pick()");
-            journal.push("objects["+s.toString()+']'+".pick()"); 
+            console.log("objects["+s.toString()+']'+".pick("+s+")");
+            journal.push("objects["+s.toString()+']'+".pick("+s+")"); 
         }
         this.Mesh.rotation.x-=(Math.PI/2-Math.atan(0.32));
         this.yoff=Math.sin(Math.atan(0.2))*(h+h/4+h/8)+h/4;
