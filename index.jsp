@@ -163,8 +163,8 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
   <h1 style="padding:20px 0px 50px 0px;color:white">What do you want to do?</h1>
   <div class="row">
     <div class="col-sm-3">
-     <a data-toggle="modal" data-target="#myModal"><p>Setup Experiment</p></a>
-     <a data-toggle="modal" data-target="#myModal"><img src="setup.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
+     <a data-toggle="modal" data-target="#myModal5"><p>Setup Experiment</p></a>
+     <a data-toggle="modal" data-target="#myModal5"><img src="setup.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
     <div id="myModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
@@ -212,22 +212,22 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
       <a data-toggle="modal" data-target="#myModal4"><img src="perform.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
     </div>
   
+     <!--FOR PERFORM-->
   <div class="modal fade" id="myModal4" role="dialog">
     <div class="modal-dialog">
     
-     
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h4 class="modal-title">List of Experiments</h4>
+        <h4 class="modal-title">List of Experiments</h4>
         </div>
         <div class="modal-body">
-    <div style="height:550px; overflow:scroll;">
-          <table class="TableDetails">
-  
-  
-          </table>
-</div>
+            <div style="height:550px; overflow:scroll;">
+            <table class="TableDetails">
+
+
+            </table>
+            </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -236,14 +236,81 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
       
     </div>
   </div>
+      
+  <!--myModel5 for Setup-->
+  <div class="modal fade" id="myModal5" role="dialog">
+    <div class="modal-dialog">
+    
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Create New Experiments or Edit a previously created one</h4>
+        </div>
+        <div class="modal-body">
+            <div style="height:550px; overflow:scroll;">
+            <td><button data-toggle="modal" data-target="#myModal" class="btn btn-primary" onclick="cccc()" >Create NEW Experiment</button></td>
+            <script>
+                function cccc(){
+                    $('#myModal5').modal('hide');
+                }
+            </script>
+            <br><br>
+            <table class="SetupTableDetails">
+                <!--<tr><th>Sr.No.</th><th>Experiment Name</th><th>Actions</th></tr>;-->
+
+            <!--BE CAREFUL TABLE ENDING ATTACHED WITH THE AJAX CALL-->
+            </table>
+            <span class="SetupTableDetailsDiv"></span>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  <!--ends-->
+  
+  <!--myModel6 for DEMO DDDDDDDDDEEEEEEEEEEEMMMMMMMMMOOOOOOOOOOOO-->
+  <div class="modal fade" id="myModal6" role="dialog">
+    <div class="modal-dialog">
+    
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Select Demo to Play and see how Experiment works and how to perform it</h4>
+        </div>
+        <div class="modal-body">
+            <div style="height:550px; overflow:scroll;">
+
+            <table class="DemoTableDetails">
+                <!--<tr><th>Sr.No.</th><th>Experiment Name</th><th>Actions</th></tr>;-->
+
+                <!--BE CAREFUL TABLE ENDING ATTACHED WITH THE AJAX CALL-->
+            </table>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  <!--ends ===================================-->
 
     <div class="col-sm-3"> 
-      <a href="demo.html"><p>Demo Experiment</p></a>
-      <a href="demo.htmo"><img src="demo.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
+      <a data-toggle="modal" data-target="#myModal6"><p>Demo Experiment</p></a>
+      <a data-toggle="modal" data-target="#myModal6"><img src="demo.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
+
+      <!--<a href="demo.jsp"><p>Demo Experiment</p></a>-->
+      <!--<a href="demo.jsp"><img src="demo.jpg" class="img-responsive" style="width:100%" alt="Image"></a>-->
     </div>
    <div class="col-sm-3"> 
-      <a href="evaluate.html"><p>Evaluate Experiment</p></a>
-      <a href="evaluate.html"><img src="evaluate.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
+      <a href="evaluate.jsp"><p>Evaluate Experiment</p></a>
+      <a href="evaluate.jsp"><img src="evaluate.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
     </div>
    
   </div>
@@ -308,12 +375,59 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
                         }
                     });
                 }();
-    //                response.sendRedirect("perform.jsp");
+
             <% } %>
-//            window.location.href = 'perform.jsp?title='+Etitle+'&author='+Eauthor+'&Eclass='+Eclass+'&aim='+Eaim+'&marks='+Emarks+'&ins='+Eins+'&uid='+id+'&way='+"setup";
+
         }
     });
+    console.log("IN===");
+    
+        <% if(session.getAttribute("currentSessionUser")!=null){ %>
+            var ExperimentSetupEditList = function() {
+            var EdataS;
+            var num1 = 1;
+            var UID1 = '<%= session.getAttribute("currentSessionUser") %>';
+            $.ajax({
 
+                    method: "GET",
+                    url: "GetSetupEdit?uid=" + UID1,
+//                        dataType: "HTML",
+//                        data : {
+//                            'uid' : UID1,
+//                        },
+//                        async: false,
+                    success: function(response) {
+                        console.log(response);
+                        console.log(response==0);
+                        if(response!=0){
+                            EdataS = response.split(",");
+                            displayS = "<tr><th>Sr.No.</th><th>Experiment Name</th><th>Actions</th></tr>";
+                            for (var i = 0;i<EdataS.length-1;i++){
+                                displayS += "<tr>";
+                                displayS += "<td>" + num1 + "</td>";num1++;
+                                displayS += "<td>" + EdataS[i] + "</td>";
+                                displayS += "<td><button class =\"btn btn-primary\" >" + "Edit" + "</button></td>";
+                                displayS += "</tr>";
+                            }
+                            console.log(displayS);
+                            $(".SetupTableDetails").html(displayS);
+                        }
+                        else{
+                            displayS1 = "<p style=\"color:red\"> No Previously created Experiment </p>";
+                            $(".SetupTableDetailsDiv").html(displayS1);
+                        }
+                    },
+                    error : function(){
+                              alert("Error Occured");
+                    }
+                });
+        /* response will be saved to data_obj*/
+            }();
+        <%  }else{ %>
+            displayS2 = "<p style=\"color:red\"> No Previously created Experiment </p>";
+            $(".SetupTableDetailsDiv").html(displayS2);
+        <% } %>
+    
     var ExperimentList = function() {
         //console.log("Retriving");
             var Edata;
@@ -378,6 +492,64 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
 //        window.location.href = 'perform.jsp';
 //        window.location.href = 'perform.jsp?uid='+id+'&way='+"perform"+'&eid='+eid+'&title='+tit;
         console.log("end "+eid);
+    }
+    
+    var DemoList = function() {
+        //console.log("Retriving");
+            var EdataD;
+            var num = 1;
+            $.ajax({
+
+                    method: "GET",
+                    url: "GetDemoDetails",
+                    dataType: "HTML",               
+                    //async: false,
+                    success: function(response) {
+                       console.log(response);
+                       console.log("=======================================================================");
+                        EdataD = response.split(",");
+                        displayD = "<tr><th>Sr.No.</th><th>Experiment Name</th><th>Actions</th></tr>";
+                        for (var i = 0;i<EdataD.length-1;i+=3){
+                            displayD += "<tr>";
+                            displayD += "<td>" + num + "</td>";num++;
+                            displayD += "<td>" + EdataD[i] + "</td>";
+                            displayD += "<td><button class=\"btn btn-primary\" onclick=\"demoSub( \'"+ EdataD[i] +"\'," + EdataD[i+1] + "," + EdataD[i+2] + " )\"  >" + "View Demo" + "</button></td>";
+                            displayD += "</tr>";
+                        }
+                        console.log(displayD);
+                        $(".DemoTableDetails").html(displayD);
+                    },
+                    error : function(){
+                              alert("Error Occured");
+                    }
+        });
+        /* response will be saved to data_obj*/
+    }();
+    
+     function demoSub(tit,eid,uid){
+        console.log(eid);
+        console.log(tit);
+        console.log(uid);
+        var setVal1 = function() {
+            console.log("Working on Demo button");
+            $.ajax({
+                type: "POST",
+                url: "demoSend",
+                data:{
+                      'uid':uid,
+                      'way':"perform",
+                      'eid':eid
+                },
+                async: false,
+                success: function(response) {
+                    console.log(response);
+                    window.location.href = 'demo.jsp';
+                },
+                error : function(){
+                    alert("Error in setVal");
+                }
+            });
+        }();
     }
 </script>
 
