@@ -49,7 +49,7 @@ function dbtordata(str){
 	var arr=stl.split(',');
 	var len=parseInt(arr[0]);
 	for(var i=0;i<len;i++){
-		arrtoreac(arr[3*i+1]+','+arr[3*i+2]+','+arr[3*i+3]);
+		strtoreac(arr[3*i+1]+','+arr[3*i+2]+','+arr[3*i+3]);
 	}
 }
 var FetchChemical = function() {
