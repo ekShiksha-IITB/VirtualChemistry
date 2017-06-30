@@ -327,6 +327,7 @@ $("#selectbox2").change(function () {
     var spotLight=[];
     var dobject=null;
     var pobject=null;
+    var curdisp=0;  
     var dirLight;
     var journal=[];
     var isclick=1;
@@ -337,34 +338,103 @@ $("#selectbox2").change(function () {
     var cur=0;
     var table_n=0;
     var ajournal=[];
+    //var strr="addTable()#instantiate(new Beaker(150,new Mixture([])),new THREE.Vector3(-22.158028558432914,0,0))#instantiate(new Beaker(100,new Mixture([])),new THREE.Vector3(10.515346564102044,0,0))#instantiate(new Bottle(250,new Mixture([new Chemical('Ferric Chloride','light brown',-1,0,'FeCl3',0.16,2.9,162,'brown',undefined),new Chemical('Water','transparent',0,1,'H2O',10.38072,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5))#move(objects[2],-9.311587411220874,0,0)#move(objects[2],-9.311587411220874,0,0)#instantiate(new Pipette(10,new Mixture([])),new THREE.Vector3(26.78286846198826,0,0))#objects[3].pick(3)#move(objects[3],33.727779805688535,0,0)#objects[3].drop(3)#move(objects[3],33.727779805688535,0,0)#pourF(2,1,30)#objects[3].pick(3)#PlaceF(3,1,0)#PressFor(3,6062)#Dethrone(3,1,0)#PlaceF(3,1,0)#Dethrone(3,1,0)#PlaceF(3,0,0)#PressFor(3,5673)#Dethrone(3,0,0)#move(objects[3],28.869823396369494,0,0)#objects[3].drop(3)#move(objects[3],28.869823396369494,0,0)#instantiate(new Bottle(250,new Mixture([new Chemical('Ferric Chloride','light brown',-1,0,'FeCl3',0.16,2.9,162,'brown',undefined),new Chemical('Water','transparent',0,1,'H2O',10.38072,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5))#instantiate(new Beaker(250,new Mixture([])),new THREE.Vector3(38.75228712241902,0,0))#objects[3].pick(3)#PlaceF(3,0,0)#PressFor(3,6059)#Dethrone(3,0,0)#PlaceF(3,5,0)#PressFor(3,5582)#Dethrone(3,5,0)#move(objects[3],21.05343757052756,0,0)#objects[3].drop(3)#move(objects[3],21.05343757052756,0,0)";
+    //ajournal=strr.split('#');
     //This has to be taken from DB
-     ajournal.push("addTable()");
-     ajournal.push("instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-1,1,'Hcl',0.075,1,98,'white',undefined),new Chemical('Water','transparent',0,1,'H2O',7.9170750000000005,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5))");
-     ajournal.push("instantiate(new Flask(250,new Mixture([])),new THREE.Vector3(2.394957198219069,0,0))");
-    ajournal.push("move(objects[0],-15.116133406176848,0,0)");
-    ajournal.push("pourF(0,1,40)");
-    ajournal.push("move(objects[1],9.431482357156643,0,0)");
-    ajournal.push("move(objects[1],-39.29645436848371,0,0)");
-    ajournal.push("instantiate(new Burette(100,new Mixture([])),new THREE.Vector3(28.87861691819878,0,0))");
-    ajournal.push("pourF(0,2,20)");
-    ajournal.push("PressFor(2,1614)");
-    ajournal.push("washF(0,0)");
+    // ajournal.push("addTable()");
+    // ajournal.push("instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-1,1,'Hcl',0.075,1,98,'white',undefined),new Chemical('Water','transparent',0,1,'H2O',7.9170750000000005,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5))");
+    // ajournal.push("instantiate(new Beaker(250,new Mixture([])),new THREE.Vector3(7.388325254742461,0,0))");
+    // ajournal.push("instantiate(new Pipette(20,new Mixture([])),new THREE.Vector3(20.773492405201477,0,0))");
+    // ajournal.push("pourF(0,1,40)");
+    // ajournal.push("objects[2].pick(2)");
+    // ajournal.push("PlaceF(2,1,0)");
+    // ajournal.push("PressFor(2,6434)");
+    //ajournal.push("instantiate(new Beaker(250,new Mixture([])),new THREE.Vector3(-0.08962765334148311,0,0))");
+    //ajournal.push("move(objects[0],-18.10600015609365,0,0)");
+    //ajournal.push("pourF(0,1,30)");
+    //ajournal.push("move(objects[1],-39.080123516792014,0,0)");
+    //ajournal.push("move(objects[1],-46.586079683723526,0,0)");
+    // ajournal.push("addTable()");
+    // ajournal.push("instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-1,1,'Hcl',0.075,1,98,'white',undefined),new Chemical('Water','transparent',0,1,'H2O',7.9170750000000005,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5))");
+    //ajournal.push("instantiate(new Flask(250,new Mixture([])),new THREE.Vector3(2.394957198219069,0,0))");
+    //ajournal.push("move(objects[0],-15.116133406176848,0,0)");
+    //ajournal.push("pourF(0,1,40)");
+    // ajournal.push("move(objects[1],9.431482357156643,0,0)");
+    // ajournal.push("move(objects[1],-39.29645436848371,0,0)");
+    // ajournal.push("instantiate(new Burette(100,new Mixture([])),new THREE.Vector3(28.87861691819878,0,0))");
+    // ajournal.push("pourF(0,2,20)");
+    // ajournal.push("PressFor(2,1614)");
+    //ajournal.push("washF(0,0)");
+
+    // ajournal.push("addTable()");
+    // ajournal.push("instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-1,1,'Hcl',0.075,1,98,'white',undefined),new Chemical('Water','transparent',0,1,'H2O',7.9170750000000005,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5))");
+    // ajournal.push("instantiate(new Beaker(250,new Mixture([])),new THREE.Vector3(-7.976861147391617,0,0))");
+    // ajournal.push("instantiate(new Beaker(250,new Mixture([])),new THREE.Vector3(6.048031778854266,0,0))");
+    // ajournal.push("instantiate(new Pipette(20,new Mixture([])),new THREE.Vector3(18.95085184831284,0,0))");
+    // ajournal.push("pourF(0,1,50)");
+    // ajournal.push("objects[3].pick(3)");
+    // ajournal.push("PlaceF(3,1,0)");
+    // ajournal.push("PressFor(3,10860)");
+    // ajournal.push("Dethrone(3,1,0)");
+    // ajournal.push("PlaceF(3,2,0)");
+    // ajournal.push("PressFor(3,10746)");
+    // ajournal.push("Dethrone(3,2,0)");
+    // ajournal.push("objects[3].drop(3)");
+    // ajournal.push("move(objects[3],19.67418221001234,0,0)");
+    
+    //ajournal.push("");  
     // Ends
+    // for(var i=0;i<ajournal.length;i++){
+    // 	console.log(ajournal[i]);
+    //   var temp=ajournal[i].split('(');
+    // 	if(isanimated[temp[0]]){
+    // 		ajournal[i]='A'+ajournal[i];
+    // 	}
+    // }
     for(var i=0;i<ajournal.length;i++){
-    	var temp=ajournal[i].split('(');
-    	if(isanimated[temp[0]]){
-    		ajournal[i]='A'+ajournal[i];
-    	}
+      //console.log(ajournal[i]);
+      var temp=ajournal[i].split('(');
+      if(isanimated[temp[0]]){
+        ajournal[i]='A'+ajournal[i];
+      }
     }
     var callback=function(){
     	while(cur<ajournal.length && ajournal[cur][0]!='A'){
-    		eval(ajournal[cur]);
+    		//console.log("THIS "+ajournal[cur]);
+        eval(ajournal[cur]);
     		cur++;
     	}
     	if(cur<ajournal.length){
+        //console.log("THIS "+ajournal[cur]);
     		cur++;
     		eval(ajournal[cur-1]);
     	}
+    }
+    function updateDisplay(i){
+      document.getElementById('dtext').innerHTML='';
+      if(i!=null){
+        curdisp=i;
+        document.getElementById('dtext').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
+        if(iscontainer[objects[i].id]){
+          document.getElementById('dtext').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
+          document.getElementById('dtext').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
+          if(objects[i].Slots!=null){
+            for(var x=0;x<objects[i].Slots.length;x++){
+              if(objects[i].Slots[x].Slave!=null && omap[objects[objects[i].Slots[x].Slave].id]=='PhMeter')
+                document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
+            }
+          }
+        }
+        if(objects[i].label!=undefined){
+            document.getElementById('dtext').innerHTML+='Label: '+objects[i].label+'<br>'; 
+        }
+        else if(omap[objects[i].id]=='PhMeter'){
+          if(objects[i].Master!=null){
+            document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[objects[i].Master].Mixture.Ph).toFixed(3))+'<br>';
+          }
+        }
+        //document.getElementById('dtext').innerHTML+='Name: '+omap[i]+'<br>';
+      }
     }
     function init() {
         scene = new THREE.Scene();
@@ -431,7 +501,26 @@ $("#selectbox2").change(function () {
         var dt=0;
         var et;
         document.getElementById('b0').click();
-    	callback();
+        callback();
+        function onDocumentMouseDown(event){
+            event.preventDefault();
+            mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+            mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+            raycaster.setFromCamera( mouse, camera );
+            intersects=raycaster.intersectObjects(objectsM);
+            var pobject=null;
+            if(intersects.length>0){
+              for(var i=0;i<objects.length;i++){
+                if(objects[i].Mesh == intersects[0].object){
+                  pobject=i;
+                }
+              }
+              if(pobject!=null){
+                updateDisplay(pobject);           
+              }
+            }
+        }
+        renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
         function renderScene() {           
             controls.update();
             requestAnimationFrame(renderScene);
