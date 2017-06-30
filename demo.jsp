@@ -15,6 +15,7 @@
     <script src="libs/OrbitControls.js"></script>  
     <script src="libs/DragControls.js"></script>
     <script src="libs/threex.dynamictexture.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
     <script src="libs/TrackballControls.js"></script>  
     <script src="Objects/Chemicals.js"></script>
   <style>
@@ -147,22 +148,9 @@ border: 1px solid #ddd;
       <ul class="nav navbar-nav">
         <li ><a href="#" style="color:white">Home</a></li>
 
-<li><select id="selectbox2">
-  <option selected hidden>Choose chemicals</option>
-  <optgroup label="Acids">
-  <option value="#consumer_goods">Hydrochloric acid</option>
-  <option value="#consumer_goods">Sulphuric acid</option>
-  <option value="#consumer_goods">Phosphoric acid</option>
-  <optgroup label="Bases">
-  <option value="#consumer_goods">Sodium Hydroxide</option>
-  <option value="#consumer_goods">Ammonium Hydroxide</option>
-  <optgroup label="Indicators">
-  <option>Methyl orange</option>
-  <option>Phenolphthalein</option>
-  <option>Red litmus</option>
-  <option>Blue litmus</option>
-    
-</select></li>
+<!--<li><select id="selectbox2">
+        
+</select></li>-->
 <li>
 <div class="btn btn-group">
 <button class="btn btn-primary" id='Save'>Save</button>
@@ -255,13 +243,13 @@ $(".btn-default").click(function(){
 </div>
 
 </div>
-<script>
+<!--<script>
 $("#selectbox2").change(function () {
     if ($(this).val() == "#consumer_goods") {
         $('#consumer_goods').modal('show');
       }
 });
-</script>
+</script>-->
 <div class="modal fade" id="consumer_goods" data-target="#consumer_goods">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -326,6 +314,7 @@ $("#selectbox2").change(function () {
     var spotLight=[];
     var dobject=null;
     var pobject=null;
+    var curdisp=0;  
     var dirLight;
     var journal=[];
     var isclick=1;
@@ -336,21 +325,9 @@ $("#selectbox2").change(function () {
     var cur=0;
     var table_n=0;
     var ajournal=[];
-//    FetchReaction();
-//    FetchChemical();
+    //var strr="addTable()#instantiate(new Beaker(150,new Mixture([])),new THREE.Vector3(-22.158028558432914,0,0))#instantiate(new Beaker(100,new Mixture([])),new THREE.Vector3(10.515346564102044,0,0))#instantiate(new Bottle(250,new Mixture([new Chemical('Ferric Chloride','light brown',-1,0,'FeCl3',0.16,2.9,162,'brown',undefined),new Chemical('Water','transparent',0,1,'H2O',10.38072,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5))#move(objects[2],-9.311587411220874,0,0)#move(objects[2],-9.311587411220874,0,0)#instantiate(new Pipette(10,new Mixture([])),new THREE.Vector3(26.78286846198826,0,0))#objects[3].pick(3)#move(objects[3],33.727779805688535,0,0)#objects[3].drop(3)#move(objects[3],33.727779805688535,0,0)#pourF(2,1,30)#objects[3].pick(3)#PlaceF(3,1,0)#PressFor(3,6062)#Dethrone(3,1,0)#PlaceF(3,1,0)#Dethrone(3,1,0)#PlaceF(3,0,0)#PressFor(3,5673)#Dethrone(3,0,0)#move(objects[3],28.869823396369494,0,0)#objects[3].drop(3)#move(objects[3],28.869823396369494,0,0)#instantiate(new Bottle(250,new Mixture([new Chemical('Ferric Chloride','light brown',-1,0,'FeCl3',0.16,2.9,162,'brown',undefined),new Chemical('Water','transparent',0,1,'H2O',10.38072,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5))#instantiate(new Beaker(250,new Mixture([])),new THREE.Vector3(38.75228712241902,0,0))#objects[3].pick(3)#PlaceF(3,0,0)#PressFor(3,6059)#Dethrone(3,0,0)#PlaceF(3,5,0)#PressFor(3,5582)#Dethrone(3,5,0)#move(objects[3],21.05343757052756,0,0)#objects[3].drop(3)#move(objects[3],21.05343757052756,0,0)";
+    //ajournal=strr.split('#');
     //This has to be taken from DB
-//    ajournal.push("addTable()");
-//    ajournal.push("instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-1,1,'Hcl',0.075,1,98,'white',undefined),new Chemical('Water','transparent',0,1,'H2O',7.9170750000000005,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5))");
-//    ajournal.push("instantiate(new Flask(250,new Mixture([])),new THREE.Vector3(2.394957198219069,0,0))");
-//    ajournal.push("move(objects[0],-15.116133406176848,0,0)");
-//    ajournal.push("pourF(0,1,40)");
-//    ajournal.push("move(objects[1],9.431482357156643,0,0)");
-//    ajournal.push("move(objects[1],-39.29645436848371,0,0)");
-//    ajournal.push("instantiate(new Burette(100,new Mixture([])),new THREE.Vector3(28.87861691819878,0,0))");
-//    ajournal.push("pourF(0,2,20)");
-//    ajournal.push("PressFor(2,1614)");
-//    ajournal.push("washF(0,0)");
-    // Ends
     //DB Begins
     var UIDD = '<%= session.getAttribute("DemoUID") %>';
     var WAYD = '<%= session.getAttribute("DemoWAY") %>';
@@ -390,24 +367,59 @@ $("#selectbox2").change(function () {
                 /* response will be saved to data_obj*/
     }();
     
-    //ENDING
-    
+    //ENDING  
+    // Ends
+    // for(var i=0;i<ajournal.length;i++){
+    // 	console.log(ajournal[i]);
+    //   var temp=ajournal[i].split('(');
+    // 	if(isanimated[temp[0]]){
+    // 		ajournal[i]='A'+ajournal[i];
+    // 	}
+    // }
     for(var i=0;i<ajournal.length;i++){
-    	var temp=ajournal[i].split('(');
-    	if(isanimated[temp[0]]){
-    		ajournal[i]='A'+ajournal[i];
-    	}
+      //console.log(ajournal[i]);
+      var temp=ajournal[i].split('(');
+      if(isanimated[temp[0]]){
+        ajournal[i]='A'+ajournal[i];
+      }
     }
-    
     var callback=function(){
     	while(cur<ajournal.length && ajournal[cur][0]!='A'){
-    		eval(ajournal[cur]);
+    		//console.log("THIS "+ajournal[cur]);
+        eval(ajournal[cur]);
     		cur++;
     	}
     	if(cur<ajournal.length){
+        //console.log("THIS "+ajournal[cur]);
     		cur++;
     		eval(ajournal[cur-1]);
     	}
+    }
+    function updateDisplay(i){
+      document.getElementById('dtext').innerHTML='';
+      if(i!=null){
+        curdisp=i;
+        document.getElementById('dtext').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
+        if(iscontainer[objects[i].id]){
+          document.getElementById('dtext').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
+          document.getElementById('dtext').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
+          if(objects[i].Slots!=null){
+            for(var x=0;x<objects[i].Slots.length;x++){
+              if(objects[i].Slots[x].Slave!=null && omap[objects[objects[i].Slots[x].Slave].id]=='PhMeter')
+                document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
+            }
+          }
+        }
+        if(objects[i].label!=undefined){
+            document.getElementById('dtext').innerHTML+='Label: '+objects[i].label+'<br>'; 
+        }
+        else if(omap[objects[i].id]=='PhMeter'){
+          if(objects[i].Master!=null){
+            document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[objects[i].Master].Mixture.Ph).toFixed(3))+'<br>';
+          }
+        }
+        //document.getElementById('dtext').innerHTML+='Name: '+omap[i]+'<br>';
+      }
     }
     function init() {
         scene = new THREE.Scene();
@@ -459,13 +471,7 @@ $("#selectbox2").change(function () {
             //document.getElementById('dtext').innerHTML+='Name: '+omap[i]+'<br>';
           }
         }
-        document.getElementById('NewTable').addEventListener('click',addTable);
-        document.getElementById('Save').addEventListener('click',function(){
-           callback=undefined;
-        });
-        document.getElementById('Restore').addEventListener('click',function(){
-            window.open('perform2.html')
-        });
+        
         var presstate=null;
         renderScene();
         var date=new Date();
@@ -474,7 +480,26 @@ $("#selectbox2").change(function () {
         var dt=0;
         var et;
         document.getElementById('b0').click();
-    	callback();
+        callback();
+        function onDocumentMouseDown(event){
+            event.preventDefault();
+            mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+            mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+            raycaster.setFromCamera( mouse, camera );
+            intersects=raycaster.intersectObjects(objectsM);
+            var pobject=null;
+            if(intersects.length>0){
+              for(var i=0;i<objects.length;i++){
+                if(objects[i].Mesh == intersects[0].object){
+                  pobject=i;
+                }
+              }
+              if(pobject!=null){
+                updateDisplay(pobject);           
+              }
+            }
+        }
+        renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
         function renderScene() {           
             controls.update();
             requestAnimationFrame(renderScene);
