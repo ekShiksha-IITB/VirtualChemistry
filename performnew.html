@@ -314,7 +314,7 @@ $("#selectbox2").change(function () {
       str+=intersects[0].point.x.toString()+',';
       str+='0,';
       str+='0)'
-      if(ltxt.value!=null){
+      if(ltxt.value!=null && ltxt.value!=undefined && ltxt.value.length>0){
           str+=','+'\''+ltxt.value+'\'';
       }
       str+=')';
