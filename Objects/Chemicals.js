@@ -142,6 +142,10 @@ function Mixture(chemarr,ind){
         if(this.Color=='transparent')
             this.Color="blue";
         }
+        if(this.Color[0]=='0'){
+            this.Color=parseInt(this.Color,16);
+        }
+        this.Color=new THREE.Color(this.Color);        
     }
     this.FindWeight=function(){
         this.volume=0;
