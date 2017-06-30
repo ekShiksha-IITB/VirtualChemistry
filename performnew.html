@@ -411,7 +411,8 @@ $("#selectbox2").change(function () {
         shelves[0].setPosition(0,0,-table_height*2/5);
         table_n=0;
         addTable();
-instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','transparent',-1,1,'Hcl',0.075,1.00,98.00,'transparent'),new Chemical('Water','transparent',0,1,'H2O',7.9170750000000005,1,18,'transparent')])),nextShelfSlot());
+instantiate(new Bottle(250,new Mixture([new Chemical('Hydrobromic Acid','ffff99',1,1,'HBr',0.1,1.49,81,'ffff99',undefined),new Chemical('Water','transparent',0,1,'H2O',5.2482885906040275,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5));
+instantiate(new Bottle(250,new Mixture([new Chemical('Lithium Hydroxide','FBFCFC',-1,1,'LiOH',0.1,1.46,24,'transparent',undefined),new Chemical('Water','transparent',0,1,'H2O',5.477013698630137,1,18,'transparent',undefined)])),new THREE.Vector3(0,34.16666666666667,-21.5))
         // var nmix=new Mixture([new Chemical('Hydrochloric Acid','green',0,1,'HCl',12,1,18,'green')]);
         // var base=new Mixture([new Chemical('Sodium Hydroxide','red',0,1,'NaOH',12,1,18,'red')]);
         // instantiate(new Flask(250,nmix),nextShelfSlot());
