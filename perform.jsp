@@ -123,7 +123,7 @@ border: 1px solid #ddd;
   background-color: green !important;
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
   }
-  #text{
+  #dtext{
     position: absolute;
     color:red;
     font-size: 150%;
@@ -257,7 +257,7 @@ border: 1px solid #ddd;
  
 </nav>
 <nav class="navbar navbar-inverse navbar-fixed-top">
-<div id="text">
+<div id="dtext">
 Item : Bottle<br>
 Volume: 250 ml
 </div>
@@ -362,7 +362,7 @@ $("#selectbox2").change(function () {
 </div>
 <div id="vcl"></div>
 <script type="text/javascript">
-  function addEquipment(v){
+  function addEquipment(v,label){
     if(v!=0){
       var str='instantiate(';
       str+='new ';
@@ -372,7 +372,11 @@ $("#selectbox2").change(function () {
       str+='new THREE.Vector3(';
       str+=intersects[0].point.x.toString()+',';
       str+='0,';
-      str+='0))';
+      str+='0)'
+      if(ltxt.value!=null && ltxt.value!=undefined && ltxt.value.length>0){
+          str+=','+'\''+ltxt.value+'\'';
+      }
+      str+=')';
       eval(str);
     }
   }
@@ -385,7 +389,9 @@ $("#selectbox2").change(function () {
     else{
       dragControls.deactivate();
     }
-  } var callback=undefined;
+  } 
+    var curdisp=0;
+    var callback=undefined;
     var state=0;
     var drag=1;
     var tablesM=[];
@@ -419,6 +425,32 @@ $("#selectbox2").change(function () {
     var mouse = new THREE.Vector2();
 //    FetchReaction();
 //    FetchChemical();
+    function updateDisplay(i){
+      document.getElementById('dtext').innerHTML='';
+      if(i!=null){
+        curdisp=i;
+        document.getElementById('dtext').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
+        if(iscontainer[objects[i].id]){
+          document.getElementById('dtext').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
+          document.getElementById('dtext').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
+          if(objects[i].Slots!=null){
+            for(var x=0;x<objects[i].Slots.length;x++){
+              if(objects[i].Slots[x].Slave!=null && omap[objects[objects[i].Slots[x].Slave].id]=='PhMeter')
+                document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
+            }
+          }
+        }
+        if(objects[i].label!=undefined){
+            document.getElementById('dtext').innerHTML+='Label: '+objects[i].label+'<br>'; 
+        }
+        else if(omap[objects[i].id]=='PhMeter'){
+          if(objects[i].Master!=null){
+            document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[objects[i].Master].Mixture.Ph).toFixed(3))+'<br>';
+          }
+        }
+        //document.getElementById('dtext').innerHTML+='Name: '+omap[i]+'<br>';
+      }
+    }
     function init() {
         scene = new THREE.Scene();
         // create a camera, which defines where we're looking at.
@@ -490,28 +522,6 @@ $("#selectbox2").change(function () {
         function onDocumentMouseMove( event ){
             isclick=0;
         }
-        function updateDisplay(i){
-          document.getElementById('text').innerHTML='';
-          if(i!=null){
-            document.getElementById('text').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
-            if(iscontainer[objects[i].id]){
-              document.getElementById('text').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
-              document.getElementById('text').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
-              if(objects[i].Slots!=null){
-                for(var x=0;x<objects[i].Slots.length;x++){
-                  if(objects[i].Slots[x].Slave!=null && omap[objects[objects[i].Slots[x].Slave].id]=='PhMeter')
-                    document.getElementById('text').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
-                }
-              }
-            }
-            else if(omap[objects[i].id]=='PhMeter'){
-              if(objects[i].Master!=null){
-                document.getElementById('text').innerHTML+='Ph: '+Number((objects[objects[i].Master].Ph).toFixed(3))+'<br>';
-              }
-            }
-            //document.getElementById('text').innerHTML+='Name: '+omap[i]+'<br>';
-          }
-        }
         function onDocumentMouseUp(event){
             event.preventDefault();
             if(state==0)
@@ -532,11 +542,13 @@ $("#selectbox2").change(function () {
               }
               if(flag){
                 if(iscontainer[state-1]){
-                  document.getElementById('inserthere').innerHTML='';
                   if(choices[state-1].length>1){
+                  document.getElementById('inserthere').innerHTML='';
+
                     for(var j=0;j<choices[state-1].length;j++){
                       document.getElementById('inserthere').innerHTML+='<button type=\'button\' onclick=\'addEquipment(this.value)\' value='+choices[state-1][j]+ ' class=\'btn btn-primary\' data-dismiss=\'modal\'>'+choices[state-1][j]+' ml'+'</button>&nbsp;&nbsp;&nbsp;';
                     }
+                    document.getElementById('inserthere').innerHTML+='<div class="form-group"><br><input type="text" id="ltxt" class="form-control" placeholder="Attach a label (optional)"> </div>';
                     $('#myModal').modal('show');
                   }
                   else{
@@ -806,6 +818,25 @@ $("#selectbox2").change(function () {
         var dt=0;
         var et;
         document.getElementById('b0').click();
+        function onDocumentMouseDown(event){
+            event.preventDefault();
+            mouse.x = ( event.clientX / renderer.domElement.width ) * 2 - 1;
+            mouse.y = - ( event.clientY / renderer.domElement.height ) * 2 + 1;
+            raycaster.setFromCamera( mouse, camera );
+            intersects=raycaster.intersectObjects(objectsM);
+            var pobject=null;
+            if(intersects.length>0){
+              for(var i=0;i<objects.length;i++){
+                if(objects[i].Mesh == intersects[0].object){
+                  pobject=i;
+                }
+              }
+              if(pobject!=null){
+                updateDisplay(pobject);           
+              }
+            }
+        }
+        renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
         function renderScene() {
             date=new Date();
             var temp=date.getTime();
