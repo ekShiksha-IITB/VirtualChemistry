@@ -300,6 +300,40 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
     </div>
   </div>
   <!--ends ===================================-->
+  
+  
+  <!--myModel7 for EVALUATE-->
+  
+  <div class="modal fade" id="myModal7" role="dialog">
+    <div class="modal-dialog">
+    
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Select to view how others performed the experiments you have setup</h4>
+        </div>
+        <div class="modal-body">
+            <div style="height:550px; overflow:scroll;">
+
+            <table class="EvalTableDetails">
+                <!--<tr><th>Sr.No.</th><th>Experiment Name</th><th>Actions</th></tr>;-->
+
+                <!--BE CAREFUL TABLE ENDING ATTACHED WITH THE AJAX CALL-->
+            </table>
+                
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!--End of Evaluate=========================================-->
+  
+  
 
     <div class="col-sm-3"> 
       <a data-toggle="modal" data-target="#myModal6"><p>Demo Experiment</p></a>
@@ -309,8 +343,10 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
       <!--<a href="demo.jsp"><img src="demo.jpg" class="img-responsive" style="width:100%" alt="Image"></a>-->
     </div>
    <div class="col-sm-3"> 
-      <a href="evaluate.jsp"><p>Evaluate Experiment</p></a>
-      <a href="evaluate.jsp"><img src="evaluate.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
+      <a data-toggle="modal" data-target="#myModal7"><p>Evaluate Experiment</p></a>
+      <a data-toggle="modal" data-target="#myModal7"><img src="evaluate.jpg" class="img-responsive" style="width:100%" alt="Image"></a>
+<!--      <a href="evaluate.jsp"><p>Evaluate Experiment</p></a>
+      <a href="evaluate.jsp"><img src="evaluate.jpg" class="img-responsive" style="width:100%" alt="Image"></a>-->
     </div>
    
   </div>
@@ -328,7 +364,7 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
 <script type="text/javascript">
 //    var id = prompt("Enter User Id");
 //    var id = session.getAttribute("currentSessionUser");
-    var id = null;
+//    var id = null;
     document.getElementById('superSubmit').addEventListener('click',function(){
         console.log("IN SuperSumbit");
         if(document.getElementById("Etitle").value!="" && document.getElementById("Eauthor").value!="" && document.getElementById("Eclass").value!="" &&document.getElementById("Eaim").value!="" &&document.getElementById("Emarks").value!="" &&document.getElementById("Eins").value!=""){
@@ -526,19 +562,19 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
         /* response will be saved to data_obj*/
     }();
     
-     function demoSub(tit,eid,uid){
-        console.log(eid);
-        console.log(tit);
-        console.log(uid);
+     function demoSub(tit,Deid,Duid){
+        console.log(Deid);
+//        console.log(tit);
+        console.log(Duid);
         var setVal1 = function() {
             console.log("Working on Demo button");
             $.ajax({
                 type: "POST",
                 url: "demoSend",
                 data:{
-                      'uid':uid,
+                      'uid':Duid,
                       'way':"perform",
-                      'eid':eid
+                      'eid':Deid
                 },
                 async: false,
                 success: function(response) {
@@ -551,6 +587,43 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
             });
         }();
     }
+    
+    
+    var EvaluateList = function() {
+        //console.log("Retriving");
+            var uuid1 = '<%= session.getAttribute("currentSessionUser") %>';
+            console.log("hohohohohohohoohohoho");
+            console.log(uuid1);
+            var EdataE;
+            var num = 1;
+            $.ajax({
+                    method: "GET",
+                    url: "GetEvalDetails?uidS="+uuid1,
+                    async: false,
+                    success: function(response) {
+                       console.log(response);
+                       console.log(response.length);
+                       console.log("Thats the fucking shit");
+                       console.log("=======================================================================");
+                        EdataE = response.split(",");
+                        displayE = "<tr><th>Sr.No.</th><th>Experiment Name</th><th>UserName Name</th><th>Actions</th></tr>";
+                        for (var i = 0;i<EdataE.length-1;i+=4){
+                            displayE += "<tr>";
+                            displayE += "<td>" + num + "</td>";num++;
+                            displayE += "<td>" + EdataE[i] + "</td>";
+                            displayE += "<td>" + EdataE[i+1] + "</td>";
+                            displayE += "<td><button class=\"btn btn-primary\" onclick=\"demoSub( \'"+ EdataE[i] +"\'," + EdataE[i+3] + "," + EdataE[i+2] + " )\"  >" + "View Conduct" + "</button></td>";
+                            displayE += "</tr>";
+                        }
+                        console.log(displayE);
+                        $(".EvalTableDetails").html(displayE);
+                    },
+                    error : function(){
+                              alert("Error Occured");
+                    }
+        });
+        /* response will be saved to data_obj*/
+    }();
 </script>
 
 

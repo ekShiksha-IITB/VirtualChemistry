@@ -336,6 +336,8 @@ $("#selectbox2").change(function () {
     var cur=0;
     var table_n=0;
     var ajournal=[];
+//    FetchReaction();
+//    FetchChemical();
     //This has to be taken from DB
 //    ajournal.push("addTable()");
 //    ajournal.push("instantiate(new Bottle(250,new Mixture([new Chemical('Hydrochloric acid','red',-1,1,'Hcl',0.075,1,98,'white',undefined),new Chemical('Water','transparent',0,1,'H2O',7.9170750000000005,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5))");
@@ -396,6 +398,7 @@ $("#selectbox2").change(function () {
     		ajournal[i]='A'+ajournal[i];
     	}
     }
+    
     var callback=function(){
     	while(cur<ajournal.length && ajournal[cur][0]!='A'){
     		eval(ajournal[cur]);

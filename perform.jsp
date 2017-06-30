@@ -23,6 +23,7 @@
     <script src="libs/threex.dynamictexture.js"></script>
     <script src="libs/TrackballControls.js"></script>  
     <script src="Objects/Chemicals.js"></script>
+    <!--<script src="Objects/fetch.js"></script>-->
     <script type="text/javascript" src="Objects/backend.js"></script>
   <style>
     /* Remove the navbar's default margin-bottom and rounded borders */ 
@@ -135,6 +136,57 @@ border: 1px solid #ddd;
     /*opacity: 0;*/
     /*overflow:scroll;*/
     top:50px;
+  }
+    .dropdown-submenu {
+      position: relative;
+    }
+
+  .dropdown-submenu .dropdown-menu {
+      top: 0;
+      left: 100%;
+      margin-top: 5px;
+  }
+  .dropdown-submenu:hover .dropdown-menu {
+      display: block;
+
+  }
+  a{cursor:pointer;}
+  #overlay{
+  position:fixed;
+  width:30%;
+  height:30%;
+  margin-top:100px;
+  right:0;
+  background-color:rgba(0,0,0,0.5);
+  z-index:2;
+
+  }
+
+  .overlay {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: rgb(0,0,0);
+      overflow-x: hidden;
+      transition: 0.5s;
+  }
+
+  .overlay-content {
+      position: relative;
+      top: 25%;
+      width: 100%;
+      text-align: center;
+      margin-top: 30px;
+          color:white;
+  }
+  .overlay .closebtn {
+      position: absolute;
+      top: 20px;
+      right: 45px;
+      font-size: 60px;
   }
   </style>
 </head>
@@ -365,6 +417,8 @@ $("#selectbox2").change(function () {
     var controls;
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2();
+//    FetchReaction();
+//    FetchChemical();
     function init() {
         scene = new THREE.Scene();
         // create a camera, which defines where we're looking at.
@@ -529,11 +583,15 @@ $("#selectbox2").change(function () {
         var UID = '<%= session.getAttribute("currentSessionUser") %>';
         var WAY = '<%= session.getAttribute("way") %>';
         var Etitle = '<%= session.getAttribute("title") %>';
-        var Eauthor = '<%= session.getAttribute("author") %>'
-        var Eclass = '<%= session.getAttribute("Eclass") %>'
-        var Eaim = '<%= session.getAttribute("aim") %>'
-        var Emarks = '<%= session.getAttribute("marks") %>'
-        var Eins = '<%= session.getAttribute("ins") %>'
+        var Eauthor = '<%= session.getAttribute("author") %>';
+        var Eclass = '<%= session.getAttribute("Eclass") %>';
+        var Eaim = '<%= session.getAttribute("aim") %>';
+        var Emarks = '<%= session.getAttribute("marks") %>';
+        var Eins = '<%= session.getAttribute("ins") %>';
+        
+//        var UID = 9;
+//        var WAY = "perform";
+        
 //        //older
 //        var WAY = dataT.way;
 //        var Etitle = dataT.title;
@@ -543,7 +601,8 @@ $("#selectbox2").change(function () {
 //        var Emarks = dataT.marks;
 //        var Eins = dataT.ins;
         if(WAY=="perform"){
-            var eid = ${eid};
+            var eid = '<%= session.getAttribute("eid") %>';
+//            var eid = 14;
             var ExpLoader = function() {
                     console.log("RetrivingExperiment");
                     console.log(UID);
@@ -562,7 +621,7 @@ $("#selectbox2").change(function () {
                                 },
                                 async: false,
                                 success: function(response) {
-//                                    alert("IN");
+                                    alert("IN");
                                     console.log(response);
                                     var data = response.split("#");
                                     var n = data.length;
@@ -723,9 +782,11 @@ $("#selectbox2").change(function () {
                                 s+=',';
                                 s+= "\'" + temArr[6];
                                 s+= '\'),';
-                                var mol = (( vol - (concn*vol)/1000 * parseInt(temArr[5]) / parseInt(temArr[4]) ) * 55.5 )/1000;
+                                var mol = (( vol - (concn*vol)/1000 * parseFloat(temArr[5]) / parseFloat(temArr[4]) ) * 55.5 )/1000;
                                 var molS = mol.toString();
                                 s+="new Chemical('Water','transparent',0,1,'H2O'," + molS + ",1,18,'transparent')" + '])';
+                                console.log(molS);
+                                console.log(molS/55500);
                                 //console.log(s);
                                 
                             },
@@ -771,7 +832,7 @@ $("#selectbox2").change(function () {
               date=new Date();
               et=date.getTime();
               objects[presstate].setPosition(prevcor);
-              var str="objects["+presstate.toString()+'].PressFor('+presstate.toString()+','+(et-st).toString()+')';
+              var str='PressFor('+presstate.toString()+','+(et-st).toString()+')';
               journal.push(str);
               console.log(str);
               objects[presstate].onPressEnd(presstate);
@@ -883,6 +944,26 @@ $("#selectbox2").change(function () {
     }
     window.onload = init;
 </script>
+<nav class="navbar navbar-inverse navbar-fixed-bottom" style="width:15%">
+<center><span style="font-size:10px;cursor:pointer;color:white" onclick="openNav()">&#9776; info</span></center>
+</nav>
+    <div id="sidenav" class="overlay">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    <div class="overlay-content">
+        <h1> TITLE </h1>
+        
+    </div>
+</div>
+  
+ <script>
+    function openNav() {
+        document.getElementById("sidenav").style.width = "50%";
+    }
+
+    function closeNav() {
+        document.getElementById("sidenav").style.width = "0%";
+    }
+</script>
 <script>
       var id;
       var volume = 0;
@@ -901,7 +982,7 @@ $("#selectbox2").change(function () {
             data_obj = "<option>Choose</option>";
             //data_obj = "<option value='#consumer_goods'>" + "Hydrochloric acid" + "</option>";
             for (obj1 in data){
-                if(data[obj1] == "Acid" || data[obj1] == "Base"){
+                if(data[obj1] == "Acid" || data[obj1] == "Base" || data[obj1] == "Neutral" ){
                     data_obj += "<optgroup label="+data[obj1]+">"
                 }
                 else{
@@ -940,6 +1021,9 @@ $("#selectbox2").change(function () {
         });
       };
       dataLoader();
+      
+      
 </script>
+
 </body>
 </html>
