@@ -181,6 +181,7 @@ class Burette extends Equipment{
                     this.stream=null;
                 }
             }
+            totalUpdate(objects[fi]);
         }
         this.PressFor=function(fi,dt){
             var trans=Math.min(dt/100,this.Mixture.volume);
@@ -194,6 +195,7 @@ class Burette extends Equipment{
 	        }
 	        this.Mixture.Reduce(trans);
 	        this.Fill();
+            totalUpdate(objects[fi]);
         }
         this.APressFor = function(fi,t){
             objects[fi].onPress();
@@ -490,6 +492,7 @@ class Pipette extends Equipment{
         		pourF(fi,this.Master,y);
                 this.Mixture.Reduce(x);
         	}
+            totalUpdate(objects[fi]);
             //console.log("after"+objects[this.Master].Mixture.volume);
         }
         this.PressFor=function(fi,t){
@@ -604,15 +607,15 @@ class TestTube extends Equipment{
             this.Mesh.position.y+=(this.height/2);
             this.yoff=this.height/2+this.radius;
             this.Mesh.rotation.x+=Math.PI/2;
-            console.log("objects["+s.toString()+']'+".pick()");
-            journal.push("objects["+s.toString()+']'+".pick()");       
+            console.log("objects["+s.toString()+']'+".pick("+s+")");
+            journal.push("objects["+s.toString()+']'+".pick("+s+")");       
         }
         this.drop=function(s){
             this.yoff=this.radius;
             this.Mesh.position.y-=(this.height/2);
             this.Mesh.rotation.x-=Math.PI/2;
-            console.log("objects["+s.toString()+']'+".drop()");
-            journal.push("objects["+s.toString()+']'+".drop()");
+            console.log("objects["+s.toString()+']'+".drop("+s+")");
+            journal.push("objects["+s.toString()+']'+".drop("+s+")");
         }
         this.Fill=function(){
             if(this.Mixture.volume==0 && this.fl!=null){

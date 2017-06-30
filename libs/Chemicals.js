@@ -46,17 +46,28 @@ function Transfer(a,b,vol){
             b.Chemicals.push(temp);
         }
     }
-    if(a.volume==0){
-        a.Clear();
-    }
     a.volume-=vol;
     b.volume+=vol;
-    if(a.volume < Math.pow(10,-10))
-        a.volume=0;
+    if(a.volume < Math.pow(10,-10)){
+        a.Clear();
+    }
     a.FindWeight();
     b.FindWeight();
     b.FindNature();
     b.FindColor();
+    // var tep=(b.Chemicals[0].Moles*b.Chemicals[0].Nature*b.Chemicals[0].Nfac+b.Chemicals[1].Moles*b.Chemicals[1].Nature*b.Chemicals[1].Nfac+b.Chemicals[2].Moles*b.Chemicals[2].Nature*b.Chemicals[2].Nfac);
+    // console.log(tep);
+    // tep/=b.volume;
+    // var pph;
+    // if(tep<0){
+    //     console.log("here1");
+    //     pph=14+Math.log10(-tep+Math.pow(10,-4))-3;
+    // }
+    // else{
+    //     console.log("here2");
+    //    pph=-Math.log10(tep+Math.pow(10,-4))+3;
+    // }
+    // console.log(pph);
 }
 function Mixture(chemarr,ind){
     this.Indicator=ind;
@@ -70,6 +81,8 @@ function Mixture(chemarr,ind){
     for(var i=0;i<this.Chemicals.length;i++){
     	this.volume+=this.Chemicals[i].Moles*this.Chemicals[i].Molarmass/this.Chemicals[i].Density;
         this.weight+=this.Chemicals[i].Moles*this.Chemicals[i].Molarmass;
+        if(this.volume<Math.pow(10,-10))
+            this.volume=0;
     }
     this.FindNature=function(){
         if(this.volume==0){
@@ -83,10 +96,11 @@ function Mixture(chemarr,ind){
         }
         this.Hions/=this.volume;
         if(this.Hions<0){
-        	this.Ph=14+Math.log(-this.Hions+Math.pow(10,-7));
+        	this.Ph=14+Math.log10(-this.Hions+Math.pow(10,-4))-3;
         }
-    	else
-           this.Ph=-Math.log(this.Hions+Math.pow(10,-7));
+    	else{
+           this.Ph=-Math.log10(this.Hions+Math.pow(10,-4))+3;
+        }
     }
     this.FindColor=function(){
     	var iswater=0;
@@ -128,6 +142,10 @@ function Mixture(chemarr,ind){
         if(this.Color=='transparent')
             this.Color="blue";
         }
+        if(this.Color[0]=='0'){
+            this.Color=parseInt(this.Color,16);
+        }
+        this.Color=new THREE.Color(this.Color);        
     }
     this.FindWeight=function(){
         this.volume=0;
