@@ -4,6 +4,7 @@
   <title>ekshikhsha</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -135,7 +136,7 @@ border: 1px solid #ddd;
 </head>
 <body>
 
-<nav class="navbar navbar-fixed-top" style="background-color:black;">
+<nav id='rrzz' class="navbar navbar-fixed-top" style="background-color:black;">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -303,6 +304,10 @@ $("#selectbox2").change(function () {
 </div>
 <div id="vcl"></div>
 <script type="text/javascript">
+window.addEventListener('zoom', function(e){ 
+  console.log("here");
+  document.getElementById('rrzz').style["transform"] = "scale(" + window.innerWidth/document.documentElement.clientWidth + ")";
+  });
   function addEquipment(v,label){
     if(v!=0){
       var str='instantiate(';
@@ -320,6 +325,7 @@ $("#selectbox2").change(function () {
       str+=')';
       eval(str);
     }
+    document.getElementById('b0').click();
   }
   function changeState(x){
     if(x==state)
@@ -347,6 +353,7 @@ $("#selectbox2").change(function () {
     var objectsM=[];
     var objectsC=[];
     var table_n;
+    var cursz=0;
     var table_height=50;
     var basin_height=50;
     var shelf_height=table_height;
@@ -361,34 +368,9 @@ $("#selectbox2").change(function () {
     var isclick=1;
     var dragControls;
     var controls;
+    var flagtask=0;
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2();
-    function updateDisplay(i){
-      document.getElementById('dtext').innerHTML='';
-      if(i!=null){
-        curdisp=i;
-        document.getElementById('dtext').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
-        if(iscontainer[objects[i].id]){
-          document.getElementById('dtext').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
-          document.getElementById('dtext').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
-          if(objects[i].Slots!=null){
-            for(var x=0;x<objects[i].Slots.length;x++){
-              if(objects[i].Slots[x].Slave!=null && omap[objects[objects[i].Slots[x].Slave].id]=='PhMeter')
-                document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
-            }
-          }
-        }
-        if(objects[i].label!=undefined){
-            document.getElementById('dtext').innerHTML+='Label: '+objects[i].label+'<br>'; 
-        }
-        else if(omap[objects[i].id]=='PhMeter'){
-          if(objects[i].Master!=null){
-            document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[objects[i].Master].Mixture.Ph).toFixed(3))+'<br>';
-          }
-        }
-        //document.getElementById('dtext').innerHTML+='Name: '+omap[i]+'<br>';
-      }
-    }
     function init() {
       getfromdb();
         scene = new THREE.Scene();
@@ -396,12 +378,17 @@ $("#selectbox2").change(function () {
         camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         // create a render and set the size
         renderer = new THREE.WebGLRenderer();
-        renderer.setClearColor(new THREE.Color(0x232323));
+        renderer.setClearColor(new THREE.Color(0x436521));
         //renderer.setClearColorHex(new THREE.Color(0x000000, 1));
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMapEnabled = true;
         // add subtle ambient lighting
-        var ambientLight = new THREE.AmbientLight(0x0c0c0c,4);
+        // var base=new THREE.Mesh(new THREE.PlaneGeometry(1000,1000),new THREE.MeshBasicMaterial({color:'gray'}));
+        // scene.add(base);
+        // base.rotation.x-=Math.PI/2;
+        // base.position.set(0,-50,0);
+        // base.recieveShadow=true;
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c,5);
         scene.add(ambientLight);
         // add spotlight for the shadows
         document.body.appendChild(renderer.domElement);
@@ -411,8 +398,8 @@ $("#selectbox2").change(function () {
         shelves[0].setPosition(0,0,-table_height*2/5);
         table_n=0;
         addTable();
-instantiate(new Bottle(250,new Mixture([new Chemical('Hydrobromic Acid','ffff99',1,1,'HBr',0.1,1.49,81,'ffff99',undefined),new Chemical('Water','transparent',0,1,'H2O',5.2482885906040275,1,18,'transparent',undefined)])),new THREE.Vector3(-12.5,34.16666666666667,-21.5));
-instantiate(new Bottle(250,new Mixture([new Chemical('Lithium Hydroxide','FBFCFC',-1,1,'LiOH',0.1,1.46,24,'transparent',undefined),new Chemical('Water','transparent',0,1,'H2O',5.477013698630137,1,18,'transparent',undefined)])),new THREE.Vector3(0,34.16666666666667,-21.5))
+instantiate(new Bottle(250,new Mixture([new Chemical('Oxalic Acid','FBFCFC',1,2,'H2C2O4',0.01,1.9,126,'transparent',undefined),new Chemical('Water','transparent',0,1,'H2O',5.518713450292398,1,18,'transparent',undefined)])),new THREE.Vector3(12.5,18.333333333333336,-21.5));
+instantiate(new Bottle(250,new Mixture([new Chemical('Pottasium permanganate','A569BD',-1,5,'KMnO4',0.01,2.703,158,'e600ac',undefined),new Chemical('Water','transparent',0,1,'H2O',5.523081349940395,1,18,'transparent',undefined)])),new THREE.Vector3(0,18.333333333333336,-21.5));
         // var nmix=new Mixture([new Chemical('Hydrochloric Acid','green',0,1,'HCl',12,1,18,'green')]);
         // var base=new Mixture([new Chemical('Sodium Hydroxide','red',0,1,'NaOH',12,1,18,'red')]);
         // instantiate(new Flask(250,nmix),nextShelfSlot());
@@ -421,6 +408,7 @@ instantiate(new Bottle(250,new Mixture([new Chemical('Lithium Hydroxide','FBFCFC
         camera.position.set(0,table_height,table_height*4);
         dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
         dragControls.addEventListener('dragstart',function (event){
+            cursz=journal.length;
             isclick=1;
             drag=1;
             intersects = _raycaster.intersectObjects( pressobjects ); 
@@ -522,6 +510,8 @@ instantiate(new Bottle(250,new Mixture([new Chemical('Lithium Hydroxide','FBFCFC
             objects[pobject].restrict(-table_height+objects[pobject].half_width,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].half_width,0,table_height*2,0,0);
                   updatePos(objects[pobject]);
             pobject=null
+            flagtask=1;
+            console.log('here');
         });
         document.getElementById('NewTable').addEventListener('click',addTable);
         document.getElementById('Save').addEventListener('click',function(){
@@ -690,7 +680,6 @@ instantiate(new Bottle(250,new Mixture([new Chemical('Lithium Hydroxide','FBFCFC
                   s+='],';
                   s+=(objects[dobject].x()).toString();
                   s+=',0,0)';
-                  journal.push(s);
                   if(typeof objects[dobject].drop == 'function'){
                     objects[dobject].drop(dobject);
                   }
@@ -719,10 +708,21 @@ instantiate(new Bottle(250,new Mixture([new Chemical('Lithium Hydroxide','FBFCFC
               pobject=null;
               dobject=null;
             }
+            if(flagtask ==1 && cursz!=null && journal.length>cursz){
+              for(var i=cursz+1;i<journal.length;i++){
+                journal[cursz]+=';'+journal[i];
+              }
+              while(journal.length > cursz+1)
+              journal.pop();
+              cursz=null;
+              console.log(journal[journal.length-1]);
+              flagtask=0;
+            }
             controls.update();
             requestAnimationFrame(renderScene);
             renderer.render(scene, camera);
-        }
+            console.log(journal.length);
+          }
     }
     window.onload = init;
 </script>
