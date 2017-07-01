@@ -21,8 +21,9 @@
     <script src="libs/OrbitControls.js"></script>  
     <script src="libs/DragControls.js"></script>
     <script src="libs/threex.dynamictexture.js"></script>
-    <script src="libs/TrackballControls.js"></script>  
+    <script src="libs/TrackballControls.js"></script>
     <script src="Objects/Chemicals.js"></script>
+    <script src="libs/decimal.js"></script>
     <script src="Objects/fetch.js"></script>
     <script type="text/javascript" src="Objects/backend.js"></script>
   <style>
@@ -221,11 +222,11 @@ border: 1px solid #ddd;
 
 </div>
 </li>
-<li><button class="btn btn-primary" style="margin-top:8px"><i class="fa fa-undo"></i></button></li>
+<li><button class="btn btn-primary" style="margin-top:8px" id="Undo" onclick="UndoButt()"><i class="fa fa-undo"></i></button></li>
 <li><button class="btn btn-default" onclick="changeState(0)" id='b0' style="margin-top:8px;margin-left:10px;"><i class="glyphicon glyphicon-hand-up"></i></button></li>    
     <li>
     <div class="btn btn-group">
-    <button class="btn btn-default" id='b1' onclick="changeState(1)" title="Bottle"><img class="objects" src="Photos/bottle.jpeg" ></button>
+    <button class="btn btn-default" id='b1'  onclick="changeState(1)" title="Bottle"><img class="objects" src="Photos/bottle.jpeg" ></button>
     <button class="btn btn-default" id='b2'  onclick="changeState(2)" title="Beaker"><img class="objects" src="Photos/beaker.jpg" ></button>
     <button class="btn btn-default" id='b3'  onclick="changeState(3)" title="Flask"><img class="objects" src="Photos/flask.jpg" ></button>
     <button class="btn btn-default" id='b4'  onclick="changeState(4)" title="Test tube"><img class="objects" src="Photos/testtube.jpg" ></button>
@@ -369,6 +370,7 @@ $("#selectbox2").change(function () {
       str+=')';
       eval(str);
     }
+    document.getElementById('b0').click();
   }
   function changeState(x){
     if(x==state)
@@ -407,16 +409,22 @@ $("#selectbox2").change(function () {
     var dobject=null;
     var pobject=null;
     var dirLight;
+    var cursz=0;
     var journal=[];
     var isclick=1;
     var dragControls;
     var controls;
+    var flagtask=0;
     var raycaster = new THREE.Raycaster();
     var mouse = new THREE.Vector2();
+    var UNDOval = null;
 //    FetchReaction();
 //    FetchChemical();
     
     function init() {
+        FetchChemical();
+        FetchReaction();
+        //console.log(cdata['Sodium sulphate']);
         scene = new THREE.Scene();
         // create a camera, which defines where we're looking at.
         camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -445,6 +453,7 @@ $("#selectbox2").change(function () {
         camera.position.set(0,table_height,table_height*4);
         dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
         dragControls.addEventListener('dragstart',function (event){
+            cursz=journal.length;
             isclick=1;
             drag=1;
             intersects = _raycaster.intersectObjects( pressobjects ); 
@@ -545,6 +554,7 @@ $("#selectbox2").change(function () {
             objects[pobject].restrict(-table_height+objects[pobject].half_width,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].half_width,0,table_height*2,0,0);
                   updatePos(objects[pobject]);
             pobject=null
+            flagtask=1;
         });
         document.getElementById('NewTable').addEventListener('click',addTable);
         //older
@@ -565,7 +575,8 @@ $("#selectbox2").change(function () {
         var Eaim = '<%= session.getAttribute("aim") %>';
         var Emarks = '<%= session.getAttribute("marks") %>';
         var Eins = '<%= session.getAttribute("ins") %>';
-        
+
+//        
 //        var UID = 9;
 //        var WAY = "perform";
         
@@ -577,7 +588,24 @@ $("#selectbox2").change(function () {
 //        var Eaim = dataT.aim;
 //        var Emarks = dataT.marks;
 //        var Eins = dataT.ins;
-        if(WAY=="perform" || WAY=="edit"){
+//        var tempror = 0;
+//        if(UNDOval == 1){
+//            UndoButt();
+//            tempror = 1;
+//            
+//            var n = dataUndo.length;
+//            console.log(n);
+//            journal = [];
+//            for(var i = 0;i<n;i++){
+//                console.log(dataUndo[i]);
+//                eval(dataUndo[i]);
+//            }
+//            journal = [];
+//            for(var i = 0;i<n;i++){
+//                journal.push(dataUndo[i]);
+//            }
+//        }
+        if( (WAY=="perform" || WAY=="edit") ){
             var eid = '<%= session.getAttribute("eid") %>';
 //            var eid = 14;
             var TempPrev = WAY;
@@ -662,7 +690,7 @@ $("#selectbox2").change(function () {
         document.getElementById('exp_marks').innerHTML = Emarks;
         document.getElementById('exp_author').innerHTML = Eauthor;
         
-//        FetchChemical();
+//        UNDOval = 0;
         if(table_n==0)
             addTable();
         document.getElementById('Save').addEventListener('click',function(){
@@ -675,6 +703,9 @@ $("#selectbox2").change(function () {
 //            }
             
 //            mystring += "table_n=" + table_n.toString();
+            if(WAY=="edit"){
+                WAY = "setup";
+            }
             mystring += journal[0].toString();
             for(var i=1;i<journal.length;i++){
                 mystring += "#";
@@ -805,7 +836,8 @@ $("#selectbox2").change(function () {
                                 s+=',';
                                 s+= "\'" + temArr[6];
                                 s+= '\'),';
-                                var mol = (( vol - (concn*vol)/1000 * parseFloat(temArr[5]) / parseFloat(temArr[4]) ) * 55.5 )/1000;
+                                
+                                var mol = (( vol - (concn*vol)/1000 * parseFloat(temArr[5]) / parseFloat(temArr[4]) ))/18;
                                 var molS = mol.toString();
                                 s+="new Chemical('Water','transparent',0,1,'H2O'," + molS + ",1,18,'transparent')" + '])';
                                 console.log(molS);
@@ -950,7 +982,6 @@ $("#selectbox2").change(function () {
                   s+='],';
                   s+=(objects[dobject].x()).toString();
                   s+=',0,0)';
-                  journal.push(s);
                   if(typeof objects[dobject].drop == 'function'){
                     objects[dobject].drop(dobject);
                   }
@@ -979,9 +1010,20 @@ $("#selectbox2").change(function () {
               pobject=null;
               dobject=null;
             }
+            if(flagtask ==1 && cursz!=null && journal.length>cursz){
+              for(var i=cursz+1;i<journal.length;i++){
+                journal[cursz]+=';'+journal[i];
+              }
+              while(journal.length > cursz+1)
+              journal.pop();
+              cursz=null;
+              console.log(journal[journal.length-1]);
+              flagtask=0;
+            }
             controls.update();
             requestAnimationFrame(renderScene);
             renderer.render(scene, camera);
+            console.log(journal.length);
         }
     }
     window.onload = init;
@@ -1018,63 +1060,136 @@ function closeNav() {
 </script>
 
 <script>
-      var id;
-      var volume = 0;
-      var normality;
-      var data;
-      var data_cat = "";
-      var data_obj = "";
-      var data_attr = "";
-      var dataLoader = function() {
-        $.ajax({
-          type: "GET",
-          url: "MyServlet",
-          success: function(response) {
-            //    console.log(response);
-            data = response.split(",");
-            data_obj = "<option>Choose</option>";
-            //data_obj = "<option value='#consumer_goods'>" + "Hydrochloric acid" + "</option>";
-            for (obj1 in data){
-                if(data[obj1] == "Acid" || data[obj1] == "Base" || data[obj1] == "Neutral" ){
-                    data_obj += "<optgroup label="+data[obj1]+">"
-                }
-                else{
-                    data_obj += "<option value=\"#consumer_goods\">" + data[obj1] + "</option>";
-                }
-            }
-                                                
-            $(".hifi").html(data_obj);
-          }
-        });
-
-        /* response will be saved to data_obj*/
-      };
-      var addFunc = function() {
-        /* ajax request to add data into db */
-        $.ajax({
-          type: "POST",
-          url: "Upload",
-          data:{
-            'vol':volume,
-            'norm':normality,
-//            'val':$('.attr>form').serialize()
-          },
-          error : function(){
-            alert("Error Occured");
-          },
-          success: function(response) {
-            dataLoader();
-            id+=1;
-            $(".attr").html("");
-            $(".cat-main").html(selectedCategory);
-            $(".categories").hide();
-          }
-          /**/
-
-        });
-      };
-      dataLoader();
       
+    var id;
+    var volume = 0;
+    var normality;
+    var data;
+    var data_cat = "";
+    var data_obj = "";
+    var data_attr = "";
+    var dataLoader = function() {
+      $.ajax({
+        type: "GET",
+        url: "MyServlet",
+        success: function(response) {
+          //    console.log(response);
+          data = response.split(",");
+          data_obj = "<option>Choose</option>";
+          //data_obj = "<option value='#consumer_goods'>" + "Hydrochloric acid" + "</option>";
+          for (obj1 in data){
+              if(data[obj1] == "Acid" || data[obj1] == "Base" || data[obj1] == "Neutral" ){
+                  data_obj += "<optgroup label="+data[obj1]+">"
+              }
+              else{
+                  data_obj += "<option value=\"#consumer_goods\">" + data[obj1] + "</option>";
+              }
+          }
+
+          $(".hifi").html(data_obj);
+        }
+      });
+
+      /* response will be saved to data_obj*/
+    };
+    var addFunc = function() {
+      /* ajax request to add data into db */
+      $.ajax({
+        type: "POST",
+        url: "Upload",
+        data:{
+          'vol':volume,
+          'norm':normality,
+//            'val':$('.attr>form').serialize()
+        },
+        error : function(){
+          alert("Error Occured");
+        },
+        success: function(response) {
+          dataLoader();
+          id+=1;
+          $(".attr").html("");
+          $(".cat-main").html(selectedCategory);
+          $(".categories").hide();
+        }
+        /**/
+
+      });
+    };
+    dataLoader();
+    
+    function UndoButt(){
+        emptyScene();
+        var dataUndo = [];
+        console.log(journal.length);
+        for(var i = 0;i<journal.length-1;i++){
+            dataUndo[i] = journal[i];
+        }
+//        console.log(journal[journal.length-2]);
+//        console.log(journal[journal.length-1]);
+
+        journal = [];
+        for(var i = 0;i<dataUndo.length;i++){
+            console.log(dataUndo[i]);
+            eval(dataUndo[i]);
+        }
+        journal = [];
+        
+        for(var i = 0;i<dataUndo.length;i++){
+            journal.push(dataUndo[i]);
+        }
+
+    }
+//function UndoButt(){
+//    var PresentJ = journal[0].toString();
+//    for(var i=1;i<journal.length-1;i++){
+//        PresentJ += "#";
+//        PresentJ +=journal[i].toString();
+//    }
+//    if(UNDOval == 1){
+//        var setUndo1 = function() {
+//            console.log("STUCKED");
+//            $.ajax({
+//                type: "POST",
+//                url: "UndoSet",
+//                data:{
+//                      'UNDOval':UNDOval,
+//                },
+//                async: false,
+//                success: function(response) {
+//                    console.log(response);
+//                    
+////                    location.reload(true);
+//                },
+//                error : function(){
+//                    alert("Error in setUndo1");
+//                }
+//            });
+//        }();
+//    }
+//    else{
+//        var setUndo = function() {
+//            console.log("STUCKED");
+//            $.ajax({
+//                type: "POST",
+//                url: "UndoSet",
+//                data:{
+//                      'JOURNAL':PresentJ,
+//                      'UNDOval':UNDOval,
+//                },
+//                async: false,
+//                success: function(response) {
+//                    console.log(response);
+//                    location.reload(true);
+//                },
+//                error : function(){
+//                    alert("Error in setUndo");
+//                }
+//            });
+//        }();
+//    }
+//}
+
       
 </script>
 
