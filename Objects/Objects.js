@@ -29,7 +29,6 @@ class Equipment{
             if(objects[curdisp]==this){
                 updateDisplay(curdisp);
             }
-
         };
         this.updateSlaves=function(){
         	if(this.Slots==null)
@@ -940,18 +939,18 @@ function Basin(w){
     var m1=new THREE.MeshLambertMaterial({color:0xf1f4f6});
     var m2=new THREE.MeshStandardMaterial({color:"gray"});
     var m3=new THREE.MeshStandardMaterial({color:"white"});
-    var basin=new THREE.BoxGeometry(w,w/2,w);
+    var basin=new THREE.BoxGeometry(w,w/2+w/8,w);
     var pole=new THREE.CylinderGeometry(w/4,w/4,hp,32,1);
     basin=new THREE.Mesh(basin,m1);
-    var extrude=new THREE.BoxGeometry(w*0.9,w/3,w*0.7);
+    var extrude=new THREE.BoxGeometry(w*0.9,w/3+w/8,w*0.7);
     extrude=new THREE.Mesh(extrude,m1);
-    extrude.position.set(0,w/12,w/10);
+    extrude.position.set(0,w/12 +w/16,w/10);
     var b1=new ThreeBSP(basin);
     var b2=new ThreeBSP(extrude);
     b1=b1.subtract(b2);
     b1=b1.toGeometry();
     basin=new THREE.Mesh(b1,m1);
-    basin.position.set(0,(w*7/12)+(w/4),0);
+    basin.position.set(0,(w*7/12)+(w/4)-w/16,0);
     var r=new THREE.Mesh(pole,m1);
     r.add(basin);   
     var tap=new THREE.CylinderGeometry(w*0.07,w*0.07,w/4,32,1);

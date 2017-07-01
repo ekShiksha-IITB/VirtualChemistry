@@ -45,7 +45,7 @@ isanimated['PlaceF']=true;
 var omap=['Bottle','Beaker','Flask','TestTube','Burette','Pipette','Petridish','BunsenBurner','WeighingMachine','WatchGlass','TestTubeStand','Funnel','PhMeter','Shelf','Table','Basin'];
 var issmall=[1,1,1,1,0,0,1,0,0,1,1,1,0];
 var iscontainer=[1,1,1,1,1,1,1,0,0,1,0,0,0];
-var maxhw=[3.41392,3.41392,5.303922,1.401053,1.31844,2.52583545,10,5,5,5,5,5,5,5,5,5];
+var maxhw=[3.41392,3.41392,5.303922,1.401053,1.31844,2.52583545,5.2,5,5,2.674,1.786,4,2,5,5,5];
 var choices=[];
 choices[0]=[100,150,250];
 choices[1]=[100,150,250];
@@ -270,7 +270,10 @@ function APlaceF(fi,se,i){
     t.Slots[i].Slave=fi;
     s.Master=se;
     s.Masterslot=i;
-    Amove(s,t.Slotpos(i).x,t.Slotpos(i).y,t.Slotpos(i).z);
+    Amove(s,t.Slotpos(i).x,t.Slotpos(i).y,t.Slotpos(i).z,function(){
+        totalUpdate(objects[fi]);
+        callback();
+    });
 }
 function PlaceF(fi,se,i){
     var str="PlaceF(";
@@ -672,9 +675,10 @@ function addTable(){
     basins.push(new Basin(basin_width));
     basins[table_n].setPosition((2*table_n+1)*table_height+((1/2)+table_n)*basin_width,-basin_height,0);
     scene.add(basins[table_n].Mesh);
-    spotLight.push(new THREE.PointLight(0xffffff,1));
+    spotLight.push(new THREE.SpotLight(0xffffff,1));
     spotLight[table_n].position.set(table_n*table_height*2+table_n*basin_width, 80, -60);
     spotLight[table_n].castShadow = true;
+    spotLight[table_n].target=tables[table_n].Mesh;
     scene.add(spotLight[table_n]);
     tablesM.push(tables[table_n].Mesh);
     table_n++;
@@ -709,3 +713,28 @@ function drain(mix,vol){
         
     }
 }
+function updateDisplay(i){
+  document.getElementById('dtext').innerHTML='';
+    if(i!=null){
+        curdisp=i;
+    }
+    document.getElementById('dtext').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
+    if(iscontainer[objects[i].id]){
+      document.getElementById('dtext').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
+      document.getElementById('dtext').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
+      if(objects[i].Slots!=null){
+        for(var x=0;x<objects[i].Slots.length;x++){
+          if(objects[i].Slots[x].Slave!=null && omap[objects[objects[i].Slots[x].Slave].id]=='PhMeter')
+            document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
+        }
+      }
+    }
+    if(objects[i].label!=undefined){
+        document.getElementById('dtext').innerHTML+='Label: '+objects[i].label+'<br>'; 
+    }
+    else if(omap[objects[i].id]=='PhMeter'){
+      if(objects[i].Master!=null){
+        document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[objects[i].Master].Mixture.Ph).toFixed(3))+'<br>';
+      }
+    }
+  }

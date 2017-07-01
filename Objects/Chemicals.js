@@ -25,14 +25,27 @@ function Transfer(a,b,vol){
                 }
                 else if(rdata[b.Chemicals[j].Name]!=undefined && rdata[b.Chemicals[j].Name][a.Chemicals[i].Name]!=undefined){
                     var x=rdata[b.Chemicals[j].Name][a.Chemicals[i].Name];
-                    var l=Math.min(a.Chemicals[i].Moles*vol/a.volume,b.Chemicals[j].Moles*x.Balance[1]/x.Balance[2]);
+                    var l=Math.min(a.Chemicals[i].Moles*vol/a.volume,b.Chemicals[j].Moles*x.Balance[0]/x.Balance[1]);
                     if(l==a.Chemicals[i].Moles*vol/a.volume)
                         flag=1;
                     var t;
-                    for(var i=2;i<x.Products.length;i++){
-                        t=copyChemical(cdata[x.Products[i]]);
-                        t.Moles=x.Balance[i]*l/x.Balance[0];
-                        b.Chemicals.push(t);
+                    a.Chemicals[i].Moles-=l;
+                    b.Chemicals[i].Moles-=l*x.Balance[1]/x.Balance[0];
+                    for(var k=0;k<x.Products.length;k++){
+                        t=copyChemical(cdata[x.Products[k]]);
+                        if(t.Col_in_water==undefined){
+                            console.log(cdata[x.Products[k]]);
+                        }
+                        t.Moles=x.Balance[k+2]*l/x.Balance[0];
+                        var f2=1;
+                        for(var m=0;m<b.Chemicals.length;m++){
+                            if(b.Chemicals[m].Name==t.Name){
+                                b.Chemicals[m].Moles+=t.Moles;
+                                f2=0;
+                            }
+                        }
+                        if(f2)
+                            b.Chemicals.push(t);
                     }
                 }
             }
@@ -46,6 +59,7 @@ function Transfer(a,b,vol){
             b.Chemicals.push(temp);
         }
     }
+
     a.volume-=vol;
     b.volume+=vol;
     if(a.volume < Math.pow(10,-10)){
@@ -81,9 +95,8 @@ function Mixture(chemarr,ind){
     for(var i=0;i<this.Chemicals.length;i++){
     	this.volume+=this.Chemicals[i].Moles*this.Chemicals[i].Molarmass/this.Chemicals[i].Density;
         this.weight+=this.Chemicals[i].Moles*this.Chemicals[i].Molarmass;
-        if(this.volume<Math.pow(10,-10))
-            this.volume=0;
     }
+    this.Chemicals.volume=Number((this.Chemicals.volume)).toFixed(3);
     this.FindNature=function(){
         if(this.volume==0){
         	this.Hions=0;
@@ -94,12 +107,13 @@ function Mixture(chemarr,ind){
         for(var i=0;i<this.Chemicals.length;i++){
             this.Hions+=this.Chemicals[i].Moles*this.Chemicals[i].Nature*this.Chemicals[i].Nfac;
         }
+        this.Hions*=1000;
         this.Hions/=this.volume;
         if(this.Hions<0){
-        	this.Ph=14+Math.log10(-this.Hions+Math.pow(10,-4))-3;
+        	this.Ph=14+Math.log10(-this.Hions+Math.pow(10,-7));
         }
     	else{
-           this.Ph=-Math.log10(this.Hions+Math.pow(10,-4))+3;
+           this.Ph=-Math.log10(this.Hions+Math.pow(10,-7));
         }
     }
     this.FindColor=function(){
@@ -130,7 +144,10 @@ function Mixture(chemarr,ind){
 	    else{
 	    	for(var i=0;i<this.Chemicals.length;i++){
 	            if(this.Chemicals[i].Col_in_water!='transparent'){
-	                if(this.Chemicals[i].Moles > maxmoles){
+	                if(this.Chemicals[i].Col_in_water==undefined){
+                        console.log(this.Chemicals[i].Name)
+                    }
+                    if(this.Chemicals[i].Moles > maxmoles){
 	                    maxcol=this.Chemicals[i].Col_in_water;
 	                    maxmoles=this.Chemicals[i].Moles;
 	                }
@@ -142,7 +159,7 @@ function Mixture(chemarr,ind){
         if(this.Color=='transparent')
             this.Color="blue";
         }
-        if(this.Color[0]=='0'){
+        if(this.Color!='blue'){
             this.Color=parseInt(this.Color,16);
         }
         this.Color=new THREE.Color(this.Color);        
@@ -151,8 +168,8 @@ function Mixture(chemarr,ind){
         this.volume=0;
         this.weight=0;
         for(var i=0;i<this.Chemicals.length;i++){
-            this.volume+=this.Chemicals[i].Moles*this.Chemicals[i].Molarmass/this.Chemicals[i].Density;
             this.weight+=this.Chemicals[i].Moles*this.Chemicals[i].Molarmass;
+            this.volume+=this.Chemicals[i].Moles*this.Chemicals[i].Molarmass/this.Chemicals[i].Density; 
         }
     }
     this.FindNature();
@@ -199,7 +216,7 @@ function Chemical(nc,col,nat,nf,cf,mol,den,mm,colw){
     this.toString=ChemToString;
 }
 function copyChemical(x){
-    var r=new Chemical(x.Name,x.Color,x.Nature,x.Nfac,x.Formula,x.Moles,x.Molarmass,x.Col_in_water);
+    var r=new Chemical(x.Name,x.Color,x.Nature,x.Nfac,x.Formula,x.Moles,x.Molarmass,x.Density,x.Col_in_water);
     return r;
 }
 function ChemToString(){
