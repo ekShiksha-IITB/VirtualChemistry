@@ -438,11 +438,11 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
                         if(response!=0){
                             EdataS = response.split(",");
                             displayS = "<tr><th>Sr.No.</th><th>Experiment Name</th><th>Actions</th></tr>";
-                            for (var i = 0;i<EdataS.length-1;i++){
+                            for (var i = 0;i<EdataS.length-1;i+=2){
                                 displayS += "<tr>";
                                 displayS += "<td>" + num1 + "</td>";num1++;
                                 displayS += "<td>" + EdataS[i] + "</td>";
-                                displayS += "<td><button class =\"btn btn-primary\" >" + "Edit" + "</button></td>";
+                                displayS += "<td><button class =\"btn btn-primary\"  onclick=\"EditSub( "+ EdataS[i+1] + " )\"  >" + "Edit" + "</button></td>";
                                 displayS += "</tr>";
                             }
                             console.log(displayS);
@@ -508,7 +508,7 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
                     type: "POST",
                     url: "SetSend",
                     data:{
-                          'title':tit,
+//                          'title':tit,
                           'way':"perform",
                           'eid':eid
                     },
@@ -586,6 +586,38 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
                 }
             });
         }();
+    }
+    
+    function EditSub(eid){
+        console.log(eid);
+        <% if ( session.getAttribute("currentSessionUser")==null ) { %> 
+//            response.sendRedirect("register.jsp");
+            window.location.href = 'register.jsp';
+        <% } else {%>
+            var setEditVal = function() {
+                console.log("STUCKED-EDIT");
+                $.ajax({
+                    type: "POST",
+                    url: "SetSend",
+                    data:{
+//                          'title':tit,
+                          'way':"edit",
+                          'eid':eid
+                    },
+                    async: false,
+                    success: function(response) {
+                        console.log(response);
+                        window.location.href = 'perform.jsp';
+                    },
+                    error : function(){
+                        alert("Error in setEditVal");
+                    }
+                });
+            }();
+            
+        <% } %>
+            
+        console.log("edit "+eid);
     }
     
     
