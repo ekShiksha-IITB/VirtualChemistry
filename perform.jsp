@@ -23,7 +23,7 @@
     <script src="libs/threex.dynamictexture.js"></script>
     <script src="libs/TrackballControls.js"></script>  
     <script src="Objects/Chemicals.js"></script>
-    <!--<script src="Objects/fetch.js"></script>-->
+    <script src="Objects/fetch.js"></script>
     <script type="text/javascript" src="Objects/backend.js"></script>
   <style>
     /* Remove the navbar's default margin-bottom and rounded borders */ 
@@ -129,27 +129,15 @@ border: 1px solid #ddd;
     font-size: 150%;
     font-family: "Times New Roman", Times, serif;
 }
-  .navbar-inverse{
+  .EQInf{
     width:300px;height:150px;margin-left:auto;
-      background:#7f7f7f;
-  background:rgba(255,255,255,0);
+    background:#7f7f7f;
+    background:rgba(255,255,255,0);
     /*opacity: 0;*/
     /*overflow:scroll;*/
     top:50px;
   }
-    .dropdown-submenu {
-      position: relative;
-    }
-
-  .dropdown-submenu .dropdown-menu {
-      top: 0;
-      left: 100%;
-      margin-top: 5px;
-  }
-  .dropdown-submenu:hover .dropdown-menu {
-      display: block;
-
-  }
+    
   a{cursor:pointer;}
   #overlay{
   position:fixed;
@@ -157,6 +145,7 @@ border: 1px solid #ddd;
   height:30%;
   margin-top:100px;
   right:0;
+  
   background-color:rgba(0,0,0,0.5);
   z-index:2;
 
@@ -176,11 +165,11 @@ border: 1px solid #ddd;
 
   .overlay-content {
       position: relative;
-      top: 25%;
+      top: 10%;
       width: 100%;
       text-align: center;
       margin-top: 30px;
-          color:white;
+      color:white;
   }
   .overlay .closebtn {
       position: absolute;
@@ -256,7 +245,7 @@ border: 1px solid #ddd;
     </div>
  
 </nav>
-<nav class="navbar navbar-inverse navbar-fixed-top">
+<nav class="navbar EQInf navbar-fixed-top">
 <div id="dtext">
 Item : Bottle<br>
 Volume: 250 ml
@@ -352,6 +341,7 @@ $("#selectbox2").change(function () {
       </div>
       <div id='inserthere' class="modal-body">
         <p>Some text in the modal.</p>
+        <div class="form-group"><br><input type="text" id="ltxt" class="form-control" placeholder="Attach a label (optional)"> </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -425,32 +415,7 @@ $("#selectbox2").change(function () {
     var mouse = new THREE.Vector2();
 //    FetchReaction();
 //    FetchChemical();
-    function updateDisplay(i){
-      document.getElementById('dtext').innerHTML='';
-      if(i!=null){
-        curdisp=i;
-        document.getElementById('dtext').innerHTML+='Name: '+omap[objects[i].id]+'<br>';
-        if(iscontainer[objects[i].id]){
-          document.getElementById('dtext').innerHTML+='Total Volume: '+objects[i].volume+'<br>';
-          document.getElementById('dtext').innerHTML+='Chemical Volume: '+Number((objects[i].Mixture.volume).toFixed(3))+'<br>';
-          if(objects[i].Slots!=null){
-            for(var x=0;x<objects[i].Slots.length;x++){
-              if(objects[i].Slots[x].Slave!=null && omap[objects[objects[i].Slots[x].Slave].id]=='PhMeter')
-                document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[i].Mixture.Ph).toFixed(3))+'<br>';                
-            }
-          }
-        }
-        if(objects[i].label!=undefined){
-            document.getElementById('dtext').innerHTML+='Label: '+objects[i].label+'<br>'; 
-        }
-        else if(omap[objects[i].id]=='PhMeter'){
-          if(objects[i].Master!=null){
-            document.getElementById('dtext').innerHTML+='Ph: '+Number((objects[objects[i].Master].Mixture.Ph).toFixed(3))+'<br>';
-          }
-        }
-        //document.getElementById('dtext').innerHTML+='Name: '+omap[i]+'<br>';
-      }
-    }
+    
     function init() {
         scene = new THREE.Scene();
         // create a camera, which defines where we're looking at.
@@ -612,9 +577,15 @@ $("#selectbox2").change(function () {
 //        var Eaim = dataT.aim;
 //        var Emarks = dataT.marks;
 //        var Eins = dataT.ins;
-        if(WAY=="perform"){
+        if(WAY=="perform" || WAY=="edit"){
             var eid = '<%= session.getAttribute("eid") %>';
 //            var eid = 14;
+            var TempPrev = WAY;
+            if(WAY=="edit"){
+                console.log("Eid:"+eid + " " + "Uid:"+UID );
+//                var happiness = prompt("HAPPY");
+                WAY = "setup";
+            }
             var ExpLoader = function() {
                     console.log("RetrivingExperiment");
                     console.log(UID);
@@ -638,11 +609,12 @@ $("#selectbox2").change(function () {
                                     var data = response.split("#");
                                     var n = data.length;
                                     console.log(n);
+                                    journal = [];
                                     for(var i = 0;i<n;i++){
                                         console.log(data[i]);
                                         eval(data[i]);
                                     }
-                                    journal=[];
+                                    journal = [];
                                     for(var i = 0;i<n;i++){
                                         journal.push(data[i]);
                                     }
@@ -653,7 +625,44 @@ $("#selectbox2").change(function () {
                     });
                 /* response will be saved to data_obj*/
             }();
+            var InfoLoader = function() {
+                    console.log("RetrivingInformation");
+                    console.log(eid);
+                    
+                        $.ajax({
+                                method: "GET",
+                                url: "RetriveInfo",
+//                                url: "RetriveObjects?uid=" + UID +"&&way=" + WAY +"&&eid=" + eid,
+                                data:{
+                                    'eid':eid
+                                },
+                                async: false,
+                                success: function(response) {
+                                    console.log(response);
+                                    var dataIn = response.split("##@%");
+                                    
+                                    Etitle = dataIn[0];
+                                    Eauthor = dataIn[1];
+                                    Eclass = dataIn[2];
+                                    Eaim = dataIn[3];
+                                    Emarks = dataIn[4];
+                                    Eins = dataIn[5];
+                                },
+                                error : function(){
+                                          alert("Error Occured");
+                                }
+                    });
+                /* response will be saved to data_obj*/
+            }();
         }
+        document.getElementById('exp_title').innerHTML = Etitle;
+        document.getElementById('exp_aim').innerHTML = Eaim;
+        document.getElementById('exp_instruction').innerHTML = Eins;
+        document.getElementById('exp_class').innerHTML = Eclass;
+        document.getElementById('exp_marks').innerHTML = Emarks;
+        document.getElementById('exp_author').innerHTML = Eauthor;
+        
+//        FetchChemical();
         if(table_n==0)
             addTable();
         document.getElementById('Save').addEventListener('click',function(){
@@ -777,10 +786,12 @@ $("#selectbox2").change(function () {
                                 s+=',';
                                 s+= "\'" + temArr[0]  + "\'";
                                 s+=',';
-                                if(temArr[1]=="acid")
+                                if(temArr[1]=="Acid")
                                     s+= 1 ;
+                                else if(temArr[1]=="Base")
+                                    s+= -1 ;
                                 else
-                                    s+= -1;
+                                    s+= 0;
                                 s+=',';
                                 s+= temArr[2]  ;
                                 s+=',';
@@ -975,26 +986,37 @@ $("#selectbox2").change(function () {
     }
     window.onload = init;
 </script>
+
 <nav class="navbar navbar-inverse navbar-fixed-bottom" style="width:15%">
-<center><span style="font-size:10px;cursor:pointer;color:white" onclick="openNav()">&#9776; info</span></center>
+<span style="font-size:30px;cursor:pointer;color:white" onclick="openNav()">&#9776; Info</span>
 </nav>
-    <div id="sidenav" class="overlay">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <div class="overlay-content">
-        <h1> TITLE </h1>
-        
-    </div>
-</div>
+  <div id="sidenav" class="overlay">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <div class="overlay-content">
+    <h3>Title:- </h3>
+    <h4 style="color : red"><div id="exp_title"></div></h4><hr>
+    <h3>Aim of the Experiment:- </h3>
+    <h4 style="color : red"><div id="exp_aim"></div></h4><hr>
+    <h3> Author:-</h3>
+    <h4 style="color : red"><div id="exp_author"></div></h4><hr>
+    <h3>Class:-</h3>
+    <h4 style="color : red"><div id="exp_class"></div></h4><hr>
+    <h3>Maximum mark:-</h3>
+    <h4 style="color : red"><div id="exp_marks"></div></h4><hr>
+    <h3> Instructions:-</h3>
+    <h4 style="color : yellow"><div id="exp_instruction"></div></h4><hr>
+ </div> 
   
  <script>
-    function openNav() {
-        document.getElementById("sidenav").style.width = "50%";
-    }
+function openNav() {
+    document.getElementById("sidenav").style.width = "50%";
+}
 
-    function closeNav() {
-        document.getElementById("sidenav").style.width = "0%";
-    }
+function closeNav() {
+    document.getElementById("sidenav").style.width = "0%";
+}
 </script>
+
 <script>
       var id;
       var volume = 0;
