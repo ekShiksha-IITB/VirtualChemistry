@@ -127,6 +127,9 @@ function pour(fi,se){
             });
         }
     }
+    else{
+        resetPosition(fi);
+    }
 }
 function pourF(fi,se,x){
     if(x==0)
@@ -738,3 +741,76 @@ function updateDisplay(i){
       }
     }
   }
+  function emptyScene(){
+    table_n=0;
+    objects=new Array(0);
+    for(var i=0;i<objectsM.length;i++){
+        scene.remove(objectsM[i]);
+    }
+    for(var i=0;i<tables.length;i++){
+        scene.remove(tables[i].Mesh);
+        scene.remove(basins[i].Mesh);
+        scene.remove(shelves[i].Mesh);
+    }
+    tables=new Array(0);
+    basins=new Array(0);
+    shelves=new Array(0);
+    objectsM=new Array(0);
+    objectsC=new Array(0);
+    pressobjects=new Array(0);
+    pressmap=new Array(0);
+    dragControls.dispose();
+    dragControls =new THREE.DragControls(objectsM,camera,renderer.domElement);
+    dragControls.addEventListener('dragstart',function (event){
+            cursz=journal.length;
+            isclick=1;
+            drag=1;
+            intersects = _raycaster.intersectObjects( pressobjects ); 
+            if (intersects.length>0) {
+              for(var i=0;i<pressobjects.length;i++){
+                if(pressobjects[i]==intersects[0].object){
+                  if(typeof objects[pressmap[i]].canBePressed == 'function'){
+                    if(objects[pressmap[i]].canBePressed()){
+                      drag=0;
+                    }
+                  }
+                  else{
+                    drag=0;
+                  }
+                    break;                  
+                }
+              }
+            }
+            controls.enabled=false;
+            for(var i=0;i<objects.length;i++){
+                if(_selected==objectsM[i]){
+                    pobject=i;
+                    prevcor=new THREE.Vector3(objects[i].x(),objects[i].y(),objects[i].z());
+                    prevmaster=objects[i].Master;
+                    if(prevmaster!=null){
+                      prevslot=objects[i].Masterslot;
+                      if(drag)
+                        Dethrone(i,prevmaster,prevslot);
+                    }
+                    break;
+                }
+            }
+            updateDisplay(pobject);
+            if(drag==1){
+              if(objects[pobject].Master==null && typeof objects[pobject].pick =='function'){
+                objects[pobject].pick(pobject);
+              }
+            }
+        });
+        dragControls.addEventListener('dragend',function (event){
+            controls.enabled=true;
+            if(drag==1){
+              dobject=pobject;
+            }
+            objects[pobject].restrict(-table_height+objects[pobject].half_width,-table_height+basin_width*table_n+table_height*2*table_n-objects[pobject].half_width,0,table_height*2,0,0);
+                  updatePos(objects[pobject]);
+            pobject=null
+            flagtask=1;
+        });
+    renderer.render(scene, camera);
+}

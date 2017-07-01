@@ -1,6 +1,5 @@
 var cdata=[];
 var rdata=[];
-cdata['Ferric Chloride']=new Chemical('Ferric Chloride','light brown',-1,0,'FeCl3',0.16,2.9,162,'brown',undefined);
 class Reaction{
     constructor(pr,ba,cat){
         this.Products=pr;  
@@ -30,7 +29,7 @@ function Transfer(a,b,vol){
                         flag=1;
                     var t;
                     a.Chemicals[i].Moles-=l;
-                    b.Chemicals[i].Moles-=l*x.Balance[1]/x.Balance[0];
+                    b.Chemicals[j].Moles-=l*x.Balance[1]/x.Balance[0];
                     for(var k=0;k<x.Products.length;k++){
                         t=copyChemical(cdata[x.Products[k]]);
                         if(t.Col_in_water==undefined){
