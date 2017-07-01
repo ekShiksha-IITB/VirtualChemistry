@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 /**
  *
- * @author dell
+ * @author sid
  */
 public class ExperimentDetails {
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
@@ -30,7 +30,6 @@ public class ExperimentDetails {
                 s += rs.getString("Expid");
                 s += ",";
             }
-            //s=s.substring(0, s.length()-1);
             rs.close();
             return s;
         } catch (SQLException se) {
