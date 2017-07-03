@@ -320,10 +320,12 @@ $("#selectbox2").change(function () {
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
 
         </button>
-        <p><h4 class="modal-title">Provide details</h4></p>
+        <p><h4 class="modal-title">Provide details of Chemical to be added</h4></p>
         <form action="#" method="$POST">
-    <input type="text" class="form-control" id="ChemV" placeholder="Enter volume in mL">
+            <center><select id="ChemForm"><option>Liquid Form</option><option>Pure Solid</option></select></center><br>
+    <input type="text" class="form-control" id="ChemV" placeholder="Enter volume in mL (less than 250ml) ">
     <input type="text" class="form-control" id="ChemC" placeholder="Enter Concentration" style="margin-top:20px"><br>
+    <input type="text" id="Chemtxt" class="form-control" placeholder="Attach a label (optional)"><br>;
     <button type="button" id="ChemSub" data-dismiss="modal" class="btn btn-primary">Submit</button>
     
     </form>
@@ -777,27 +779,42 @@ $("#selectbox2").change(function () {
 //                }();
         });
 //instantiate(new Bottle(250,new Mixture(new Chemical(Water,blue,undefined,1,H2O,4,1,18,blue,undefined)),new THREE.Vector3(0,34.16666666666667,-20))
+        $("#ChemForm").change(function(){
+//            alert('Selected value: ' + $(this).val());
+        });
+        
         document.getElementById('ChemSub').addEventListener('click',function(){
                     console.log("FUN");
                     if(document.getElementById('ChemV').value!="" && document.getElementById('ChemC').value!=""){
                         console.log(document.getElementById('ChemV').value + "22" + document.getElementById('ChemC').value );
                         var t = document.getElementById('selectbox2');
                         var chemName = t.options[t.selectedIndex].text;
+                        var t1 = document.getElementById('ChemForm');
+                        var Cform = t1.options[t1.selectedIndex].text;
+                        var labelC = document.getElementById('Chemtxt').value;
                         console.log(chemName);
                         var mystring = "";
                         //mystring += "instantiate(new Bottle (" + 250 + "," + myMix(document.getElementById('ChemV').value,document.getElementById('ChemC').value,chemName) + "),nextShelfSlot()" + ")";
                         //instantiate(new Bottle(250,base),nextShelfSlot());
-                        mystring += "instantiate(new Bottle(250,";
-                        var str=myMix(document.getElementById('ChemV').value,document.getElementById('ChemC').value,chemName) + "),nextShelfSlot())";
+                        if(Cform=="Pure Solid")
+                            mystring += "instantiate(new WatchGlass(30,";
+                        else
+                            mystring += "instantiate(new Bottle(250,";
+                        var str=myMix(document.getElementById('ChemV').value,document.getElementById('ChemC').value,chemName,Cform) + "),nextShelfSlot()";
+                        if(Chemtxt.value!=null && Chemtxt.value!=undefined && Chemtxt.value.length>0){
+                            str+=','+'\''+labelC+'\'';
+                        }
+                        str+= ')';
                         mystring+=str;
                         console.log(mystring);
                         eval(mystring);
                         alert("Chemical Added Successfully");
                         document.getElementById('ChemV').value = "";
                         document.getElementById('ChemC').value = "";
+                        document.getElementById('Chemtxt').value = "";
                     }
         });
-        function myMix(vol,concn,name){
+        function myMix(vol,concn,name,fr){
             //new Mixture("H2O","blue",80,[],[],[],[],[])
             //new Mixture([new Chemical('Water','blue',0,1,'H2O',4,1,18,'blue')])
             var temArr;
@@ -835,11 +852,14 @@ $("#selectbox2").change(function () {
                                 s+= temArr[5];
                                 s+=',';
                                 s+= "\'" + temArr[6];
-                                s+= '\'),';
+                                s+= '\')';
                                 
                                 var mol = (( vol - (concn*vol)/1000 * parseFloat(temArr[5]) / parseFloat(temArr[4]) ))/18;
                                 var molS = mol.toString();
-                                s+="new Chemical('Water','transparent',0,1,'H2O'," + molS + ",1,18,'transparent')" + '])';
+                                if(fr == "Pure Solid")
+                                    s+= '])';
+                                else
+                                    s+=",new Chemical('Water','transparent',0,1,'H2O'," + molS + ",1,18,'transparent')" + '])';
                                 console.log(molS);
                                 console.log(molS/55500);
                                 //console.log(s);
