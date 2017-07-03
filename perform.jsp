@@ -325,6 +325,7 @@ $("#selectbox2").change(function () {
             <center><select id="ChemForm"><option>Liquid Form</option><option>Pure Solid</option></select></center><br>
     <input type="text" class="form-control" id="ChemV" placeholder="Enter volume in mL (less than 250ml) ">
     <input type="text" class="form-control" id="ChemC" placeholder="Enter Concentration" style="margin-top:20px"><br>
+    <input type="text" class="form-control" id="Chemgm" placeholder="Enter weight in gm (less than 30ml)" style="margin-top:20px"><br>
     <input type="text" id="Chemtxt" class="form-control" placeholder="Attach a label (optional)"><br>;
     <button type="button" id="ChemSub" data-dismiss="modal" class="btn btn-primary">Submit</button>
     
@@ -779,13 +780,25 @@ $("#selectbox2").change(function () {
 //                }();
         });
 //instantiate(new Bottle(250,new Mixture(new Chemical(Water,blue,undefined,1,H2O,4,1,18,blue,undefined)),new THREE.Vector3(0,34.16666666666667,-20))
+        document.getElementById('Chemgm').style.display = 'none';
         $("#ChemForm").change(function(){
+            if($(this).val() == "Pure Solid"){
+                document.getElementById('ChemV').style.display = 'none';
+                document.getElementById('ChemC').style.display = 'none';
+                document.getElementById('Chemgm').style.display = 'block';
+            }
+            else if ($(this).val() == "Liquid Form"){
+                document.getElementById('ChemV').style.display = 'block';
+                document.getElementById('ChemC').style.display = 'block';
+                document.getElementById('Chemgm').style.display = 'none';
+            }
+
 //            alert('Selected value: ' + $(this).val());
         });
         
         document.getElementById('ChemSub').addEventListener('click',function(){
                     console.log("FUN");
-                    if(document.getElementById('ChemV').value!="" && document.getElementById('ChemC').value!=""){
+                    if( (document.getElementById('ChemV').value!="" && document.getElementById('ChemC').value!="") || (document.getElementById('Chemgm').value!="") ){
                         console.log(document.getElementById('ChemV').value + "22" + document.getElementById('ChemC').value );
                         var t = document.getElementById('selectbox2');
                         var chemName = t.options[t.selectedIndex].text;
@@ -796,11 +809,29 @@ $("#selectbox2").change(function () {
                         var mystring = "";
                         //mystring += "instantiate(new Bottle (" + 250 + "," + myMix(document.getElementById('ChemV').value,document.getElementById('ChemC').value,chemName) + "),nextShelfSlot()" + ")";
                         //instantiate(new Bottle(250,base),nextShelfSlot());
-                        if(Cform=="Pure Solid")
+                        if(Cform=="Pure Solid"){
+                            if(document.getElementById('Chemgm').value > 30){
+                                alert("weight cannot exceed 30gm");
+                                document.getElementById('ChemV').value = "";
+                                document.getElementById('ChemC').value = "";
+                                document.getElementById('Chemtxt').value = "";
+                                document.getElementById('Chemgm').value = "";
+                                return;
+                            }
                             mystring += "instantiate(new WatchGlass(30,";
-                        else
+                        }
+                        else{
+                            if(document.getElementById('ChemV').value > 250){
+                                alert("volume cannot exceed 250ml");
+                                document.getElementById('ChemV').value = "";
+                                document.getElementById('ChemC').value = "";
+                                document.getElementById('Chemtxt').value = "";
+                                document.getElementById('Chemgm').value = "";
+                                return;
+                            }
                             mystring += "instantiate(new Bottle(250,";
-                        var str=myMix(document.getElementById('ChemV').value,document.getElementById('ChemC').value,chemName,Cform) + "),nextShelfSlot()";
+                        }
+                        var str=myMix(document.getElementById('ChemV').value,document.getElementById('ChemC').value,chemName,Cform,document.getElementById('Chemgm').value) + "),nextShelfSlot()";
                         if(Chemtxt.value!=null && Chemtxt.value!=undefined && Chemtxt.value.length>0){
                             str+=','+'\''+labelC+'\'';
                         }
@@ -812,9 +843,10 @@ $("#selectbox2").change(function () {
                         document.getElementById('ChemV').value = "";
                         document.getElementById('ChemC').value = "";
                         document.getElementById('Chemtxt').value = "";
+                        document.getElementById('Chemgm').value = "";
                     }
         });
-        function myMix(vol,concn,name,fr){
+        function myMix(vol,concn,name,fr,mas){
             //new Mixture("H2O","blue",80,[],[],[],[],[])
             //new Mixture([new Chemical('Water','blue',0,1,'H2O',4,1,18,'blue')])
             var temArr;
@@ -845,7 +877,10 @@ $("#selectbox2").change(function () {
                                 s+=',';
                                 s+= "\'" + temArr[3] + "\'" ;
                                 s+=',';
-                                s+= (concn*vol)/1000; 
+                                if(fr == "Pure Solid")
+                                    s+= mas/parseFloat(temArr[5]);
+                                else
+                                    s+= (concn*vol)/1000;
                                 s+=',';
                                 s+= temArr[4];
                                 s+=',';

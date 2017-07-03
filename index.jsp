@@ -638,7 +638,7 @@ The aim is to illustrate the concepts of Chemistry Lab Experiments of class 11th
                        console.log("Thats the fucking shit");
                        console.log("=======================================================================");
                         EdataE = response.split(",");
-                        displayE = "<tr><th>Sr.No.</th><th>Experiment Name</th><th>UserName Name</th><th>Actions</th></tr>";
+                        displayE = "<tr><th>Sr.No.</th><th>Experiment Name</th><th>UserName</th><th>Actions</th></tr>";
                         for (var i = 0;i<EdataE.length-1;i+=4){
                             displayE += "<tr>";
                             displayE += "<td>" + num + "</td>";num++;
